@@ -5,26 +5,35 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import makeStyles from './md-style';
+import useMaterialStyles from './md-style';
+import { useSelector, useDispatch } from 'react-redux';
+import { makeStyles } from '@material-ui/core/styles';
+import NavbarAvatar from '../NavbarAvatar';
+
 
 export default props => {
-  const materialStyles = makeStyles();
+  const materialStyles = useMaterialStyles();
+  const { authUser } = useSelector(state => state.authState);
+
   return (
     <AppBar position="static">
       <Toolbar>
-        <IconButton
-          className={materialStyles.menuButton}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-          onClick={() => props.setDrawerOpen(true)}
-        >
-          <MenuIcon />
-        </IconButton>
+        {authUser && (
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={() => props.setDrawerOpen(true)}
+          >
+            <MenuIcon className={materialStyles.menuIcon} />
+          </IconButton>
+        )}
         <Typography variant="h6" className={materialStyles.title}>
           Favours App
         </Typography>
-        <Button color="inherit">Login</Button>
+        {authUser && (
+          <NavbarAvatar authUser={authUser} />
+        )}
       </Toolbar>
     </AppBar>
   );

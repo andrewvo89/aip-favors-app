@@ -17,7 +17,7 @@ export default props => {
         drawerOpen={drawerOpen}
         setDrawerOpen={setDrawerOpen}
       />
-      <Container>
+      <Container className={materialStyles.container}>
         {props.children}
       </Container>
     </div>
