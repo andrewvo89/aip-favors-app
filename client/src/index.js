@@ -4,22 +4,16 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import * as serviceWorker from './serviceWorker';
-import { Provider } from 'react-redux';
-import { applyMiddleware, combineReducers, createStore } from 'redux';
-import ReduxThunk from 'redux-thunk';
-import authReducer from './store/auth-reducer';
-
-const rootReducer = combineReducers({
-  authState: authReducer
-});
-
-const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
+import ReduxProvder from './store/init';
+import ThemeProvider from './global/theme';
 
 ReactDOM.render(
   <BrowserRouter>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <ReduxProvder>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </ReduxProvder>
   </BrowserRouter>,
   document.getElementById('root')
 );
