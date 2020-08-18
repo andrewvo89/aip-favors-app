@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import ReduxThunk from 'redux-thunk';
-import authReducer from './auth-reducer';
+import authReducer from './auth';
 
 const rootReducer = combineReducers({
   authState: authReducer

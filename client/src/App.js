@@ -5,7 +5,8 @@ import './App.css';
 import AppContainer from './components/AppContainer';
 import Login from './pages/Login';
 import { useSelector, useDispatch } from 'react-redux';
-import * as authActions from './store/auth-actions';
+import * as authActions from './controllers/auth';
+import Home from './pages/Home';
 
 function App() {
   const [authLoading, setAuthLoading] = useState(true);
@@ -13,9 +14,12 @@ function App() {
   const { authUser } = useSelector(state => state.authState);
 
   useEffect(() => {
-    // dispatchAuth(authActions.getAuthState());
-    setAuthLoading(false);
-  }, []);
+    const verifyAuth = async () => {
+      await dispatchAuth(authActions.verifyAuth());
+      setAuthLoading(false);
+    };
+    verifyAuth();
+  }, [dispatchAuth]);
 
   let children = <CircularProgress />;
 
@@ -30,7 +34,7 @@ function App() {
     if (authUser) {
       children = (
         <Switch>
-          <Route path="/home" component={Login} />
+          <Route path="/home" component={Home} />
           <Redirect to="/home" />
         </Switch>
       );
