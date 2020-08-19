@@ -19,6 +19,11 @@ module.exports.setCookies = (res, accessToken, refreshToken) => {
   });
 }
 
+module.exports.clearCookies = res => {
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken');
+}
+
 const tokenGenerator = (payload, secret, expiry) => {
   return jwt.sign(payload, secret, {
     algorithm: 'HS256',

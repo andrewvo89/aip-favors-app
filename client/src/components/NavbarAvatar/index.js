@@ -1,31 +1,32 @@
-import React, { Fragment, useState, useRef } from 'react'
-import { Avatar, Menu, MenuItem, ClickAwayListener } from '@material-ui/core/';
-import useMaterialStyles from './md-style';
+import React, { Fragment, useState } from 'react'
+import { Menu, MenuItem } from '@material-ui/core/';
+import { useDispatch } from 'react-redux';
+import * as authActions from '../../controllers/auth';
+import { StyledAvatar } from './styled-components';
 
 export default props => {
-  const anchorRef = useRef();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [open, setOpen] = useState(false);
-  const materialStyles = useMaterialStyles();
+  const authDispatch = useDispatch();
+  const [anchorElement, setAnchorElement] = useState(null);
 
   const menuCloseHandler = () => {
-    setOpen(false);
-  }
+    setAnchorElement(null);
+  };
+
+  const logoutHandler = async () => {
+    authDispatch(authActions.logout());
+  };
+
 
   return (
     <Fragment>
-      <Avatar
-        ref={anchorRef}
-        className={materialStyles.avatarLarge}
-        onClick={event => setAnchorEl(event.target)}
-      >
+      <StyledAvatar onClick={event => setAnchorElement(event.target)} >
         {`${props.authUser.firstName.substring(0, 1)}${props.authUser.lastName.substring(0, 1)}`}
-      </Avatar>
+      </StyledAvatar>
       <Menu
         id="simple-menu"
-        anchorEl={anchorEl}
+        anchorEl={anchorElement}
         keepMounted
-        open={!!anchorEl}
+        open={!!anchorElement}
         onClose={menuCloseHandler}
         anchorOrigin={{
           vertical: 'bottom',
@@ -39,7 +40,7 @@ export default props => {
       >
         <MenuItem onClick={menuCloseHandler}>Profile</MenuItem>
         <MenuItem onClick={menuCloseHandler}>My account</MenuItem>
-        <MenuItem onClick={menuCloseHandler}>Logout</MenuItem>
+        <MenuItem onClick={logoutHandler}>Logout</MenuItem>
       </Menu>
     </Fragment>
   );

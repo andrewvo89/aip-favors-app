@@ -1,21 +1,21 @@
 //auth Reducer
-import { AUTH_STATE_CHANGED, LOGOUT } from "../utils/constants";
+import { SET_ERROR, CLEAR_ERROR } from "../utils/constants";
 
 const initialState = {
-  authUser: null
+  error: null
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case AUTH_STATE_CHANGED:
+    case SET_ERROR:
       return {
         ...state,
-        authUser: action.authUser
+        error: action.error
       }
-    case LOGOUT:
+    case CLEAR_ERROR:
       return {
         ...state,
-        authUser: null
+        error: null
       }
     default:
       return state;

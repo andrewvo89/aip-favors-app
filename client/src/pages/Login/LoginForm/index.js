@@ -1,12 +1,12 @@
 import React, { useEffect, useState, Fragment } from 'react';
-import { IconButton, InputAdornment, Input, FormControl, InputLabel, CircularProgress } from '@material-ui/core';
+import { IconButton, InputAdornment, FormControl, InputLabel, CircularProgress } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { Formik } from 'formik';
-import { StyledCardContent, StyledTitle, StyledCardActions, StyledButton, StyledLink } from './styled-components';
+import { StyledCardContent, StyledTitle, StyledCardActions, StyledButton } from './styled-components';
+import { StyledInput } from '../../../utils/styled-components';
 import * as yup from 'yup';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import * as authActions from '../../../controllers/auth';
-import axios from '../../../utils/axios';
 
 export default props => {
   const dispatchAuth = useDispatch();
@@ -31,17 +31,13 @@ export default props => {
   });
 
   const submitHandler = async (values, actions) => {
-    try {
-      setLoading(true);
-      await (dispatchAuth(authActions.login({
-        email: values.email,
-        password: values.password
-      })));
-    } catch (error) {
-      console.log(error.response);
-      console.log(Object.keys(error.response));
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    const result = await dispatchAuth(authActions.login({
+      email: values.email,
+      password: values.password
+    }));
+    if (!result) {//If login failed, set loading to false
+      setLoading(false);//If login passed, cannot perform this action on unmounted component
     }
   };
 
@@ -62,7 +58,7 @@ export default props => {
               <StyledTitle variant="h5">Login</StyledTitle>
               <FormControl>
                 <InputLabel>Email</InputLabel>
-                <Input
+                <StyledInput
                   type="email"
                   value={values.email}
                   onChange={handleChange('email')}
@@ -73,7 +69,7 @@ export default props => {
               </FormControl>
               <FormControl>
                 <InputLabel>Password</InputLabel>
-                <Input
+                <StyledInput
                   type={showPassword ? "text" : "password"}
                   value={values.password}
                   onChange={handleChange('password')}
@@ -106,19 +102,6 @@ export default props => {
                     color="primary"
                     onClick={() => props.setMode(props.modes.SIGNUP)}
                   >Signup</StyledButton>
-                  <StyledLink
-                    onClick={async () => {
-                      // props.setMode(props.modes.FORGOT)
-                      try {
-                        const result = await axios.post('/cookies', null, {
-                          withCredentials: true
-                        });
-                        console.log(result);
-                      } catch (error) {
-                        console.log(error.response);
-                      }
-                    }}
-                  >Forgot Password?</StyledLink>
                 </Fragment>
               )}
             </StyledCardActions>

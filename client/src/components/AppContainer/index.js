@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
-import Container from '@material-ui/core/Container';
-import useMaterialStyles from './md-style';
+import React, { Fragment, useState } from 'react';
 import Navbar from '../Navbar/index';
 import SideDrawer from '../SideDrawer/index';
+import { StyledContainer } from './styled-components';
 
 export default props => {
-  const materialStyles = useMaterialStyles();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <div className={materialStyles.root}>
+    <Fragment>
       <Navbar
         setDrawerOpen={setDrawerOpen}
       />
@@ -17,9 +15,9 @@ export default props => {
         drawerOpen={drawerOpen}
         setDrawerOpen={setDrawerOpen}
       />
-      <Container className={materialStyles.container}>
+      <StyledContainer>
         {props.children}
-      </Container>
-    </div>
+      </StyledContainer>
+    </Fragment>
   );
 }

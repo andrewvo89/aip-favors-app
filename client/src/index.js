@@ -4,14 +4,17 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import * as serviceWorker from './serviceWorker';
-import ReduxProvder from './store/init';
-import ThemeProvider from './global/theme';
+import ReduxProvder from './utils/redux';
+import ThemeProvider from './utils/theme';
+import ErrorProvider from './utils/error-handler';
 
 ReactDOM.render(
   <BrowserRouter>
     <ReduxProvder>
       <ThemeProvider>
-        <App />
+        <ErrorProvider>
+          <App />
+        </ErrorProvider>
       </ThemeProvider>
     </ReduxProvder>
   </BrowserRouter>,

@@ -1,6 +1,6 @@
 import CircularProgress from '@material-ui/core/CircularProgress';
-import React, { Fragment, useEffect, useState } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import './App.css';
 import AppContainer from './components/AppContainer';
 import Login from './pages/Login';
@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import * as authActions from './controllers/auth';
 import Home from './pages/Home';
 
-function App() {
+export default withRouter(props => {
   const [authLoading, setAuthLoading] = useState(true);
   const dispatchAuth = useDispatch();
   const { authUser } = useSelector(state => state.authState);
@@ -23,6 +23,12 @@ function App() {
 
   let children = <CircularProgress />;
 
+  useEffect(() => {
+    if (authUser) {//Once user logins, adjust URL to root
+      props.history.push('/');
+    }
+  }, [authUser, props.history])
+
   if (!authLoading) {
     children = (
       <Switch>
@@ -34,8 +40,8 @@ function App() {
     if (authUser) {
       children = (
         <Switch>
-          <Route path="/home" component={Home} />
-          <Redirect to="/home" />
+          <Route path="/" component={Home} />
+          <Redirect to="/" />
         </Switch>
       );
     }
@@ -47,6 +53,4 @@ function App() {
       {children}
     </AppContainer>
   );
-}
-
-export default App;
+});

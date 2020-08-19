@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 const { REFRESH_TOKEN_EXPIRY } = process.env;
 
 const tokenSchema = new Schema({
+  userId: {
+    type: String,
+    required: true
+  },
   token: {
     type: String,
     required: true

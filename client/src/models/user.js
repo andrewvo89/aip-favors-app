@@ -1,6 +1,8 @@
 export default class User {
-  constructor({ userId, token }) {
+  constructor(userId, email, firstName, lastName) {
     this.userId = userId;
-    this.token = token;
+    this.email = email;
+    this.firstName = firstName;
+    this.lastName = lastName;
   }
 }

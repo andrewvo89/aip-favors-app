@@ -1,5 +1,6 @@
-module.exports.getError = (code, message) => {
+module.exports.getError = (status, message, feedback) => {
   const error = new Error(message);
-  error.code = code;
+  error.status = status;
+  error.feedback = feedback;
   return error;
 };

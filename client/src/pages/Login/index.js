@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import LoginForm from './LoginForm';
 import { StyledCard } from './styled-components';
 import SignupForm from './SignupForm';
-const modes = { LOGIN: 'LOGIN', SIGNUP: 'SIGNUP', FORGOT: 'FORGOT' };
 
 export default props => {
+  const modes = { LOGIN: 'LOGIN', SIGNUP: 'SIGNUP' };
   const [mode, setMode] = useState(modes.LOGIN);
 
   let form;
@@ -20,14 +20,6 @@ export default props => {
     case modes.SIGNUP:
       form = (
         <SignupForm
-          modes={modes}
-          setMode={setMode}
-        />
-      );
-      break;
-    case modes.FORGOT:
-      form = (
-        <LoginForm
           modes={modes}
           setMode={setMode}
         />

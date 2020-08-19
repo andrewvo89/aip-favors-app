@@ -1,13 +1,16 @@
 
 import { Formik } from 'formik';
 import React, { Fragment, useEffect, useState } from 'react';
-import { IconButton, InputAdornment, Link, Input, FormControl, InputLabel, Grid, CircularProgress } from '@material-ui/core';
-import { Visibility, VisibilityOff } from '@material-ui/icons';
+import { IconButton, InputAdornment, FormControl, InputLabel, Grid, CircularProgress } from '@material-ui/core';
 import { StyledCardContent, StyledTitle, StyledCardActions, StyledButton, StyledFormControl } from './styled-components';
+import { StyledInput } from '../../../utils/styled-components';
+import { Visibility, VisibilityOff } from '@material-ui/icons';
 import * as yup from 'yup';
-import axios from '../../../utils/axios';
+import { useDispatch } from 'react-redux';
+import * as authActions from '../../../controllers/auth';
 
 export default props => {
+  const dispatchAuth = useDispatch();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -46,23 +49,17 @@ export default props => {
   });
 
   const submitHandler = async (values, actions) => {
-    try {
-      setLoading(true);
-      const result = await axios.put('/auth/signup', {
-        email: values.email.trim().toLowerCase(),
-        password: values.password.trim(),
-        firstName: values.firstName.trim(),
-        lastName: values.lastName.trim()
-      });
-      console.log(result);
-    } catch (error) {
-      console.log(error.response);
-      console.log(Object.keys(error.response));
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    const result = await dispatchAuth(authActions.signup({
+      email: values.email.trim().toLowerCase(),
+      password: values.password.trim(),
+      firstName: values.firstName.trim(),
+      lastName: values.lastName.trim()
+    }));
+    if (!result) {//If login failed, set loading to false
+      setLoading(false);//If login passed, cannot perform this action on unmounted component
     }
   }
-
 
   return (
     <Formik
@@ -83,7 +80,7 @@ export default props => {
                 <Grid item xs={6}>
                   <StyledFormControl>
                     <InputLabel>First name</InputLabel>
-                    <Input
+                    <StyledInput
                       type="text"
                       value={values.firstName}
                       onChange={handleChange('firstName')}
@@ -96,7 +93,7 @@ export default props => {
                 <Grid item xs={6}>
                   <StyledFormControl>
                     <InputLabel>Last name</InputLabel>
-                    <Input
+                    <StyledInput
                       type="text"
                       value={values.lastName}
                       onChange={handleChange('lastName')}
@@ -108,7 +105,7 @@ export default props => {
               </Grid>
               <FormControl>
                 <InputLabel>Email</InputLabel>
-                <Input
+                <StyledInput
                   type="email"
                   value={values.email}
                   onChange={handleChange('email')}
@@ -118,7 +115,7 @@ export default props => {
               </FormControl>
               <FormControl>
                 <InputLabel>Password</InputLabel>
-                <Input
+                <StyledInput
                   type={showPassword ? "text" : "password"}
                   value={values.password}
                   onChange={handleChange('password')}
@@ -138,7 +135,7 @@ export default props => {
               </FormControl>
               <FormControl>
                 <InputLabel>Confirm password</InputLabel>
-                <Input
+                <StyledInput
                   type={showConfirmPassword ? "text" : "password"}
                   value={values.passwordConfirm}
                   onChange={handleChange('passwordConfirm')}
@@ -171,9 +168,6 @@ export default props => {
                     color="primary"
                     onClick={() => props.setMode(props.modes.LOGIN)}
                   >Cancel</StyledButton>
-                  <Link
-                    onClick={() => props.setMode(props.modes.FORGOT)}
-                  >Forgot Password?</Link>
                 </Fragment>
               )}
             </StyledCardActions>

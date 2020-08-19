@@ -1,121 +1,149 @@
 const { validationResult } = require('express-validator')
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Token = require('../models/token');
-const { getTokens, setCookies } = require('../utils/token');
-const mongoose = require('mongoose');
-
+const { getTokens, setCookies, clearCookies } = require('../utils/token');
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env;
-const jwt = require('jsonwebtoken');
+const { DIALOG, SILENT, JSON_WEB_TOKEN_ERROR, TOKEN_EXPIRED_ERROR } = require('../utils/constants');
 const { getError } = require('../utils/error');
 
 module.exports.verify = async (req, res, next) => {
-  let accessTokenExpired = false;
-  const accessToken = req.cookies.accessToken;
-  if (accessToken) {
-    try {
-      const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);//If this line passes without error, user is authenticated
-      const user = await User.findOne({ _id: new mongoose.Types.ObjectId(payload.userId) });
-      const authUser = {
-        _id: user._id.toString(),
-        firstName: user.firstName,
-        lastName: user.lastName
-      }
-      console.log('made it to the end of access token', authUser);
-      return res.status(200).json({ authUser });
-    } catch (error) {//Access token has expired, check the refresh token
-      if (error.name === 'TokenExpiredError') {
-        accessTokenExpired = true;
-      }
+  try {
+    let accessTokenError;
+    let refreshTokenError;
+    let payload;
+    const accessToken = req.cookies.accessToken;//Extract Access Token from the request body
+    if (!accessToken) {//If it is empty, user has no Access Token
+      throw getError(401, 'Access token not found', SILENT);
     }
-    if (accessTokenExpired) {
-      const refreshToken = req.cookies.refreshToken;
-      if (refreshToken) {
-        const dbTokenExists = await Token.exists({ token: refreshToken });
-        if (dbTokenExists) {
-          try {
-            const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-            const newTokens = getTokens({
-              userId: payload.userId,
-              email: payload.email
-            });
-            await Token.deleteOne({ token: refreshToken });
-            const dbToken = new Token({ token: newTokens.refreshToken });
-            await dbToken.save();
-            setCookies(res, newTokens.accessToken, newTokens.refreshToken);
-            const user = await User.findOne({ _id: new mongoose.Types.ObjectId(payload.userId) });
-            const authUser = {
-              _id: user._id.toString(),
-              firstName: user.firstName,
-              lastName: user.lastName
-            }
-            console.log('made it to the end of refresh token', authUser);
-            return res.status(200).json({ authUser });
-          } catch {
-            //Error validating refresh token, do nothing, go to error handler below
-          }
+    try {//Verify the Access Token against the Secret synchronously
+      payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
+    } catch (error) {//If verification fails, store the error in accessTokenError
+      accessTokenError = error;
+    }
+    if (accessTokenError) {
+      if (accessTokenError.name === JSON_WEB_TOKEN_ERROR) {//If jwt verification failed
+        throw getError(401, 'Access token not valid', SILENT);
+      } else if (accessTokenError.name === TOKEN_EXPIRED_ERROR) {//If verification was OK, however token is expired
+        const refreshToken = req.cookies.refreshToken;//Start process of analysing Refresh Token
+        const dbTokenExists = await Token.exists({ token: refreshToken });//Check against database to see is Refresh Token exists (could be blacklisted)
+        if (!dbTokenExists) {//If not available in database, it has been blacklisted or it is a fake refresh token
+          throw getError(401, 'Refresh token not valid', SILENT);
         }
+        try {//Verify the Refresh Token against the Secret synchronously
+          payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+        } catch (error) {//If verification fails, store the error in refreshTokenError
+          refreshTokenError = error;
+        }
+        if (refreshTokenError) {//If jwt verification failed
+          throw getError(401, 'Refresh token not valid', SILENT);
+        }
+        const newTokens = getTokens({//All verifications passed, user is OK to get a new Access Token and Refresh Token
+          userId: payload.userId,
+          email: payload.email
+        });
+        await Token.deleteOne({ token: refreshToken });//Remove the old-non expired Refresh Token from the database
+        const dbToken = new Token({
+          token: newTokens.refreshToken,
+          userId: payload.userId
+        });
+        await dbToken.save();//Save the new Refresh Token into the database to cross check in future checks
+        setCookies(res, newTokens.accessToken, newTokens.refreshToken);//Set the response cookies, so the client can get the new Tokens
       }
     }
+    const user = await User.findOne({ _id: new mongoose.Types.ObjectId(payload.userId) });//Retrieve the User from the database to send back
+    const authUser = {
+      userId: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName
+    }
+    res.status(200).json({ authUser });
+  } catch (error) {
+    next(error);
   }
-
-  next(getError(401, 'Not authenticated.'));
 }
-
 module.exports.signup = async (req, res, next) => {
   try {
     const validationErrors = validationResult(req);
-    // console.log(validationErrors);
-    if (!validationErrors.isEmpty()) {
-      const error = new Error('Validation failed.');
-      error.code = 422;
-      error.data = validationErrors.array();
-      console.log(error);
-      throw error;
+    if (!validationErrors.isEmpty()) {//Catches any errors detected through express-validator middlware
+      throw getError(422, 'Data validation failed', DIALOG);
     }
     const { email, firstName, lastName, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const userDoc = await User.exists({ email });
+    if (userDoc) {
+      throw getError(409, 'Email address already exists', DIALOG);
+    }
+    const hashedPassword = await bcrypt.hash(password, 12);//Convert user's plain text password to encrypted password
     const user = new User({
       email,
       password: hashedPassword,
       firstName,
       lastName
     });
-    const result = await user.save();
-    res.status(201).json({//201 because a resource was created
-      message: 'user created',
-      userId: result._id
-    });
+    await user.save();//Save new user into the database
+    res.status(201).send();
   } catch (error) {
     next(error);
   }
 };
 
-exports.login = async (req, res, next) => {
+module.exports.login = async (req, res, next) => {
   try {
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {//Catches any errors detected through express-validator middlware
+      throw getError(422, 'Data validation failed', DIALOG);
+    }
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      const error = new Error('A user with this email could not be found.');
-      error.code = 401;
-      throw error;
+    const user = await User.findOne({ email });//Check if email is in the database
+    if (!user) {//If not, throw an error, but be ambiguous with the error message
+      throw getError(401, 'Incorrect email or password', DIALOG);
     }
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      const error = new Error('Wrong password!');
-      error.code = 401;
-      throw error;
+    const passwordMatch = await bcrypt.compare(password, user.password);//Do a encryption password comparison to the one in the database
+    if (!passwordMatch) {//If not, throw an error, but be ambiguous with the error message
+      throw getError(401, 'Incorrect email or password', DIALOG);
     }
-    const payload = {
+    const payload = {//Prepare the Token payload
       email: user.email,
       userId: user._id.toString()
     };
     const { accessToken, refreshToken } = getTokens(payload);
-    const dbToken = new Token({ token: refreshToken });
+    const dbToken = new Token({//Create Token model object to enter into the database
+      token: refreshToken,//Refresh token stored in databse for later comparison
+      userId: payload.userId
+    });
     await dbToken.save();
-    setCookies(res, accessToken, refreshToken);
-    res.status(200).json({ userId: user._id.toString() });
+    setCookies(res, accessToken, refreshToken);//Set the response cookies to send back to the client
+    const authUser = {
+      userId: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName
+    }
+    res.status(202).json({ authUser });
+  }
+  catch (error) {
+    next(error);
+  }
+};
+
+exports.logout = async (req, res, next) => {
+  try {
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {//Catches any errors detected through express-validator middlware
+      throw getError(422, 'Data validation failed', SILENT);
+    }
+    const dbToken = await Token.findOne({
+      token: req.cookies.refreshToken,
+      userId: req.body.userId
+    });
+    if (dbToken) {//Remove the refresh token from the database
+      dbToken.deleteOne();
+    }
+    clearCookies(res);//Remove cookies from the client
+    res.status(205).send();
   }
   catch (error) {
     next(error);

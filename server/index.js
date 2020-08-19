@@ -11,6 +11,8 @@ dotenv.config();
 
 const authRoutes = require('./routes/auth');
 const verifyAuth = require('./middleware/verify-auth');
+const { SILENT } = require('./utils/constants');
+const errorHandler = require('./middleware/error-handler');
 
 const { DB_USER, DB_PASS, CLIENT_DOMAIN } = process.env;
 const MONGODB_URI = `mongodb+srv://${DB_USER}:${DB_PASS}@aip-favors-app.umokf.mongodb.net/production?retryWrites=true&w=majority`;
@@ -35,14 +37,7 @@ app.post('/cookies', verifyAuth);
 //Routes
 app.use('/auth', authRoutes);
 //catch all errors that get passed via next()
-app.use((error, req, res, next) => {
-  const code = error.code || 500;
-  res.status(code).json({
-    status: code,
-    message: error.message,
-    data: error.data
-  });
-});
+app.use(errorHandler);
 //Initialize the mongodb connection, then start listening on port 8080
 mongoose
   .connect(MONGODB_URI, {
