@@ -6,6 +6,10 @@ import SignupForm from './SignupForm';
 export default props => {
   const modes = { LOGIN: 'LOGIN', SIGNUP: 'SIGNUP' };
   const [mode, setMode] = useState(modes.LOGIN);
+  const [values, setValues] = useState({
+    username: '',
+    password: ''
+  })
 
   let form;
   switch (mode) {
@@ -14,6 +18,8 @@ export default props => {
         <LoginForm
           modes={modes}
           setMode={setMode}
+          values={values}
+          setValues={setValues}
         />
       );
       break;
@@ -22,6 +28,8 @@ export default props => {
         <SignupForm
           modes={modes}
           setMode={setMode}
+          values={values}
+          setValues={setValues}
         />
       );
       break;

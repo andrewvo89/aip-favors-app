@@ -12,10 +12,7 @@ export default props => {
   const dispatchAuth = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const initialValues = {
-    email: '',
-    password: '',
-  };
+  const initialValues = props.values;
 
   const validationSchema = yup.object().shape({
     email: yup
@@ -100,7 +97,10 @@ export default props => {
                   <StyledButton
                     variant="outlined"
                     color="primary"
-                    onClick={() => props.setMode(props.modes.SIGNUP)}
+                    onClick={() => {
+                      props.setValues(values);
+                      props.setMode(props.modes.SIGNUP);
+                    }}
                   >Signup</StyledButton>
                 </Fragment>
               )}

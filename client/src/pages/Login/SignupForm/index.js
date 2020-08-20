@@ -15,8 +15,8 @@ export default props => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const initialValues = {
-    email: '',
-    password: '',
+    email: props.values.email,
+    password: props.values.password,
     passwordConfirm: '',
     firstName: '',
     lastName: ''
@@ -166,7 +166,13 @@ export default props => {
                   <StyledButton
                     variant="outlined"
                     color="primary"
-                    onClick={() => props.setMode(props.modes.LOGIN)}
+                    onClick={() => {
+                      props.setValues({
+                        email: values.email,
+                        password: values.password
+                      });
+                      props.setMode(props.modes.LOGIN);
+                    }}
                   >Cancel</StyledButton>
                 </Fragment>
               )}
