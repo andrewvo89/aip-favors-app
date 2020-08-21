@@ -1,4 +1,4 @@
-import { AUTH_STATE_CHANGED, LOGOUT, SET_ERROR, NETWORK_ERROR } from "../utils/constants";
+import { AUTH_USER_CHANGED, LOGOUT, SET_ERROR, NETWORK_ERROR } from "../utils/constants";
 import axios from '../utils/axios';
 import User from "../models/user";
 import ErrorMessage from "../models/error-message";
@@ -16,7 +16,7 @@ export const verifyAuth = () => {
         result.data.authUser.lastName
       );
       dispatch({
-        type: AUTH_STATE_CHANGED,
+        type: AUTH_USER_CHANGED,
         authUser: authUser
       });
     } catch (error) {
@@ -54,7 +54,7 @@ export const signup = ({ email, password, passwordConfirm, firstName, lastName }
         result.data.authUser.lastName
       );
       dispatch({
-        type: AUTH_STATE_CHANGED,
+        type: AUTH_USER_CHANGED,
         authUser
       });
       return true;
@@ -90,7 +90,7 @@ export const login = ({ email, password }) => {
         result.data.authUser.lastName
       );
       dispatch({
-        type: AUTH_STATE_CHANGED,
+        type: AUTH_USER_CHANGED,
         authUser
       });
       return true;

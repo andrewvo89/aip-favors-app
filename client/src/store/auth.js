@@ -1,5 +1,5 @@
 //auth Reducer
-import { AUTH_STATE_CHANGED, LOGOUT } from "../utils/constants";
+import { AUTH_USER_CHANGED, LOGOUT } from "../utils/constants";
 
 const initialState = {
   authUser: null
@@ -7,7 +7,7 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case AUTH_STATE_CHANGED:
+    case AUTH_USER_CHANGED:
       return {
         ...state,
         authUser: action.authUser

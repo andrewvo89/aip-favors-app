@@ -24,7 +24,13 @@ module.exports.update = async (req, res, next) => {
     existingUser.lastName = lastName;
     existingUser.email = email;
     existingUser.save();//Save updated user into the database
-    res.status(204).send();
+    const authUser = {
+      userId: existingUser._id.toString(),
+      email: existingUser.email,
+      firstName: existingUser.firstName,
+      lastName: existingUser.lastName
+    }
+    res.status(201).json({ authUser });
   } catch (error) {
     next(error);
   }

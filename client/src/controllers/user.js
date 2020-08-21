@@ -1,4 +1,4 @@
-import { SET_ERROR, NETWORK_ERROR } from "../utils/constants";
+import { SET_ERROR, NETWORK_ERROR, AUTH_USER_CHANGED } from "../utils/constants";
 import axios from '../utils/axios';
 import ErrorMessage from "../models/error-message";
 import { get503Error } from "../utils/error-handler";
@@ -14,7 +14,17 @@ export const update = ({ email, firstName, lastName }) => {
         firstName,
         lastName
       );
-      await axios.patch('/user/update', updatedUser, config);
+      const result = await axios.patch('/user/update', updatedUser, config);
+      const authUser = new User(
+        result.data.authUser.userId,
+        result.data.authUser.email,
+        result.data.authUser.firstName,
+        result.data.authUser.lastName
+      );
+      dispatch({
+        type: AUTH_USER_CHANGED,
+        authUser
+      });
       return true;
     } catch (error) {
       let errorMessage;

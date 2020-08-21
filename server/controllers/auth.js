@@ -118,7 +118,7 @@ module.exports.login = async (req, res, next) => {
       firstName: user.firstName,
       lastName: user.lastName
     }
-    res.status(202).json({ authUser });
+    res.status(200).json({ authUser });
   }
   catch (error) {
     next(error);
