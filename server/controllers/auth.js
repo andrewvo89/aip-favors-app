@@ -14,7 +14,7 @@ module.exports.verify = async (req, res, next) => {
     let accessTokenError;
     let refreshTokenError;
     let payload;
-    const accessToken = req.cookies.accessToken;//Extract Access Token from the request body
+    const accessToken = req.cookies.token;//Extract Access Token from the request body
     if (!accessToken) {//If it is empty, user has no Access Token
       throw getError(401, 'Access token not found', SILENT);
     }
@@ -25,13 +25,14 @@ module.exports.verify = async (req, res, next) => {
     }
     if (accessTokenError) {
       if (accessTokenError.name === JSON_WEB_TOKEN_ERROR) {//If jwt verification failed
+        clearCookies();
         throw getError(401, 'Access token not valid', SILENT);
       } else if (accessTokenError.name === TOKEN_EXPIRED_ERROR) {//If verification was OK, however token is expired
-        const refreshToken = req.cookies.refreshToken;//Start process of analysing Refresh Token
-        const dbTokenExists = await Token.exists({ token: refreshToken });//Check against database to see is Refresh Token exists (could be blacklisted)
-        if (!dbTokenExists) {//If not available in database, it has been blacklisted or it is a fake refresh token
+        const dbToken = await Token.findOne({ accessToken });//Check against database to see is Refresh Token exists (could be blacklisted)
+        if (!dbToken) {//If not available in database, it has been blacklisted or it is a fake refresh token
           throw getError(401, 'Refresh token not valid', SILENT);
         }
+        const refreshToken = dbToken.refreshToken;
         try {//Verify the Refresh Token against the Secret synchronously
           payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
         } catch (error) {//If verification fails, store the error in refreshTokenError
@@ -45,12 +46,13 @@ module.exports.verify = async (req, res, next) => {
           email: payload.email
         });
         await Token.deleteOne({ token: refreshToken });//Remove the old-non expired Refresh Token from the database
-        const dbToken = new Token({
-          token: newTokens.refreshToken,
-          userId: payload.userId
+        const newDbToken = new Token({
+          userId: payload.userId,
+          accessToken: newTokens.accessToken,
+          refreshToken: newTokens.refreshToken
         });
-        await dbToken.save();//Save the new Refresh Token into the database to cross check in future checks
-        setCookies(res, newTokens.accessToken, newTokens.refreshToken);//Set the response cookies, so the client can get the new Tokens
+        await newDbToken.save();//Save the new Refresh Token into the database to cross check in future checks
+        setCookies(res, newTokens.accessToken);//Set the response cookies, so the client can get the new Tokens
       }
     }
     const user = await User.findOne({ _id: new mongoose.Types.ObjectId(payload.userId) });//Retrieve the User from the database to send back
@@ -105,19 +107,13 @@ module.exports.login = async (req, res, next) => {
     if (!passwordMatch) {//If not, throw an error, but be ambiguous with the error message
       throw getError(401, 'Email or password is invalid', DIALOG);
     }
-    const payload = {//Prepare the Token payload
-      email: user.email,
-      userId: user._id.toString()
-    };
-    const { accessToken, refreshToken } = getTokens(payload);
-    const dbToken = new Token({//Create Token model object to enter into the database
-      token: refreshToken,//Refresh token stored in databse for later comparison
-      userId: payload.userId
-    });
+    const userId = user._id.toString();
+    const { accessToken, refreshToken } = getTokens({ userId });
+    const dbToken = new Token({ accessToken, refreshToken, userId });//Create Token model object to enter into the database
     await dbToken.save();
-    setCookies(res, accessToken, refreshToken);//Set the response cookies to send back to the client
+    setCookies(res, accessToken);//Set the response cookies to send back to the client
     const authUser = {
-      userId: user._id.toString(),
+      userId,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName

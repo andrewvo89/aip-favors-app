@@ -11,7 +11,7 @@ module.exports = async (req, res, next) => {
     let accessTokenError;
     let refreshTokenError;
     let payload;
-    const accessToken = req.cookies.accessToken;//Extract Access Token from the request body
+    const accessToken = req.cookies.token;//Extract Access Token from the request body
     if (!accessToken) {//If it is empty, user has no Access Token
       throw getError(401, 'Access denied, login credentials are invalid', DIALOG);
     }
@@ -22,32 +22,33 @@ module.exports = async (req, res, next) => {
     }
     if (accessTokenError) {
       if (accessTokenError.name === JSON_WEB_TOKEN_ERROR) {//If jwt verification failed
-        throw getError(401, 'Access denied, login credentials are invalid', DIALOG);
+        throw getError(401, 'Access token not valid', DIALOG);
       } else if (accessTokenError.name === TOKEN_EXPIRED_ERROR) {//If verification was OK, however token is expired
-        const refreshToken = req.cookies.refreshToken;//Start process of analysing Refresh Token
-        const dbTokenExists = await Token.exists({ token: refreshToken });//Check against database to see is Refresh Token exists (could be blacklisted)
-        if (!dbTokenExists) {//If not available in database, it has been blacklisted or it is a fake refresh token
-          throw getError(401, 'Access denied, login credentials are invalid', DIALOG);
+        const dbToken = await Token.findOne({ accessToken });//Check against database to see is Refresh Token exists (could be blacklisted)
+        if (!dbToken) {//If not available in database, it has been blacklisted or it is a fake refresh token
+          throw getError(401, 'Refresh token not valid', DIALOG);
         }
+        const refreshToken = dbToken.refreshToken;
         try {//Verify the Refresh Token against the Secret synchronously
           payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
         } catch (error) {//If verification fails, store the error in refreshTokenError
           refreshTokenError = error;
         }
         if (refreshTokenError) {//If jwt verification failed
-          throw getError(401, 'Access denied, login credentials are invalid', DIALOG);
+          throw getError(401, 'Refresh token not valid', DIALOG);
         }
         const newTokens = getTokens({//All verifications passed, user is OK to get a new Access Token and Refresh Token
           userId: payload.userId,
           email: payload.email
         });
         await Token.deleteOne({ token: refreshToken });//Remove the old-non expired Refresh Token from the database
-        const dbToken = new Token({
-          token: newTokens.refreshToken,
-          userId: payload.userId
+        const newDbToken = new Token({
+          userId: payload.userId,
+          accessToken: newTokens.accessToken,
+          refreshToken: newTokens.refreshToken
         });
-        await dbToken.save();//Save the new Refresh Token into the database to cross check in future checks
-        setCookies(res, newTokens.accessToken, newTokens.refreshToken);//Set the response cookies, so the client can get the new Tokens
+        await newDbToken.save();//Save the new Refresh Token into the database to cross check in future checks
+        setCookies(res, newTokens.accessToken);//Set the response cookies, so the client can get the new Tokens
       }
     }
     next();//Will pass to next middleware once authentication has been verified

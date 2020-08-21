@@ -8,20 +8,15 @@ module.exports.getTokens = payload => {
   };
 }
 
-module.exports.setCookies = (res, accessToken, refreshToken) => {
-  res.cookie("accessToken", accessToken, {
-    secure: false, //Enabled true when changeing from development (http) to production (https)
-    httpOnly: true
-  });
-  res.cookie("refreshToken", refreshToken, {
+module.exports.setCookies = (res, accessToken) => {
+  res.cookie("token", accessToken, {
     secure: false, //Enabled true when changeing from development (http) to production (https)
     httpOnly: true
   });
 }
 
 module.exports.clearCookies = res => {
-  res.clearCookie('accessToken');
-  res.clearCookie('refreshToken');
+  res.clearCookie('token');
 }
 
 const tokenGenerator = (payload, secret, expiry) => {

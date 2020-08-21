@@ -7,7 +7,11 @@ const tokenSchema = new Schema({
     type: String,
     required: true
   },
-  token: {
+  accessToken: {
+    type: String,
+    required: true
+  },
+  refreshToken: {
     type: String,
     required: true
   },
