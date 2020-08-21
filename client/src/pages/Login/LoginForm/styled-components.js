@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { CardContent, Typography, CardActions, Button, Card } from '@material-ui/core';
+import { CardContent, CardActions, Button, Card, CardHeader } from '@material-ui/core';
 
 export const StyledCard = styled(Card)`
   min-width: 300px;
@@ -10,8 +10,12 @@ export const StyledCardContent = styled(CardContent)`
   flex-direction: column;
 `;
 
-export const StyledTitle = styled(Typography)`
+export const StyledCardHeader = styled(CardHeader)`
   text-align: center;
+  padding-bottom: 0;
+  & .MuiCardHeader-title {
+    font-size: xx-large
+  }
 `;
 
 export const StyledCardActions = styled(CardActions)`

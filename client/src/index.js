@@ -7,13 +7,16 @@ import * as serviceWorker from './serviceWorker';
 import ReduxProvder from './utils/redux';
 import ThemeProvider from './utils/theme';
 import ErrorProvider from './utils/error-handler';
+import MessageProvider from './utils/message-provider';
 
 ReactDOM.render(
   <BrowserRouter>
     <ReduxProvder>
       <ThemeProvider>
         <ErrorProvider>
-          <App />
+          <MessageProvider>
+            <App />
+          </MessageProvider>
         </ErrorProvider>
       </ThemeProvider>
     </ReduxProvder>

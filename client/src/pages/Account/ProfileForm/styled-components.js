@@ -1,6 +1,7 @@
 import Card from '@material-ui/core/Card';
 import styled from 'styled-components'
-import { CardContent, CardHeader, CardActions, Button } from '@material-ui/core';
+import { CardContent, CardHeader, CardActions, Button, Link } from '@material-ui/core';
+import colors from '../../../utils/colors';
 
 export const StyledCard = styled(Card)`
   min-width: 300px;
@@ -25,6 +26,15 @@ export const StyledCardActions = styled(CardActions)`
   & > :not(:first-child) {
     margin-left: 0
   }
+`;
+
+export const StyledLink = styled(Link)`
+  &:hover {
+    cursor: pointer;
+    text-decoration: none;
+    color: ${colors.primary.lighter};
+  }
+  margin-bottom: 10px;
 `;
 
 export const StyledButton = styled(Button)`

@@ -7,27 +7,28 @@ import Login from './pages/Login';
 import { useSelector, useDispatch } from 'react-redux';
 import * as authActions from './controllers/auth';
 import Home from './pages/Home';
+import Account from './pages/Account';
 
 export default withRouter(props => {
   const [authLoading, setAuthLoading] = useState(true);
-  const dispatchAuth = useDispatch();
+  const dispatch = useDispatch();
   const { authUser } = useSelector(state => state.authState);
 
   useEffect(() => {
     const verifyAuth = async () => {
-      await dispatchAuth(authActions.verifyAuth());
+      await dispatch(authActions.verifyAuth());
       setAuthLoading(false);
     };
     verifyAuth();
-  }, [dispatchAuth]);
+  }, [dispatch]);
 
   let children = <CircularProgress />;
 
   useEffect(() => {
-    if (authUser) {//Once user logins, adjust URL to root
-      props.history.push('/');
+    if (authUser && props.location.pathname === '/login') {
+      props.history.push('/');//Once user logins, adjust URL to root
     }
-  }, [authUser, props.history])
+  }, [authUser, props.history, props.location]);
 
   if (!authLoading) {
     children = (
@@ -40,13 +41,13 @@ export default withRouter(props => {
     if (authUser) {
       children = (
         <Switch>
+          <Route path="/account" component={Account} />
           <Route path="/" component={Home} />
-          <Redirect to="/" />
+          <Redirect from="/login" to="/" />
         </Switch>
       );
     }
   }
-
 
   return (
     <AppContainer>

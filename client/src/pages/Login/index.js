@@ -7,7 +7,7 @@ export default props => {
   const modes = { LOGIN: 'LOGIN', SIGNUP: 'SIGNUP' };
   const [mode, setMode] = useState(modes.LOGIN);
   const [values, setValues] = useState({
-    username: '',
+    email: '',
     password: ''
   })
 

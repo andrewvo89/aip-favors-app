@@ -3,35 +3,34 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Dialog, DialogActions, DialogContentText, DialogTitle, Button, Snackbar } from '@material-ui/core/';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { StyledDialogContent } from './styled-components';
-import * as errorActions from '../controllers/error';
-import { DIALOG, SILENT, SNACKBAR, SERVICE_UNAVAILABLE } from './constants';
-import ErrorMessage from '../models/error-message';
+import * as messageActions from '../controllers/message';
+import { DIALOG, SILENT, SNACKBAR } from './constants';
 
 export default props => {
   const dispatch = useDispatch();
-  const error = useSelector(state => state.errorState.error);
+  const { message } = useSelector(state => state.messageState);
 
-  const errorClearHandler = () => {
-    dispatch(errorActions.clearError());
+  const messageClearHandler = () => {
+    dispatch(messageActions.clearMessage());
   };
 
-  let errorMessage;
-  if (error) {
-    const { status, statusText, message, feedback } = error;
+  let messageComponent;
+  if (message) {
+    const { title, text, feedback } = message;
     switch (feedback) {
       case DIALOG:
-        errorMessage = (
+        messageComponent = (
           <Dialog
             open={(feedback === DIALOG)}
-            onClose={errorClearHandler}
+            onClose={messageClearHandler}
           >
-            <DialogTitle>{status}: {statusText}</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
             <StyledDialogContent>
-              <DialogContentText>{message}</DialogContentText>
+              <DialogContentText>{text}</DialogContentText>
             </StyledDialogContent>
             <DialogActions>
               <Button
-                onClick={errorClearHandler}
+                onClick={messageClearHandler}
                 color="primary"
                 autoFocus>Close</Button>
             </DialogActions>
@@ -39,26 +38,26 @@ export default props => {
         )
         break;
       case SNACKBAR:
-        errorMessage = (
+        messageComponent = (
           <Snackbar
             open={(feedback === SNACKBAR)}
             autoHideDuration={5000}
-            onClose={errorClearHandler}
+            onClose={messageClearHandler}
           >
             <Alert
-              onClose={errorClearHandler}
-              severity="error"
+              onClose={messageClearHandler}
+              severity="info"
               variant="filled"
               elevation={6}
             >
-              <AlertTitle>{status}: {statusText}</AlertTitle>
-              {message}
+              <AlertTitle>{title}</AlertTitle>
+              {text}
             </Alert>
           </Snackbar>
         );
         break;
       case SILENT:
-        errorMessage = null;
+        messageComponent = null;
         break;
       default:
         break;
@@ -67,17 +66,8 @@ export default props => {
 
   return (
     <Fragment>
-      {errorMessage}
+      {messageComponent}
       {props.children}
     </Fragment>
   )
-}
-
-export const get503Error = () => {
-  return new ErrorMessage(
-    503,
-    SERVICE_UNAVAILABLE,
-    'The server is not ready to handle the request',
-    SNACKBAR
-  );
 }

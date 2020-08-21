@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator')
+const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -69,7 +69,7 @@ module.exports.signup = async (req, res, next) => {
   try {
     const validationErrors = validationResult(req);
     if (!validationErrors.isEmpty()) {//Catches any errors detected through express-validator middlware
-      throw getError(422, 'Data validation failed', DIALOG);
+      throw getError(422, validationErrors.errors[0].msg, DIALOG);
     }
     const { email, firstName, lastName, password } = req.body;
     const userDoc = await User.exists({ email });
@@ -94,16 +94,16 @@ module.exports.login = async (req, res, next) => {
   try {
     const validationErrors = validationResult(req);
     if (!validationErrors.isEmpty()) {//Catches any errors detected through express-validator middlware
-      throw getError(422, 'Data validation failed', DIALOG);
+      throw getError(422, validationErrors.errors[0].msg, DIALOG);
     }
     const { email, password } = req.body;
     const user = await User.findOne({ email });//Check if email is in the database
     if (!user) {//If not, throw an error, but be ambiguous with the error message
-      throw getError(401, 'Incorrect email or password', DIALOG);
+      throw getError(401, 'Email or password is invalid', DIALOG);
     }
     const passwordMatch = await bcrypt.compare(password, user.password);//Do a encryption password comparison to the one in the database
     if (!passwordMatch) {//If not, throw an error, but be ambiguous with the error message
-      throw getError(401, 'Incorrect email or password', DIALOG);
+      throw getError(401, 'Email or password is invalid', DIALOG);
     }
     const payload = {//Prepare the Token payload
       email: user.email,
@@ -133,7 +133,7 @@ exports.logout = async (req, res, next) => {
   try {
     const validationErrors = validationResult(req);
     if (!validationErrors.isEmpty()) {//Catches any errors detected through express-validator middlware
-      throw getError(422, 'Data validation failed', SILENT);
+      throw getError(422, validationErrors.errors[0].msg, SILENT);
     }
     const dbToken = await Token.findOne({
       token: req.cookies.refreshToken,

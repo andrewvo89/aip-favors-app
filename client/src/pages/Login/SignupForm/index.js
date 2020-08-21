@@ -1,19 +1,18 @@
-
-import { Formik } from 'formik';
 import React, { Fragment, useEffect, useState } from 'react';
 import { IconButton, InputAdornment, FormControl, InputLabel, Grid, CircularProgress } from '@material-ui/core';
-import { StyledCardContent, StyledTitle, StyledCardActions, StyledButton, StyledFormControl } from './styled-components';
+import { StyledCardContent, StyledCardHeader, StyledCardActions, StyledButton } from './styled-components';
 import { StyledInput } from '../../../utils/styled-components';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
+import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
 import * as authActions from '../../../controllers/auth';
 
 export default props => {
-  const dispatchAuth = useDispatch();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const initialValues = {
     email: props.values.email,
     password: props.values.password,
@@ -38,7 +37,7 @@ export default props => {
       .email(),
     password: yup
       .string()
-      .label('{Password')
+      .label('Password')
       .required()
       .min(6),
     passwordConfirm: yup
@@ -50,12 +49,7 @@ export default props => {
 
   const submitHandler = async (values, actions) => {
     setLoading(true);
-    const result = await dispatchAuth(authActions.signup({
-      email: values.email.trim().toLowerCase(),
-      password: values.password.trim(),
-      firstName: values.firstName.trim(),
-      lastName: values.lastName.trim()
-    }));
+    const result = await dispatch(authActions.signup(values));
     if (!result) {//If login failed, set loading to false
       setLoading(false);//If login passed, cannot perform this action on unmounted component
     }
@@ -66,7 +60,6 @@ export default props => {
       initialValues={initialValues}
       onSubmit={submitHandler}
       validationSchema={validationSchema}
-      validateOnMount={true}
     >
       {({ handleBlur, handleSubmit, handleChange, values, errors, isValid, touched, validateForm }) => {
         useEffect(() => {
@@ -74,11 +67,11 @@ export default props => {
         }, [validateForm]);
         return (
           <form onSubmit={handleSubmit}>
+            <StyledCardHeader title="Signup" />
             <StyledCardContent>
-              <StyledTitle variant="h5">Signup</StyledTitle>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
-                  <StyledFormControl>
+                  <FormControl margin="dense">
                     <InputLabel>First name</InputLabel>
                     <StyledInput
                       type="text"
@@ -88,10 +81,10 @@ export default props => {
                       error={!!touched.firstName && !!errors.firstName}
                       autoFocus={true}
                     />
-                  </StyledFormControl>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={6}>
-                  <StyledFormControl>
+                  <FormControl margin="dense">
                     <InputLabel>Last name</InputLabel>
                     <StyledInput
                       type="text"
@@ -100,10 +93,10 @@ export default props => {
                       onBlur={handleBlur('lastName')}
                       error={!!touched.lastName && !!errors.lastName}
                     />
-                  </StyledFormControl>
+                  </FormControl>
                 </Grid>
               </Grid>
-              <FormControl>
+              <FormControl margin="dense">
                 <InputLabel>Email</InputLabel>
                 <StyledInput
                   type="email"
@@ -113,7 +106,7 @@ export default props => {
                   error={!!touched.email && !!errors.email}
                 />
               </FormControl>
-              <FormControl>
+              <FormControl margin="dense">
                 <InputLabel>Password</InputLabel>
                 <StyledInput
                   type={showPassword ? "text" : "password"}
@@ -133,10 +126,10 @@ export default props => {
                   }
                 />
               </FormControl>
-              <FormControl>
+              <FormControl margin="dense">
                 <InputLabel>Confirm password</InputLabel>
                 <StyledInput
-                  type={showConfirmPassword ? "text" : "password"}
+                  type={showPasswordConfirm ? "text" : "password"}
                   value={values.passwordConfirm}
                   onChange={handleChange('passwordConfirm')}
                   onBlur={handleBlur('passwordConfirm')}
@@ -145,9 +138,9 @@ export default props => {
                     <InputAdornment position="end">
                       <IconButton
                         tabIndex={-1}
-                        onClick={() => setShowConfirmPassword(prevShowConfirmPassword => !prevShowConfirmPassword)}
+                        onClick={() => setShowPasswordConfirm(prevShowPasswordConfirm => !prevShowPasswordConfirm)}
                       >
-                        {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                        {showPasswordConfirm ? <Visibility /> : <VisibilityOff />}
                       </IconButton>
                     </InputAdornment>
                   }

@@ -3,18 +3,24 @@ import { Menu, MenuItem } from '@material-ui/core/';
 import { useDispatch } from 'react-redux';
 import * as authActions from '../../controllers/auth';
 import { StyledAvatar } from './styled-components';
+import { withRouter } from 'react-router-dom';
 
-export default props => {
-  const authDispatch = useDispatch();
+export default withRouter(props => {
+  const dispatch = useDispatch();
   const [anchorElement, setAnchorElement] = useState(null);
 
   const menuCloseHandler = () => {
     setAnchorElement(null);
   };
 
-  const logoutHandler = async () => {
-    authDispatch(authActions.logout());
+  const logoutClickHandler = async () => {
+    dispatch(authActions.logout());
   };
+
+  const accountClickedHandler = () => {
+    props.history.push('/account');
+    menuCloseHandler();
+  }
 
 
   return (
@@ -38,10 +44,10 @@ export default props => {
         }}
         getContentAnchorEl={null}
       >
-        <MenuItem onClick={menuCloseHandler}>Profile</MenuItem>
-        <MenuItem onClick={menuCloseHandler}>My account</MenuItem>
-        <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+        <MenuItem onClick={accountClickedHandler}>Account</MenuItem>
+        <MenuItem onClick={menuCloseHandler}>Settings</MenuItem>
+        <MenuItem onClick={logoutClickHandler}>Logout</MenuItem>
       </Menu>
     </Fragment>
   );
-}
+})

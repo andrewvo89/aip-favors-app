@@ -4,10 +4,12 @@ import { applyMiddleware, combineReducers, createStore } from 'redux';
 import ReduxThunk from 'redux-thunk';
 import authReducer from '../store/auth';
 import errorReducer from '../store/error';
+import messageReducer from '../store/message';
 
 const rootReducer = combineReducers({
   authState: authReducer,
-  errorState: errorReducer
+  errorState: errorReducer,
+  messageState: messageReducer
 });
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
