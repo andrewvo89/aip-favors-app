@@ -1,9 +1,10 @@
 import React from 'react'
-import { AppBar, IconButton } from '@material-ui/core';
+import { AppBar, IconButton, Badge } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import NavbarAvatar from '../NavbarAvatar';
-import { StyledMenuIcon, StyledTitle, StyledToolbar } from './styled-components';
+import { StyledMenuIcon, StyledTitle, StyledToolbar, StyledIconButton } from './styled-components';
 import { withRouter } from 'react-router-dom';
+import { Mail as MailIcon } from '@material-ui/icons';
 
 export default withRouter(props => {
   const { authUser } = useSelector(state => state.authState);
@@ -15,7 +16,6 @@ export default withRouter(props => {
           <IconButton
             edge="start"
             color="inherit"
-            aria-label="menu"
             onClick={() => props.setDrawerOpen(true)}
           >
             <StyledMenuIcon />
@@ -25,6 +25,14 @@ export default withRouter(props => {
           variant="h4"
           onClick={() => props.history.push('/')}
         >Favours App</StyledTitle>
+        <StyledIconButton
+          edge="start"
+          color="inherit"
+        >
+          <Badge badgeContent={100} max={10} color="secondary">
+            <MailIcon />
+          </Badge>
+        </StyledIconButton>
         {authUser && (
           <NavbarAvatar authUser={authUser} />
         )}
