@@ -29,7 +29,7 @@ export default withRouter(props => {
           edge="start"
           color="inherit"
         >
-          <Badge badgeContent={100} max={10} color="secondary">
+          {authUser && <Badge badgeContent={100} max={10} color="secondary">}
             <MailIcon />
           </Badge>
         </StyledIconButton>
