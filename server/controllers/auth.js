@@ -45,7 +45,7 @@ module.exports.verify = async (req, res, next) => {
           userId: payload.userId,
           email: payload.email
         });
-        await Token.deleteOne({ token: refreshToken });//Remove the old-non expired Refresh Token from the database
+        await Token.deleteOne({ refreshToken });//Remove the old-non expired Refresh Token from the database
         const newDbToken = new Token({
           userId: payload.userId,
           accessToken: newTokens.accessToken,
@@ -60,7 +60,9 @@ module.exports.verify = async (req, res, next) => {
       userId: user._id.toString(),
       email: user.email,
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      profilePicture: user.profilePicture,
+      settings: user.settings
     }
     res.status(200).json({ authUser });
   } catch (error) {
@@ -116,8 +118,10 @@ module.exports.login = async (req, res, next) => {
       userId,
       email: user.email,
       firstName: user.firstName,
-      lastName: user.lastName
-    }
+      lastName: user.lastName,
+      profilePicture: user.profilePicture,
+      settings: user.settings
+    };
     res.status(200).json({ authUser });
   }
   catch (error) {
@@ -132,7 +136,7 @@ exports.logout = async (req, res, next) => {
       throw getError(422, validationErrors.errors[0].msg, SILENT);
     }
     const dbToken = await Token.findOne({
-      token: req.cookies.refreshToken,
+      accessToken: req.cookies.token,
       userId: req.body.userId
     });
     if (dbToken) {//Remove the refresh token from the database

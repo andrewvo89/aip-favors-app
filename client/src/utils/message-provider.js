@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Dialog, DialogActions, DialogContentText, DialogTitle, Button, Snackbar } from '@material-ui/core/';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { StyledDialogContent } from './styled-components';
-import * as messageActions from '../controllers/message';
+import * as messageController from '../controllers/message';
 import { DIALOG, SILENT, SNACKBAR } from './constants';
 
 export default props => {
@@ -11,7 +11,7 @@ export default props => {
   const { message } = useSelector(state => state.messageState);
 
   const messageClearHandler = () => {
-    dispatch(messageActions.clearMessage());
+    dispatch(messageController.clearMessage());
   };
 
   let messageComponent;

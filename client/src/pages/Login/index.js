@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import LoginForm from './LoginForm';
-import { StyledCard } from './styled-components';
+import { StyledCard } from '../../utils/styled-components';
 import SignupForm from './SignupForm';
 
 export default props => {

@@ -1,12 +1,13 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { IconButton, InputAdornment, FormControl, InputLabel, Grid, CircularProgress } from '@material-ui/core';
-import { StyledCardContent, StyledCardHeader, StyledCardActions, StyledButton } from './styled-components';
+import { StyledButton } from '../styled-components';
+import { StyledCardContent, StyledCardActions, StyledCardHeader } from '../../../utils/styled-components'
 import { StyledInput } from '../../../utils/styled-components';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
-import * as authActions from '../../../controllers/auth';
+import * as authController from '../../../controllers/auth';
 
 export default props => {
   const dispatch = useDispatch();
@@ -49,7 +50,7 @@ export default props => {
 
   const submitHandler = async (values, actions) => {
     setLoading(true);
-    const result = await dispatch(authActions.signup(values));
+    const result = await dispatch(authController.signup(values));
     if (!result) {//If login failed, set loading to false
       setLoading(false);//If login passed, cannot perform this action on unmounted component
     }

@@ -41,7 +41,7 @@ module.exports = async (req, res, next) => {
           userId: payload.userId,
           email: payload.email
         });
-        await Token.deleteOne({ token: refreshToken });//Remove the old-non expired Refresh Token from the database
+        await Token.deleteOne({ refreshToken });//Remove the old-non expired Refresh Token from the database
         const newDbToken = new Token({
           userId: payload.userId,
           accessToken: newTokens.accessToken,
@@ -51,6 +51,7 @@ module.exports = async (req, res, next) => {
         setCookies(res, newTokens.accessToken);//Set the response cookies, so the client can get the new Tokens
       }
     }
+    res.locals.userId = payload.userId;
     next();//Will pass to next middleware once authentication has been verified
   } catch (error) {
     res.status(error.status || 500).json({//error.response.status / statusText

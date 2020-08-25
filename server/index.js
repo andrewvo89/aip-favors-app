@@ -1,4 +1,4 @@
-const path = require('path');
+// const path = require('path');
 const express = require('express');
 const app = express();
 
@@ -14,13 +14,13 @@ const accessControl = require('./middleware/access-control');
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const storageRoutes = require('./routes/storage');
 
-const { DB_USER, DB_PASS } = process.env;
-const MONGODB_URI = `mongodb+srv://${DB_USER}:${DB_PASS}@aip-favors-app.umokf.mongodb.net/production?retryWrites=true&w=majority`;
+const { DB_USER, DB_PASS, DB_ADDRESS, DB_NAME, PORT } = process.env;
 //Initialize the body parser for .json
 app.use(bodyParser.json()); // application/json
 //Set the public folder to server files statically
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use('/storage', express.static(path.join(__dirname, 'storage')));
 //Set security controls for incoming requests
 app.use(accessControl);
 //Initialize the cookie parser to send jwt web tokens back to the client
@@ -28,16 +28,20 @@ app.use(cookieParser());
 //Routes
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
+app.use('/storage', storageRoutes);
 //catch all errors that get passed via next()
 app.use(errorHandler);
-//Initialize the mongodb connection, then start listening on port 8080
+//Initialize the mongodb connection, then start listening
 mongoose
-  .connect(MONGODB_URI, {
+  .connect(`mongodb+srv://${DB_ADDRESS}/${DB_NAME}`, {
+    user: DB_USER,
+    pass: DB_PASS,
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true
   })
   .then(result => {
-    app.listen(8080);
+    console.log('connected');
+    app.listen(PORT || 3000);
   })
   .catch(error => console.log(error));

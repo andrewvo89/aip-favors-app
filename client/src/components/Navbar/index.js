@@ -5,7 +5,6 @@ import NavbarAvatar from '../NavbarAvatar';
 import { StyledMenuIcon, StyledTitle, StyledToolbar } from './styled-components';
 import { withRouter } from 'react-router-dom';
 
-
 export default withRouter(props => {
   const { authUser } = useSelector(state => state.authState);
 

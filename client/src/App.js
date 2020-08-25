@@ -5,9 +5,10 @@ import './App.css';
 import AppContainer from './components/AppContainer';
 import Login from './pages/Login';
 import { useSelector, useDispatch } from 'react-redux';
-import * as authActions from './controllers/auth';
+import * as authController from './controllers/auth';
 import Home from './pages/Home';
 import Account from './pages/Account';
+import Settings from './pages/Settings';
 
 export default withRouter(props => {
   const [authLoading, setAuthLoading] = useState(true);
@@ -16,7 +17,7 @@ export default withRouter(props => {
 
   useEffect(() => {
     const verifyAuth = async () => {
-      await dispatch(authActions.verifyAuth());
+      await dispatch(authController.verifyAuth());
       setAuthLoading(false);
     };
     verifyAuth();
@@ -42,6 +43,7 @@ export default withRouter(props => {
       children = (
         <Switch>
           <Route path="/account" component={Account} />
+          <Route path="/settings" component={Settings} />
           <Route path="/" component={Home} />
           <Redirect from="/login" to="/" />
         </Switch>

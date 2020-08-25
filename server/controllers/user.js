@@ -4,6 +4,10 @@ const { DIALOG } = require('../utils/constants');
 const { getError } = require('../utils/error');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const sharp = require('sharp');
+const path = require('path');
+const { v4: uuidv4 } = require("uuid");
+const fs = require('fs');
 
 module.exports.update = async (req, res, next) => {
   try {
@@ -24,17 +28,11 @@ module.exports.update = async (req, res, next) => {
     existingUser.lastName = lastName;
     existingUser.email = email;
     existingUser.save();//Save updated user into the database
-    const authUser = {
-      userId: existingUser._id.toString(),
-      email: existingUser.email,
-      firstName: existingUser.firstName,
-      lastName: existingUser.lastName
-    }
-    res.status(201).json({ authUser });
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
-}
+};
 
 module.exports.updatePassword = async (req, res, next) => {
   try {
@@ -58,5 +56,55 @@ module.exports.updatePassword = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
 
+module.exports.updateSettings = async (req, res, next) => {
+  try {
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {//Catches any errors detected through express-validator middlware
+      throw getError(422, validationErrors.errors[0].msg, DIALOG);
+    }
+    const { userId, settings } = req.body;
+    const existingUser = await User.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+    if (!existingUser) {
+      throw getError(404, 'User not found', DIALOG);
+    }
+    existingUser.settings = settings;
+    existingUser.save();//Save updated user into the database;
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.uploadPicture = async (req, res, next) => {
+  try {
+    const imagePath = path.join(req.file.destination, `${uuidv4()}_400.jpg`)
+    await sharp(req.file.path).jpeg().toFile(imagePath);
+    const existingUser = await User.findOne({ _id: new mongoose.Types.ObjectId(res.locals.userId) });
+    if (!existingUser) {
+      throw getError(404, 'User not found', DIALOG);
+    }
+    existingUser.profilePicture = imagePath;
+    existingUser.save();//Save updated user into the database;
+    res.status(200).json({ profilePicture: existingUser.profilePicture });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.deletePicture = async (req, res, next) => {
+  try {
+    const existingUser = await User.findOne({ _id: new mongoose.Types.ObjectId(res.locals.userId) });
+    if (!existingUser) {
+      throw getError(404, 'User not found', DIALOG);
+    }
+    const destination = path.join('storage', 'users', res.locals.userId, 'profilePicture');
+    fs.rmdirSync(destination, { recursive: true });
+    existingUser.profilePicture = "";
+    existingUser.save();//Save updated user into the database;
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};

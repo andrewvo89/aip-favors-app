@@ -8,11 +8,6 @@ export const clearError = () => {
 export const setError = error => {
   return {
     type: SET_ERROR,
-    error: new ErrorMessage(
-      error.status,
-      error.statusText,
-      error.message,
-      error.feedback
-    )
+    error: new ErrorMessage(error)
   }
 }

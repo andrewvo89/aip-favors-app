@@ -1,9 +1,10 @@
 import React, { Fragment, useState } from 'react'
 import { Menu, MenuItem } from '@material-ui/core/';
 import { useDispatch } from 'react-redux';
-import * as authActions from '../../controllers/auth';
-import { StyledAvatar } from './styled-components';
+import * as authController from '../../controllers/auth';
+import { StyledAvatar } from '../../utils/styled-components';
 import { withRouter } from 'react-router-dom';
+import { REST_URL } from '../../utils/constants';
 
 export default withRouter(props => {
   const dispatch = useDispatch();
@@ -14,18 +15,32 @@ export default withRouter(props => {
   };
 
   const logoutClickHandler = async () => {
-    dispatch(authActions.logout());
+    dispatch(authController.logout());
   };
 
-  const accountClickedHandler = () => {
+  const accountClickHandler = () => {
     props.history.push('/account');
     menuCloseHandler();
-  }
+  };
 
+  const settingsClickHandler = () => {
+    props.history.push('/settings');
+    menuCloseHandler();
+  };
+
+  let avatarUrl;
+  if (props.authUser.profilePicture) {
+    avatarUrl = `${REST_URL}/${props.authUser.profilePicture.split('\\').join('/')}`;
+  }
 
   return (
     <Fragment>
-      <StyledAvatar onClick={event => setAnchorElement(event.target)} >
+      <StyledAvatar
+        size={1}
+        darkMode={props.authUser.settings.darkMode}
+        onClick={event => setAnchorElement(event.target)}
+        src={avatarUrl}
+      >
         {`${props.authUser.firstName.substring(0, 1)}${props.authUser.lastName.substring(0, 1)}`}
       </StyledAvatar>
       <Menu
@@ -44,8 +59,8 @@ export default withRouter(props => {
         }}
         getContentAnchorEl={null}
       >
-        <MenuItem onClick={accountClickedHandler}>Account</MenuItem>
-        <MenuItem onClick={menuCloseHandler}>Settings</MenuItem>
+        <MenuItem onClick={accountClickHandler}>Account</MenuItem>
+        <MenuItem onClick={settingsClickHandler}>Settings</MenuItem>
         <MenuItem onClick={logoutClickHandler}>Logout</MenuItem>
       </Menu>
     </Fragment>

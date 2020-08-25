@@ -9,3 +9,6 @@ export const SNACKBAR = 'SNACKBAR';
 export const SILENT = 'SILENT'
 export const NETWORK_ERROR = 'Network Error';
 export const SERVICE_UNAVAILABLE = 'Service Unavailable';
+export const DARK = 'dark';
+export const LIGHT = 'light';
+export const REST_URL = 'http://localhost:8080';

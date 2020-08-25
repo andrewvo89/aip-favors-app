@@ -6,7 +6,7 @@ import * as yup from 'yup';
 import { Formik } from 'formik';
 import { StyledDialogContent, StyledDialogTitle } from './styled-components';
 import { useDispatch } from 'react-redux';
-import * as userActions from '../../../../controllers/user';
+import * as userController from '../../../../controllers/user';
 import * as messsageActions from '../../../../controllers/message';
 import { SNACKBAR } from '../../../../utils/constants';
 
@@ -50,7 +50,7 @@ export default props => {
 
   const submitHandler = async (values, actions) => {
     setLoading(true);
-    const result = await dispatch(userActions.updatePassword(values));
+    const result = await dispatch(userController.updatePassword(values));
     if (result) {
       dispatch(messsageActions.setMessage({
         title: 'Password Update',

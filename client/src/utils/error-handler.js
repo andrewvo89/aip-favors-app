@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Dialog, DialogActions, DialogContentText, DialogTitle, Button, Snackbar } from '@material-ui/core/';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { StyledDialogContent } from './styled-components';
-import * as errorActions from '../controllers/error';
+import * as errorController from '../controllers/error';
 import { DIALOG, SILENT, SNACKBAR, SERVICE_UNAVAILABLE } from './constants';
 import ErrorMessage from '../models/error-message';
 
@@ -12,7 +12,7 @@ export default props => {
   const error = useSelector(state => state.errorState.error);
 
   const errorClearHandler = () => {
-    dispatch(errorActions.clearError());
+    dispatch(errorController.clearError());
   };
 
   let errorMessage;
@@ -74,10 +74,10 @@ export default props => {
 }
 
 export const get503Error = () => {
-  return new ErrorMessage(
-    503,
-    SERVICE_UNAVAILABLE,
-    'The server is not ready to handle the request',
-    SNACKBAR
-  );
+  return new ErrorMessage({
+    status: 503,
+    statusText: SERVICE_UNAVAILABLE,
+    message: 'The server is not ready to handle the request',
+    feedback: SNACKBAR
+  });
 }

@@ -9,27 +9,23 @@ export const verifyAuth = () => {
   return async (dispatch, getState) => {
     try {
       const result = await axios.post('/auth/verify', null, config);
-      const authUser = new User(
-        result.data.authUser.userId,
-        result.data.authUser.email,
-        result.data.authUser.firstName,
-        result.data.authUser.lastName
-      );
+      const authUser = new User(result.data.authUser);
       dispatch({
         type: AUTH_USER_CHANGED,
-        authUser: authUser
+        authUser
       });
     } catch (error) {
+      console.log(error);
       dispatch({
         type: SET_ERROR,
         error: error.message === NETWORK_ERROR
           ? get503Error()
-          : new ErrorMessage(
-            error.response.status,
-            error.response.statusText,
-            error.response.data.message,
-            error.response.data.feedback
-          )
+          : new ErrorMessage({
+            status: error.response.status,
+            statusText: error.response.statusText,
+            message: error.response.data.message,
+            feedback: error.response.data.feedback
+          })
       });
     }
   }
@@ -47,12 +43,7 @@ export const signup = ({ email, password, passwordConfirm, firstName, lastName }
       }
       await axios.put('/auth/signup', data);
       const result = await axios.post('/auth/login', data, config);
-      const authUser = new User(
-        result.data.authUser.userId,
-        result.data.authUser.email,
-        result.data.authUser.firstName,
-        result.data.authUser.lastName
-      );
+      const authUser = new User(result.data.authUser);
       dispatch({
         type: AUTH_USER_CHANGED,
         authUser
@@ -63,12 +54,12 @@ export const signup = ({ email, password, passwordConfirm, firstName, lastName }
         type: SET_ERROR,
         error: error.message === NETWORK_ERROR
           ? get503Error()
-          : new ErrorMessage(
-            error.response.status,
-            error.response.statusText,
-            error.response.data.message,
-            error.response.data.feedback
-          )
+          : new ErrorMessage({
+            status: error.response.status,
+            statusText: error.response.statusText,
+            message: error.response.data.message,
+            feedback: error.response.data.feedback
+          })
       });
       return false;
     }
@@ -83,12 +74,7 @@ export const login = ({ email, password }) => {
         password: password
       };
       const result = await axios.post('/auth/login', data, config);
-      const authUser = new User(
-        result.data.authUser.userId,
-        result.data.authUser.email,
-        result.data.authUser.firstName,
-        result.data.authUser.lastName
-      );
+      const authUser = new User(result.data.authUser);
       dispatch({
         type: AUTH_USER_CHANGED,
         authUser
@@ -99,12 +85,12 @@ export const login = ({ email, password }) => {
         type: SET_ERROR,
         error: error.message === NETWORK_ERROR
           ? get503Error()
-          : new ErrorMessage(
-            error.response.status,
-            error.response.statusText,
-            error.response.data.message,
-            error.response.data.feedback
-          )
+          : new ErrorMessage({
+            status: error.response.status,
+            statusText: error.response.statusText,
+            message: error.response.data.message,
+            feedback: error.response.data.feedback
+          })
       });
       return false;
     }
@@ -122,12 +108,12 @@ export const logout = () => {
       if (error.message === NETWORK_ERROR) {
         errorMessage = get503Error();
       } else {
-        errorMessage = new ErrorMessage(
-          error.response.status,
-          error.response.statusText,
-          error.response.data.message,
-          error.response.data.feedback
-        );
+        errorMessage = new ErrorMessage({
+          status: error.response.status,
+          statusText: error.response.statusText,
+          message: error.response.data.message,
+          feedback: error.response.data.feedback
+        })
       }
       dispatch({
         type: SET_ERROR,

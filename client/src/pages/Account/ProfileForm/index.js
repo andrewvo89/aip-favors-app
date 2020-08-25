@@ -5,7 +5,7 @@ import { StyledInput } from '../../../utils/styled-components';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import * as userActions from '../../../controllers/user';
+import * as userController from '../../../controllers/user';
 import * as messsageActions from '../../../controllers/message';
 import ChangePassword from './ChangePassword';
 import { SNACKBAR } from '../../../utils/constants';
@@ -43,7 +43,7 @@ export default props => {
 
   const submitHandler = async (values, actions) => {
     setLoading(true);
-    const result = await dispatch(userActions.update({
+    const result = await dispatch(userController.update({
       email: values.email.trim().toLowerCase(),
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim()

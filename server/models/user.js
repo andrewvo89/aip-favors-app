@@ -20,6 +20,24 @@ const userSchema = new Schema({
   lastName: {
     type: String,
     required: true
+  },
+  profilePicture: {
+    type: String,
+    default: ""
+  },
+  settings: {
+    darkMode: {
+      type: Boolean,
+      default: false
+    },
+    emailNotifications: {
+      type: Boolean,
+      default: true
+    },
+    appNotifications: {
+      type: Boolean,
+      default: true
+    }
   }
 }, {
   timestamps: true
