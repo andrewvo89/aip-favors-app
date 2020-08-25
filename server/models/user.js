@@ -37,6 +37,24 @@ const userSchema = new Schema({
     appNotifications: {
       type: Boolean,
       default: true
+    },
+    expandSideDrawerItems: {
+      favoriteGroups: {
+        type: Boolean,
+        default: true
+      },
+      publicGroups: {
+        type: Boolean,
+        default: true
+      },
+      privateGroups: {
+        type: Boolean,
+        default: true
+      },
+      directMessages: {
+        type: Boolean,
+        default: true
+      },
     }
   }
 }, {

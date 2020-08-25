@@ -1,8 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Input, DialogContent, Card, CardContent, CardHeader, CardActions, Avatar } from '@material-ui/core';
+import { Input, DialogContent, Card, CardContent, CardHeader, CardActions, Avatar, Button } from '@material-ui/core';
 import * as styles from './styles';
 import * as colors from './colors';
+
+export const StyledButton = styled(Button)`
+  width: 100%;
+  margin-bottom: 10px
+`;
 
 export const StyledInput = styled(Input)`
   &.MuiInput-underline.Mui-error:after {

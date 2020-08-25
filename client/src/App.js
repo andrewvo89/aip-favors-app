@@ -9,6 +9,7 @@ import * as authController from './controllers/auth';
 import Home from './pages/Home';
 import Account from './pages/Account';
 import Settings from './pages/Settings';
+import Signup from './pages/Signup';
 
 export default withRouter(props => {
   const [authLoading, setAuthLoading] = useState(true);
@@ -35,7 +36,8 @@ export default withRouter(props => {
     children = (
       <Switch>
         <Route path="/login" component={Login} />
-        <Redirect to="/login" />
+        <Route path="/signup" component={Signup} />
+        <Route path="/" component={Home} />
       </Switch>
     );
 

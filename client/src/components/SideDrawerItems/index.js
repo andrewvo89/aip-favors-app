@@ -1,35 +1,23 @@
 import React from 'react'
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import { StyledListContainer } from './styled-components';
+import FavoriteGroups from './FavoriteGroups';
+import PublicGroups from './PublicGroups';
+import PrivateGroups from './PrivateGroups';
+import DirectMessages from './DirectMessages';
 
 export default props => {
   return (
-    <StyledListContainer
-      onClick={() => props.setDrawerOpen(false)}
-      onKeyDown={() => props.setDrawerOpen(false)}
-    >
+    <StyledListContainer>
       <List>
-        {['Item 1', 'Item 2', 'Item 3', 'Item 4'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {['Item 5', 'Item 6', 'Item 7'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
+        <FavoriteGroups />
+        <Divider />
+        <PublicGroups />
+        <Divider />
+        <PrivateGroups />
+        <Divider />
+        <DirectMessages />
       </List>
     </StyledListContainer>
   );

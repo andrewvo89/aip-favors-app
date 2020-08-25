@@ -15,7 +15,6 @@ export const verifyAuth = () => {
         authUser
       });
     } catch (error) {
-      console.log(error);
       dispatch({
         type: SET_ERROR,
         error: error.message === NETWORK_ERROR
