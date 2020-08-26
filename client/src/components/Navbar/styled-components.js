@@ -5,6 +5,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 
 export const StyledDiv = styled.div`
   display: flex;
+  align-items: center;
 `;
 
 export const StyledToolbar = styled(({ authUser, ...otherProps }) => <Toolbar {...otherProps} />)`

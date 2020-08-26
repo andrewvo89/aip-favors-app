@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import NavbarAvatar from '../NavbarAvatar';
 import { StyledMenuIcon, StyledTitle, StyledToolbar, StyledIconButton, StyledDiv } from './styled-components';
 import { withRouter } from 'react-router-dom';
-import { Mail as MailIcon } from '@material-ui/icons';
+import { Notifications as NotificationsIcon } from '@material-ui/icons';
 
 export default withRouter(props => {
   const { authUser } = useSelector(state => state.authState);
@@ -34,7 +34,7 @@ export default withRouter(props => {
               color="inherit"
             >
               <Badge badgeContent={100} max={10} color="secondary">
-                <MailIcon />
+                <NotificationsIcon />
               </Badge>
             </StyledIconButton>
             <NavbarAvatar authUser={authUser} />
