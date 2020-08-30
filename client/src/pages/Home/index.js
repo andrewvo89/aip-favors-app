@@ -1,17 +1,15 @@
-import React, { Fragment } from 'react'
+import React from 'react';
 import { useSelector } from 'react-redux';
 import PublicFavors from './PublicFavors';
 
-export default props => {
-  const { authUser } = useSelector(state => state.authState);
-  let darkMode;
-  if (authUser) {
-    darkMode = authUser.settings.darkMode;
-  }
+const Home = () => {
+	const { authUser } = useSelector((state) => state.authState);
+	let darkMode;
+	if (authUser) {
+		darkMode = authUser.settings.darkMode;
+	}
 
-  return (
-    <Fragment>
-      <PublicFavors darkMode={darkMode} />
-    </Fragment>
-  );
-}
+	return <PublicFavors darkMode={darkMode} />;
+};
+
+export default Home;

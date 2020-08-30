@@ -3,59 +3,57 @@ import React, { useEffect, useState } from 'react';
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import './App.css';
 import AppContainer from './components/AppContainer';
-import Login from './pages/Login';
 import { useSelector, useDispatch } from 'react-redux';
 import * as authController from './controllers/auth';
 import Home from './pages/Home';
 import Account from './pages/Account';
 import Settings from './pages/Settings';
-import Signup from './pages/Signup';
+import Login from './pages/Auth/Login';
+import Signup from './pages/Auth/Signup';
 
-export default withRouter(props => {
-  const [authLoading, setAuthLoading] = useState(true);
-  const dispatch = useDispatch();
-  const { authUser } = useSelector(state => state.authState);
+const App = withRouter((props) => {
+	const [authLoading, setAuthLoading] = useState(true);
+	const dispatch = useDispatch();
+	const { authUser } = useSelector((state) => state.authState);
 
-  useEffect(() => {
-    const verifyAuth = async () => {
-      await dispatch(authController.verifyAuth());
-      setAuthLoading(false);
-    };
-    verifyAuth();
-  }, [dispatch]);
+	useEffect(() => {
+		const verifyAuth = async () => {
+			await dispatch(authController.verifyAuth());
+			setAuthLoading(false);
+		};
+		verifyAuth();
+	}, [dispatch]);
 
-  let children = <CircularProgress />;
+	let children = <CircularProgress />;
 
-  useEffect(() => {
-    if (authUser && props.location.pathname === '/login') {
-      props.history.push('/');//Once user logins, adjust URL to root
-    }
-  }, [authUser, props.history, props.location]);
+	useEffect(() => {
+		if (authUser && props.location.pathname === '/login') {
+			props.history.push('/'); //Once user logins, adjust URL to root
+		}
+	}, [authUser, props.history, props.location]);
 
-  if (!authLoading) {
-    children = (
-      <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/signup" component={Signup} />
-        <Route path="/" component={Home} />
-      </Switch>
-    );
+	if (!authLoading) {
+		children = (
+			<Switch>
+				<Route path="/login" component={Login} />
+				<Route path="/signup" component={Signup} />
+				<Route path="/" component={Home} />
+			</Switch>
+		);
 
-    if (authUser) {
-      children = (
-        <Switch>
-          <Route path="/account" component={Account} />
-          <Route path="/settings" component={Settings} />
-          <Route path="/" component={Home} />
-          <Redirect from="/login" to="/" />
-        </Switch>
-      );
-    }
-  }
+		if (authUser) {
+			children = (
+				<Switch>
+					<Route path="/account" component={Account} />
+					<Route path="/settings" component={Settings} />
+					<Route path="/" component={Home} />
+					<Redirect from="/login" to="/" />
+				</Switch>
+			);
+		}
+	}
 
-  return (
-    <AppContainer>
-      {children}
-    </AppContainer>
-  );
+	return <AppContainer>{children}</AppContainer>;
 });
+
+export default App;

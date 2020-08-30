@@ -1,20 +1,35 @@
 {
     "env": {
-        "node": true,
         "commonjs": true,
-        "es2020": true
+        "es2020": true,
+        "node": true
     },
     "extends": "eslint:recommended",
     "parserOptions": {
         "ecmaVersion": 11
     },
     "rules": {
-        "no-unused-vars": ["error", {
-            "vars": "all",
-            "args": "none"
-        }],
-        "no-empty": ["error", {
-            "allowEmptyCatch": true
-        }]
+        "indent": [
+            "error",
+            "tab"
+        ],
+        "linebreak-style": [
+            "error",
+            "windows"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "no-unused-vars": [
+            "error",
+            {
+                "argsIgnorePattern": "^_"
+            }
+        ]
     }
 }

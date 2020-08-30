@@ -4,24 +4,27 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import * as serviceWorker from './serviceWorker';
-import ReduxProvder from './utils/redux';
-import ThemeProvider from './utils/theme';
-import ErrorProvider from './utils/error-handler';
+import StoreProvider from './utils/store-provider';
+import ThemeProvider from './utils/theme-provider';
+import ErrorHandler from './utils/error-handler';
 import MessageProvider from './utils/message-provider';
+import AuthProvider from './utils/auth-provider';
 
 ReactDOM.render(
-  <BrowserRouter>
-    <ReduxProvder>
-      <ThemeProvider>
-        <ErrorProvider>
-          <MessageProvider>
-            <App />
-          </MessageProvider>
-        </ErrorProvider>
-      </ThemeProvider>
-    </ReduxProvder>
-  </BrowserRouter>,
-  document.getElementById('root')
+	<BrowserRouter>
+		<StoreProvider>
+			<ThemeProvider>
+				<ErrorHandler>
+					<MessageProvider>
+						<AuthProvider>
+							<App />
+						</AuthProvider>
+					</MessageProvider>
+				</ErrorHandler>
+			</ThemeProvider>
+		</StoreProvider>
+	</BrowserRouter>,
+	document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change

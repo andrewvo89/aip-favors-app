@@ -33,14 +33,14 @@ app.use('/storage', storageRoutes);
 app.use(errorHandler);
 //Initialize the mongodb connection, then start listening
 mongoose
-  .connect(`mongodb+srv://${DB_ADDRESS}/${DB_NAME}`, {
-    user: DB_USER,
-    pass: DB_PASS,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true
-  })
-  .then(result => {
-    app.listen(PORT || 3000);
-  })
-  .catch(error => console.log(error));
+	.connect(`mongodb+srv://${DB_ADDRESS}/${DB_NAME}`, {
+		user: DB_USER,
+		pass: DB_PASS,
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+		useCreateIndex: true
+	})
+	.then((_result) => {
+		app.listen(PORT || 3000);
+	})
+	.catch((error) => console.log(error));
