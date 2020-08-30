@@ -92,11 +92,11 @@ const ChangePassword = (props) => {
 						<StyledInput
 							type={showCurrentPassword ? 'text' : 'password'}
 							value={formik.values.currentPassword}
-							onChange={formik.formik.handleChange('currentPassword')}
-							onBlur={formik.formik.handleBlur('currentPassword')}
+							onChange={formik.handleChange('currentPassword')}
+							onBlur={formik.handleBlur('currentPassword')}
 							error={
-								!!formik.formik.touched.currentPassword &&
-								!!formik.formik.errors.currentPassword
+								!!formik.touched.currentPassword &&
+								!!formik.errors.currentPassword
 							}
 							autoFocus={true}
 							endAdornment={
@@ -119,12 +119,9 @@ const ChangePassword = (props) => {
 						<StyledInput
 							type={showPassword ? 'text' : 'password'}
 							value={formik.values.password}
-							onChange={formik.formik.handleChange('password')}
-							onBlur={formik.formik.handleBlur('password')}
-							error={
-								!!formik.formik.touched.password &&
-								!!formik.formik.errors.password
-							}
+							onChange={formik.handleChange('password')}
+							onBlur={formik.handleBlur('password')}
+							error={!!formik.touched.password && !!formik.errors.password}
 							endAdornment={
 								<InputAdornment position="end">
 									<IconButton
