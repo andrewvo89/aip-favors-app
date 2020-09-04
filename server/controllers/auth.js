@@ -93,13 +93,18 @@ module.exports.signup = async (req, res, next) => {
 		if (userDoc) {
 			throw getError(409, 'Email address already exists', DIALOG);
 		}
-		const hashedPassword = await bcrypt.hash(password, 12); //Convert user's plain text password to encrypted password
+
+		// Generate salt with a random number of rounds between 10 - 15 and then hash plaintext password
+		const salt = bcrypt.genSaltSync(Math.floor(Math.random() * (15 - 10 + 1) + 10));
+		const hash = bcrypt.hashSync(password, salt);
+
 		const user = new User({
 			email,
-			password: hashedPassword,
+			password: hash,
 			firstName,
 			lastName
 		});
+
 		await user.save(); //Save new user into the database
 		res.status(201).send();
 	} catch (error) {
