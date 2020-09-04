@@ -60,8 +60,12 @@ module.exports.updatePassword = async (req, res, next) => {
 			//If not, throw an error, but be ambiguous with the error message
 			throw getError(401, 'Current password is invalid', DIALOG);
 		} //Once authenticated with their current password, move on to set new password
-		const hashedPassword = await bcrypt.hash(password, 12); //Convert user's plain text password to encrypted password
-		existingUser.password = hashedPassword;
+
+		// Generate salt with a random number of rounds between 10-15 and hash plaintext password
+		const salt = bcrypt.genSaltSync(Math.floor(Math.random() * (15 - 10 + 1) + 10));
+		const hash = bcrypt.hashSync(password, salt);
+		existingUser.password = hash;
+
 		existingUser.save(); //Save updated user into the database
 		res.status(204).send();
 	} catch (error) {
