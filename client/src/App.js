@@ -10,6 +10,7 @@ import Account from './pages/Account';
 import Settings from './pages/Settings';
 import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
+import Favours from './pages/Favours';
 
 const App = withRouter((props) => {
 	const [authLoading, setAuthLoading] = useState(true);
@@ -44,6 +45,7 @@ const App = withRouter((props) => {
 		if (authUser) {
 			children = (
 				<Switch>
+					<Route path="/favours" component={Favours} />
 					<Route path="/account" component={Account} />
 					<Route path="/settings" component={Settings} />
 					<Route path="/" component={Home} />
