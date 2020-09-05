@@ -13,6 +13,45 @@ const catchValidationErrors = req => {
 	}
 };
 
+module.exports.getById = async (req, res, next) => {
+	try {
+		catchValidationErrors(req);
+
+		// TODO: auth/permission handling (user is involved in this favour)
+
+		const { favourId } = req.body;
+
+		const favourDoc = await Favour.findById(favourId);
+
+		if (!favourDoc) {
+			throw getError(404, 'Favour not found', DIALOG);
+		}
+
+		res.status(200).send(favourDoc);
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports.getAll = async (req, res, next) => {
+	try {
+		catchValidationErrors(req);
+
+		// TODO: auth/permission handling (user is involved in these favours)
+
+		const { userId } = req.body;
+
+		const favourDocs = await Favour
+			.find({ fromId: userId })
+			.or([{ forId: userId }])
+			.sort({ createdAt: 'asc' });
+
+		res.status(200).send(favourDocs);
+	} catch (error) {
+		next(error);
+	}
+};
+
 module.exports.create = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);

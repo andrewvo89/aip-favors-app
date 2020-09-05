@@ -1,6 +1,16 @@
 const { body } = require('express-validator');
 
 // TODO: image path validation?
+// TODO: auth check: ensure user has permission
+
+module.exports.getById = [
+	body('userId').not().isEmpty().withMessage('User is invalid'),
+	body('favourId').not().isEmpty().withMessage('favourId is invalid')
+];
+
+module.exports.getAll = [
+	body('userId').not().isEmpty().withMessage('User is invalid')
+];
 
 module.exports.create = [
 	body('fromId').not().isEmpty().withMessage('fromId is invalid'),
@@ -11,9 +21,11 @@ module.exports.create = [
 ];
 
 module.exports.repay = [
+	body('userId').not().isEmpty().withMessage('User is invalid'),
 	body('favourId').not().isEmpty().withMessage('favourId is invalid')
 ];
 
 module.exports.delete = [
+	body('userId').not().isEmpty().withMessage('User is invalid'),
 	body('favourId').not().isEmpty().withMessage('favourId is invalid')
 ];

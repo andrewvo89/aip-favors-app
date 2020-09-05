@@ -15,6 +15,7 @@ const accessControl = require('./middleware/access-control');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const storageRoutes = require('./routes/storage');
+const favourRoutes = require('./routes/favour');
 
 const { DB_USER, DB_PASS, DB_ADDRESS, DB_NAME, PORT } = process.env;
 //Initialize the body parser for .json
@@ -29,6 +30,7 @@ app.use(cookieParser());
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/storage', storageRoutes);
+app.use('/favours', favourRoutes);
 //catch all errors that get passed via next()
 app.use(errorHandler);
 //Initialize the mongodb connection, then start listening
