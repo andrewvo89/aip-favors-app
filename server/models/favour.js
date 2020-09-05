@@ -28,6 +28,18 @@ const favourSchema = new Schema(
 			type: Boolean,
 			default: false,
 			required: true
+		},
+		proof: {
+			actImage: {
+				type: String,
+				default: '',
+				required: false
+			},
+			repaidImage: {
+				type: String,
+				default: '',
+				required: false
+			}
 		}
 	},
 	{

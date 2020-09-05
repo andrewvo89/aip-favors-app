@@ -17,6 +17,8 @@ module.exports.create = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
 
+		// TODO: upload handling - actImage
+
 		const { fromId, fromName, forId, forName, act } = req.body;
 
 		const favour = new Favour({
@@ -27,7 +29,7 @@ module.exports.create = async (req, res, next) => {
 			act
 		});
 
-		// Save favour into the database
+		// Save new favour to db and add doc to response
 		const favourDoc = await favour.save();
 		res.status(201).send(favourDoc);
 	} catch (error) {
@@ -39,13 +41,16 @@ module.exports.repay = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
 
-		const { favourId } = req.body;
+		// TODO: upload handling - repaidImage
 
-		// Find favour, set repaid to true and save
+		const { favourId, repaidImage } = req.body;
+
 		const favourDoc = await Favour.findById(favourId);
+		favourDoc.proof.repaidImage = repaidImage;
 		favourDoc.repaid = true;
-		await favourDoc.save();
 
+		// Save updated favour to db
+		await favourDoc.save();
 		res.status(204).end();
 	} catch (error) {
 		next(error);
@@ -55,6 +60,8 @@ module.exports.repay = async (req, res, next) => {
 module.exports.delete = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
+
+		// TODO: image file deletion handling (if we're doing this)
 
 		const { favourId } = req.body;
 
