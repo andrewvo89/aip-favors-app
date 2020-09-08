@@ -47,3 +47,23 @@ export const create = data => {
 		}
 	};
 };
+
+export const getFavour = favourId => {
+	return async (dispatch) => {
+		try {
+
+			const result = await axios.get(`/favours/view/${favourId}`, config);
+
+			return result;
+		} catch (error) {
+			const errorMessage = getErrorMessage(error);
+
+			dispatch({
+				type: SET_ERROR,
+				error: errorMessage
+			});
+
+			return false;
+		}
+	};
+};

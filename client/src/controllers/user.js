@@ -178,7 +178,7 @@ export const getUsers = () => {
 
 			const result = await axios.get('/user/get-users', config);
 
-			return result.data;
+			return result;
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
 

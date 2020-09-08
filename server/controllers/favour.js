@@ -18,8 +18,8 @@ module.exports.getById = async (req, res, next) => {
 		catchValidationErrors(req);
 
 		// TODO: auth/permission handling (user is involved in this favour)
-
-		const { favourId } = req.body;
+		
+		const { favourId } = req.params;
 
 		const favourDoc = await Favour.findById(favourId);
 

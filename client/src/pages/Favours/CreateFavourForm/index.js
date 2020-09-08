@@ -10,6 +10,7 @@ import { SNACKBAR } from '../../../utils/constants';
 import { actList } from '../../../utils/actList';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 import * as messsageActions from '../../../controllers/message';
 import * as favourController from '../../../controllers/favour';
@@ -20,6 +21,7 @@ import { Autocomplete } from '@material-ui/lab';
 
 const CreateFavourForm = () => {
 	const dispatch = useDispatch();
+	const history = useHistory();
 	const { authUser } = useSelector((state) => state.authState);
 
 	const [loading, setLoading] = useState(false);
@@ -30,7 +32,8 @@ const CreateFavourForm = () => {
 		const fetchUsers = async () => {
 			const result = await stableDispatch(userController.getUsers());
 
-			setUserList(result);
+			const users = await result.data;
+			setUserList(users);
 		};
 
 		fetchUsers();
@@ -93,8 +96,18 @@ const CreateFavourForm = () => {
 					feedback: SNACKBAR
 				})
 			);
+			
+			// route to new favour view
+			const favour = await result.data;
+			history.push({
+				pathname: `/favours/view/${favour._id}`,
+				state: favour
+			});
 		}
-		setLoading(false);
+
+		return () => {
+			setLoading(false);
+		};
 	};
 
 	const formik = useFormik({

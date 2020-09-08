@@ -13,7 +13,7 @@ const Favours = () => {
 				<Switch>
 					<Route path="/favours/create" component={CreateFavourForm} />
 					<Route path="/favours/view/all" component={FavoursList} />
-					<Route path="/favours/view/:favourId" component={Favour} />
+					<Route path="/favours/view/:favourId" strict sensitive component={Favour} />
 					<Redirect from="/favours" to="/favours/view/all" />
 				</Switch>
 			</StyledCard>
