@@ -135,3 +135,27 @@ module.exports.deletePicture = async (req, res, next) => {
 		next(error);
 	}
 };
+
+module.exports.getUsers = async (req, res, next) => {
+	try {
+		// const { filter } = req.params;
+		const filter = {};
+
+		const userDocs = await User
+			.find(filter)
+			.select({ firstName: 1, lastName: 1, profilePicture: 1 })
+			.sort({ firstName: 'asc' });
+		
+		const users = userDocs.map(user => {
+			return {
+				_id: user._id,
+				fullName: user.fullName,
+				profilePicture: user.profilePicture
+			};
+		});
+
+		res.status(200).send(users);
+	} catch (error) {
+		next(error);
+	}
+};

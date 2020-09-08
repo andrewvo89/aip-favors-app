@@ -9,6 +9,20 @@ import { get503Error } from '../utils/error-handler';
 import Compressor from 'compressorjs';
 const config = { withCredentials: true };
 
+
+const getErrorMessage = error => {
+	if (error.message === NETWORK_ERROR) {
+		return get503Error();
+	} else {
+		return new ErrorMessage({
+			status: error.response.status,
+			statusText: error.response.statusText,
+			message: error.response.data.message,
+			feedback: error.response.data.feedback
+		});
+	}
+};
+
 export const update = ({ email, firstName, lastName }) => {
 	return async (dispatch, getState) => {
 		try {
@@ -30,17 +44,8 @@ export const update = ({ email, firstName, lastName }) => {
 			});
 			return true;
 		} catch (error) {
-			let errorMessage;
-			if (error.message === NETWORK_ERROR) {
-				errorMessage = get503Error();
-			} else {
-				errorMessage = new ErrorMessage({
-					status: error.response.status,
-					statusText: error.response.statusText,
-					message: error.response.data.message,
-					feedback: error.response.data.feedback
-				});
-			}
+			const errorMessage = getErrorMessage(error);
+
 			dispatch({
 				type: SET_ERROR,
 				error: errorMessage
@@ -66,17 +71,8 @@ export const updatePassword = ({
 			await axios.patch('/user/update-password', data, config);
 			return true;
 		} catch (error) {
-			let errorMessage;
-			if (error.message === NETWORK_ERROR) {
-				errorMessage = get503Error();
-			} else {
-				errorMessage = new ErrorMessage({
-					status: error.response.status,
-					statusText: error.response.statusText,
-					message: error.response.data.message,
-					feedback: error.response.data.feedback
-				});
-			}
+			const errorMessage = getErrorMessage(error);
+
 			dispatch({
 				type: SET_ERROR,
 				error: errorMessage
@@ -102,17 +98,8 @@ export const updateSettings = (settings) => {
 			});
 			return true;
 		} catch (error) {
-			let errorMessage;
-			if (error.message === NETWORK_ERROR) {
-				errorMessage = get503Error();
-			} else {
-				errorMessage = new ErrorMessage({
-					status: error.response.status,
-					statusText: error.response.statusText,
-					message: error.response.data.message,
-					feedback: error.response.data.feedback
-				});
-			}
+			const errorMessage = getErrorMessage(error);
+
 			dispatch({
 				type: SET_ERROR,
 				error: errorMessage
@@ -150,17 +137,8 @@ export const uploadPicture = (file) => {
 				}
 			});
 		} catch (error) {
-			let errorMessage;
-			if (error.message === NETWORK_ERROR) {
-				errorMessage = get503Error();
-			} else {
-				errorMessage = new ErrorMessage({
-					status: error.response.status,
-					statusText: error.response.statusText,
-					message: error.response.data.message,
-					feedback: error.response.data.feedback
-				});
-			}
+			const errorMessage = getErrorMessage(error);
+
 			dispatch({
 				type: SET_ERROR,
 				error: errorMessage
@@ -181,21 +159,35 @@ export const removePicture = () => {
 				}
 			});
 		} catch (error) {
-			let errorMessage;
-			if (error.message === NETWORK_ERROR) {
-				errorMessage = get503Error();
-			} else {
-				errorMessage = new ErrorMessage({
-					status: error.response.status,
-					statusText: error.response.statusText,
-					message: error.response.data.message,
-					feedback: error.response.data.feedback
-				});
-			}
+			const errorMessage = getErrorMessage(error);
+
 			dispatch({
 				type: SET_ERROR,
 				error: errorMessage
 			});
+		}
+	};
+};
+
+export const getUsers = () => {
+	return async (dispatch) => {
+		try {
+			// TODO: maybe implement filter to grab specific users
+			// instead of returning all? e.g.:
+			// { firtName: 'David', email: 'blah@example.com' }
+
+			const result = await axios.get('/user/get-users', config);
+
+			return result.data;
+		} catch (error) {
+			const errorMessage = getErrorMessage(error);
+
+			dispatch({
+				type: SET_ERROR,
+				error: errorMessage
+			});
+
+			return false;
 		}
 	};
 };

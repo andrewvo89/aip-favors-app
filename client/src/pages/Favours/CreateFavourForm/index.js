@@ -1,18 +1,11 @@
-import React, { Fragment, useState } from 'react';
-import {
-	FormControl,
-	InputLabel,
-	Select,
-	MenuItem,
-	CircularProgress
-} from '@material-ui/core';
+import React, { Fragment, useState, useEffect, useCallback } from 'react';
+import { FormControl, CircularProgress, TextField } from '@material-ui/core';
 import {
 	StyledCardContent,
 	StyledCardHeader,
 	StyledCardActions,
 	StyledButton
 } from './styled-components';
-import { StyledInput } from '../../../utils/styled-components';
 import { SNACKBAR } from '../../../utils/constants';
 import { actList } from '../../../utils/actList';
 import { useFormik } from 'formik';
@@ -20,6 +13,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import * as messsageActions from '../../../controllers/message';
 import * as favourController from '../../../controllers/favour';
+import * as userController from '../../../controllers/user';
+import UserSearchSelect from './UserSearchSelect';
+import { Autocomplete } from '@material-ui/lab';
 
 
 const CreateFavourForm = () => {
@@ -27,28 +23,58 @@ const CreateFavourForm = () => {
 	const { authUser } = useSelector((state) => state.authState);
 
 	const [loading, setLoading] = useState(false);
+	const [userList, setUserList] = useState([]);
+
+	const stableDispatch = useCallback(dispatch, []);
+	useEffect(() => {
+		const fetchUsers = async () => {
+			const result = await stableDispatch(userController.getUsers());
+
+			setUserList(result);
+		};
+
+		fetchUsers();
+	}, [stableDispatch]);
 
 	const initialValues = {
-		fromId: authUser.id,
-		fromName: `${authUser.firstName} ${authUser.lastName}`,
-		forId: '',
-		forName: '',
+		from: {
+			_id: authUser.userId,
+			fullName: `${authUser.firstName} ${authUser.lastName}`,
+			profilePicture: ''
+		},
+		for: {
+			_id: '',
+			fullName: '',
+			profilePicture: ''
+		},
 		act: ''
 	};
 
 	const initialErrors = {
-		fromId: true,
-		fromName: true,
-		forId: true,
-		forName: true,
+		from: {
+			_id: true,
+			fullName: true,
+			profilePicture: true
+		},
+		for: {
+			_id: true,
+			fullName: true,
+			profilePicture: true
+		},
 		act: true
 	};
 
 	const validationSchema = yup.object().shape({
-		fromId: yup.string().label('fromId').required().length(24),
-		fromName: yup.string().label('fromName').required().max(101),
-		forId: yup.string().label('forId').required().length(24),
-		forName: yup.string().label('forName').required().max(101),
+		from: yup.object().shape({
+			_id: yup.string().label('from._id').required().length(24),
+			fullName: yup.string().label('from.name').required().max(101),
+			profilePicture: yup.string().label('from.profilePicture')
+		}),
+		for: yup.object().shape({
+			_id: yup.string().label('for._id').required().length(24),
+			fullName: yup.string().label('for.name').required().max(101),
+			profilePicture: yup.string().label('for.profilePicture')
+		}),
 		act: yup.string().label('Act').required().oneOf(
 			actList,
 			'Invalid act selection.'
@@ -58,8 +84,7 @@ const CreateFavourForm = () => {
 	const submitHandler = async (values) => {
 		setLoading(true);
 
-		const result = await favourController.create(values);
-
+		const result = await dispatch(favourController.create(values));
 		if (result) {
 			dispatch(
 				messsageActions.setMessage({
@@ -69,7 +94,6 @@ const CreateFavourForm = () => {
 				})
 			);
 		}
-
 		setLoading(false);
 	};
 
@@ -89,64 +113,67 @@ const CreateFavourForm = () => {
 				/>
 				<StyledCardContent>
 					<FormControl margin="dense">
-						<InputLabel id="from-name-input-label">From</InputLabel>
-						<StyledInput
-							labelId="from-name-input-label"
-							type="text"
-							value={formik.values.fromName}
-							onChange={formik.handleChange('fromName')}
-							onBlur={formik.handleBlur('fromName')}
-							error={
-								!!formik.touched.fromName && !!formik.errors.fromName
-							}
+						<UserSearchSelect
+							id="from-name-input"
+							label="From"
+							authUser={authUser}
+							userList={userList}
+							value={formik.values.from}
+							onChange={newValue => formik.setFieldValue('from', newValue)}
+							error={!!formik.touched.from && !!formik.errors.from}
 							autoFocus={true}
 						/>
 					</FormControl>
 
 					<FormControl margin="dense">
-						<InputLabel id="for-name-input-label">For</InputLabel>
-						<StyledInput
-							labelId="for-name-input-label"
-							type="text"
-							value={formik.values.forName}
-							onChange={formik.handleChange('forName')}
-							onBlur={formik.handleBlur('forName')}
-							error={!!formik.touched.forName && !!formik.errors.forName}
+						<UserSearchSelect
+							id="for-name-input"
+							label="For"
+							authUser={authUser}
+							userList={userList}
+							value={formik.values.for}
+							onChange={newValue => formik.setFieldValue('for', newValue)}
+							error={!!formik.touched.for && !!formik.errors.for}
 						/>
 					</FormControl>
 
 					<FormControl margin="dense">
-						<InputLabel id="act-input-label">Act</InputLabel>
-						<Select
-							labelId="act-input-label"
+						<Autocomplete
+							id="act-input"
+							options={actList}
 							value={formik.values.act}
 							onChange={formik.handleChange('act')}
-							onBlur={formik.handleBlur('act')}
-							error={!!formik.touched.act && !!formik.errors.act}
-						>
-							{actList.map(actText =>
-								<MenuItem value={actText} key={actText}>
-									{actText}
-								</MenuItem>
+							getOptionLabel={(option) => option}
+							autoHighlight
+							autoSelect
+							renderInput={(params) => (
+								<TextField
+									{...params}
+									label="Act"
+									error={!!formik.touched.act && !!formik.errors.act}
+									InputProps={{
+										...params.InputProps
+									}}
+								/>
 							)}
-						</Select>
+						/>
 					</FormControl>
 				</StyledCardContent>
 
 				<StyledCardActions>
-					{loading ? (
+					{loading
+						?
 						<CircularProgress />
-					) : (
+						:
 						<Fragment>
 							<StyledButton
 								variant="contained"
 								color="primary"
 								type="submit"
 								disabled={!formik.isValid}>
-									Create
+								Create
 							</StyledButton>
-						</Fragment>
-					)}
+						</Fragment>}
 				</StyledCardActions>
 			</form>
 		</Fragment>

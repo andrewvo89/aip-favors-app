@@ -50,4 +50,9 @@ const userSchema = new Schema(
 	}
 );
 
+// cannot be queried on the db directly
+userSchema.virtual('fullName').get(function() {
+	return `${this.firstName} ${this.lastName}`;
+});
+
 module.exports = mongoose.model('User', userSchema);

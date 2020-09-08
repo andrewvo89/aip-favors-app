@@ -25,10 +25,10 @@ export const create = data => {
 	return async (dispatch) => {
 		try {
 			const favourData = {
-				fromId: data.fromId,
-				fromName: data.fromName,
-				forId: data.forId,
-				forName: data.forName,
+				fromId: data.from._id,
+				fromName: data.from.fullName,
+				forId: data.for._id,
+				forName: data.for.fullName,
 				act: data.act
 			};
 
