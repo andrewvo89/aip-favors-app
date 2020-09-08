@@ -142,7 +142,7 @@ const CreateFavourForm = () => {
 							id="act-input"
 							options={actList}
 							value={formik.values.act}
-							onChange={formik.handleChange('act')}
+							onChange={(e, newValue) => formik.setFieldValue('act', newValue)}
 							getOptionLabel={(option) => option}
 							autoHighlight
 							autoSelect
