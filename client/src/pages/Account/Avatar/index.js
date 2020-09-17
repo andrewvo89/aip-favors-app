@@ -5,9 +5,10 @@ import * as errorController from '../../../controllers/error';
 import * as userController from '../../../controllers/user';
 import { StyledAvatar } from './styled-components';
 import { withRouter } from 'react-router-dom';
-import { SNACKBAR, REST_URL } from '../../../utils/constants';
+import { SNACKBAR } from '../../../utils/constants';
 import HttpStatus from 'http-status-codes';
 import ConfirmDialog from '../../../components/ConfirmDialog';
+const { REACT_APP_REST_URL: REST_URL } = process.env;
 
 const Avatar = withRouter((_props) => {
 	const fileInputRef = useRef();
@@ -83,8 +84,7 @@ const Avatar = withRouter((_props) => {
 				size={3}
 				darkMode={authUser.settings.darkMode}
 				onClick={(event) => setAnchorElement(event.target)}
-				src={avatarUrl}
-			>
+				src={avatarUrl}>
 				{loading ? (
 					<CircularProgress />
 				) : (
@@ -116,8 +116,7 @@ const Avatar = withRouter((_props) => {
 					vertical: 'top',
 					horizontal: 'center'
 				}}
-				getContentAnchorEl={null}
-			>
+				getContentAnchorEl={null}>
 				<MenuItem onClick={uploadClickHandler}>Upload Picture</MenuItem>
 				<MenuItem onClick={removeClickHandler}>Remove Picture</MenuItem>
 			</Menu>

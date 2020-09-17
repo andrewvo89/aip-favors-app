@@ -141,6 +141,7 @@ export const logout = () => {
 			const { authUser } = getState().authState;
 			await authUser.logout();
 		} catch (error) {
+			console.log(error);
 			let errorMessage;
 			if (error.message === NETWORK_ERROR) {
 				errorMessage = get503Error();

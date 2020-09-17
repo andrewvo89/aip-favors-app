@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../utils/axios';
 const config = { withCredentials: true };
 export default class User {
 	constructor({
@@ -47,7 +47,6 @@ export default class User {
 			email: email.trim().toLowerCase(),
 			password: password
 		};
-		console.log('here');
 		const result = await axios.post('/auth/login', data, config);
 		return result;
 	}

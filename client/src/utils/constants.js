@@ -11,7 +11,6 @@ export const NETWORK_ERROR = 'Network Error';
 export const SERVICE_UNAVAILABLE = 'Service Unavailable';
 export const DARK = 'dark';
 export const LIGHT = 'light';
-export const REST_URL = 'http://localhost:8080';
 export const SHOW_LOGIN_DIALOG = 'SHOW_LOGIN_DIALOG';
 export const SHOW_SIGNUP_DIALOG = 'SHOW_SIGNUP_DIALOG';
 export const CLOSE_AUTH_DIALOG = 'CLOSE_AUTH_DIALOG';
