@@ -4,8 +4,7 @@ import {
 	LOGOUT,
 	CLOSE_AUTH_DIALOG,
 	SHOW_LOGIN_DIALOG,
-	SHOW_SIGNUP_DIALOG,
-	CLEAR_RESUME_ACTION
+	SHOW_SIGNUP_DIALOG
 } from '../utils/constants';
 
 const initialState = {
@@ -53,12 +52,6 @@ export default (state = initialState, action) => {
 				...state,
 				login: initialState.login,
 				signup: initialState.signup,
-				resume: false,
-				resumeAction: null
-			};
-		case CLEAR_RESUME_ACTION:
-			return {
-				...state,
 				resume: false,
 				resumeAction: null
 			};
