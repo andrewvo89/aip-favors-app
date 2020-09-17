@@ -95,7 +95,9 @@ module.exports.signup = async (req, res, next) => {
 		}
 
 		// Generate salt with a random number of rounds between 10 - 15 and then hash plaintext password
-		const salt = bcrypt.genSaltSync(Math.floor(Math.random() * (15 - 10 + 1) + 10));
+		const salt = bcrypt.genSaltSync(
+			Math.floor(Math.random() * (15 - 10 + 1) + 10)
+		);
 		const hash = bcrypt.hashSync(password, salt);
 
 		const user = new User({

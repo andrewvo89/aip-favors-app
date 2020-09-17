@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import * as authController from '../../controllers/auth';
 import { StyledAvatar } from '../../utils/styled-components';
 import { withRouter } from 'react-router-dom';
-import { REST_URL } from '../../utils/constants';
+const { REACT_APP_REST_URL: REST_URL } = process.env;
 
 const NavbarAvatar = withRouter((props) => {
 	const dispatch = useDispatch();
@@ -41,8 +41,7 @@ const NavbarAvatar = withRouter((props) => {
 				size={1}
 				darkMode={props.authUser.settings.darkMode}
 				onClick={(event) => setAnchorElement(event.target)}
-				src={avatarUrl}
-			>
+				src={avatarUrl}>
 				{`${props.authUser.firstName.substring(
 					0,
 					1
@@ -62,8 +61,7 @@ const NavbarAvatar = withRouter((props) => {
 					vertical: 'top',
 					horizontal: 'center'
 				}}
-				getContentAnchorEl={null}
-			>
+				getContentAnchorEl={null}>
 				<MenuItem onClick={accountClickHandler}>Account</MenuItem>
 				<MenuItem onClick={settingsClickHandler}>Settings</MenuItem>
 				<MenuItem onClick={logoutClickHandler}>Logout</MenuItem>

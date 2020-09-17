@@ -19,12 +19,12 @@ router.patch(
 	userController.updatePassword
 );
 
-router.patch(
-	'/update-settings',
-	verifyAuth,
-	userValidator.updateSettings,
-	userController.updateSettings
-);
+// router.patch(
+// 	'/update-settings',
+// 	verifyAuth,
+// 	userValidator.updateSettings,
+// 	userController.updateSettings
+// );
 
 router.patch(
 	'/upload-picture',
@@ -33,7 +33,7 @@ router.patch(
 	userController.uploadPicture
 );
 
-router.delete('/remove-picture', verifyAuth, userController.deletePicture);
+router.delete('/remove-picture', verifyAuth, userController.removePicture);
 
 router.get('/get-users', verifyAuth, userController.getUsers);
 

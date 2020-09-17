@@ -16,7 +16,14 @@ module.exports.update = async (req, res, next) => {
 			//Catches any errors detected through express-validator middlware
 			throw getError(422, validationErrors.errors[0].msg, DIALOG);
 		}
-		const { userId, email, firstName, lastName } = req.body;
+		const {
+			userId,
+			email,
+			firstName,
+			lastName,
+			profilePicture,
+			settings
+		} = req.body;
 		const existingUser = await User.findOne({
 			_id: new mongoose.Types.ObjectId(userId)
 		});
@@ -30,6 +37,8 @@ module.exports.update = async (req, res, next) => {
 		existingUser.firstName = firstName;
 		existingUser.lastName = lastName;
 		existingUser.email = email;
+		existingUser.profilePicture = profilePicture;
+		existingUser.settings = settings;
 		existingUser.save(); //Save updated user into the database
 		res.status(204).send();
 	} catch (error) {
@@ -62,7 +71,9 @@ module.exports.updatePassword = async (req, res, next) => {
 		} //Once authenticated with their current password, move on to set new password
 
 		// Generate salt with a random number of rounds between 10-15 and hash plaintext password
-		const salt = bcrypt.genSaltSync(Math.floor(Math.random() * (15 - 10 + 1) + 10));
+		const salt = bcrypt.genSaltSync(
+			Math.floor(Math.random() * (15 - 10 + 1) + 10)
+		);
 		const hash = bcrypt.hashSync(password, salt);
 		existingUser.password = hash;
 
@@ -113,7 +124,7 @@ module.exports.uploadPicture = async (req, res, next) => {
 	}
 };
 
-module.exports.deletePicture = async (req, res, next) => {
+module.exports.removePicture = async (req, res, next) => {
 	try {
 		const existingUser = await User.findOne({
 			_id: new mongoose.Types.ObjectId(res.locals.userId)
@@ -141,12 +152,11 @@ module.exports.getUsers = async (req, res, next) => {
 		// const { filter } = req.params;
 		const filter = {};
 
-		const userDocs = await User
-			.find(filter)
+		const userDocs = await User.find(filter)
 			.select({ firstName: 1, lastName: 1, profilePicture: 1 })
 			.sort({ firstName: 'asc' });
-		
-		const users = userDocs.map(user => {
+
+		const users = userDocs.map((user) => {
 			return {
 				_id: user._id,
 				fullName: user.fullName,

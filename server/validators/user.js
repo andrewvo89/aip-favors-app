@@ -10,7 +10,16 @@ module.exports.update = [
 		.isEmail()
 		.withMessage('Email is invalid'),
 	body('firstName').trim().not().isEmpty().withMessage('First name is invalid'),
-	body('lastName').trim().not().isEmpty().withMessage('Last name is invalid')
+	body('lastName').trim().not().isEmpty().withMessage('Last name is invalid'),
+	body('settings').custom(async (value, { _req }) => {
+		if (
+			typeof value.darkMode !== BOOLEAN ||
+			typeof value.emailNotifications !== BOOLEAN ||
+			typeof value.appNotifications !== BOOLEAN
+		) {
+			throw new Error('Settings are invalid');
+		}
+	})
 ];
 
 module.exports.updatePassword = [
