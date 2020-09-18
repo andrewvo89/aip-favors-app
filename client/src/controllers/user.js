@@ -3,14 +3,11 @@ import {
 	NETWORK_ERROR,
 	AUTH_USER_CHANGED
 } from '../utils/constants';
-import axios from '../utils/axios';
 import ErrorMessage from '../models/error-message';
 import { get503Error } from '../utils/error-handler';
-import Compressor from 'compressorjs';
-const config = { withCredentials: true };
+import User from '../models/user';
 
-
-const getErrorMessage = error => {
+const getErrorMessage = (error) => {
 	if (error.message === NETWORK_ERROR) {
 		return get503Error();
 	} else {
@@ -23,24 +20,19 @@ const getErrorMessage = error => {
 	}
 };
 
-export const update = ({ email, firstName, lastName }) => {
+export const update = (values) => {
 	return async (dispatch, getState) => {
 		try {
-			const data = {
-				userId: getState().authState.authUser.userId,
-				email,
-				firstName,
-				lastName
-			};
-			await axios.patch('/user/update', data, config);
+			const { authUser } = getState().authState;
+			//Spread existing values of authUser, then overwrite with anything from values parameter
+			const newAuthUser = new User({
+				...authUser,
+				...values
+			});
+			await newAuthUser.save();
 			dispatch({
 				type: AUTH_USER_CHANGED,
-				authUser: {
-					...getState().authState.authUser,
-					email,
-					firstName,
-					lastName
-				}
+				authUser: newAuthUser
 			});
 			return true;
 		} catch (error) {
@@ -55,55 +47,19 @@ export const update = ({ email, firstName, lastName }) => {
 	};
 };
 
-export const updatePassword = ({
-	currentPassword,
-	password,
-	passwordConfirm
-}) => {
+export const updatePassword = (values) => {
 	return async (dispatch, getState) => {
 		try {
-			const data = {
-				userId: getState().authState.authUser.userId,
-				currentPassword,
-				password,
-				passwordConfirm
-			};
-			await axios.patch('/user/update-password', data, config);
+			const { authUser } = getState().authState;
+			await authUser.savePassword(values);
 			return true;
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
-
 			dispatch({
 				type: SET_ERROR,
 				error: errorMessage
 			});
-		}
-	};
-};
-
-export const updateSettings = (settings) => {
-	return async (dispatch, getState) => {
-		try {
-			const data = {
-				userId: getState().authState.authUser.userId,
-				settings
-			};
-			await axios.patch('/user/update-settings', data, config);
-			dispatch({
-				type: AUTH_USER_CHANGED,
-				authUser: {
-					...getState().authState.authUser,
-					settings
-				}
-			});
-			return true;
-		} catch (error) {
-			const errorMessage = getErrorMessage(error);
-
-			dispatch({
-				type: SET_ERROR,
-				error: errorMessage
-			});
+			return false;
 		}
 	};
 };
@@ -111,34 +67,17 @@ export const updateSettings = (settings) => {
 export const uploadPicture = (file) => {
 	return async (dispatch, getState) => {
 		try {
-			const reizedFile = await new Promise((resolve, reject) => {
-				return new Compressor(file, {
-					width: 400,
-					success: (result) => {
-						resolve(
-							new File([result], file.name, {
-								type: file.type,
-								lastModified: file.lastModified
-							})
-						);
-					},
-					error: (error) => reject(error)
-				});
+			const { authUser } = getState().authState;
+			const newAuthUser = new User({
+				...authUser
 			});
-			const data = new FormData();
-			data.append('userId', getState().authState.authUser.userId);
-			data.append('file', reizedFile);
-			const result = await axios.patch('/user/upload-picture', data, config);
+			await newAuthUser.uploadProfilePicture(file);
 			dispatch({
 				type: AUTH_USER_CHANGED,
-				authUser: {
-					...getState().authState.authUser,
-					profilePicture: result.data.profilePicture
-				}
+				authUser: newAuthUser
 			});
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
-
 			dispatch({
 				type: SET_ERROR,
 				error: errorMessage
@@ -150,13 +89,14 @@ export const uploadPicture = (file) => {
 export const removePicture = () => {
 	return async (dispatch, getState) => {
 		try {
-			await axios.delete('/user/remove-picture', config);
+			const { authUser } = getState().authState;
+			const newAuthUser = new User({
+				...authUser
+			});
+			await newAuthUser.removePicture();
 			dispatch({
 				type: AUTH_USER_CHANGED,
-				authUser: {
-					...getState().authState.authUser,
-					profilePicture: ''
-				}
+				authUser: newAuthUser
 			});
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
@@ -169,24 +109,21 @@ export const removePicture = () => {
 	};
 };
 
-export const getUsers = () => {
+export const getUsers = (filters) => {
 	return async (dispatch) => {
 		try {
 			// TODO: maybe implement filter to grab specific users
 			// instead of returning all? e.g.:
 			// { firtName: 'David', email: 'blah@example.com' }
-
-			const result = await axios.get('/user/get-users', config);
-
-			return result;
+			// const result = await axios.get('/user/get-users', config);
+			const users = await User.get(filters);
+			return users;
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
-
 			dispatch({
 				type: SET_ERROR,
 				error: errorMessage
 			});
-
 			return false;
 		}
 	};

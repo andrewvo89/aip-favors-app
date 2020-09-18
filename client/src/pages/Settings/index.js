@@ -25,7 +25,7 @@ const Settings = (props) => {
 	const dispatch = useDispatch();
 
 	const switchChangeHandler = async (settings) => {
-		await dispatch(userController.updateSettings(settings));
+		await dispatch(userController.update({ settings: settings }));
 	};
 
 	return (

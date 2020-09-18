@@ -18,7 +18,6 @@ import * as userController from '../../../controllers/user';
 import UserSearchSelect from './UserSearchSelect';
 import { Autocomplete } from '@material-ui/lab';
 
-
 const CreateFavourForm = () => {
 	const dispatch = useDispatch();
 	const history = useHistory();
@@ -30,9 +29,12 @@ const CreateFavourForm = () => {
 	const stableDispatch = useCallback(dispatch, []);
 	useEffect(() => {
 		const fetchUsers = async () => {
-			const result = await stableDispatch(userController.getUsers());
-
-			const users = await result.data;
+			const users = await stableDispatch(
+				userController.getUsers({
+					firstName: 'David for example'
+				})
+			);
+			// const users = await result.data;
 			setUserList(users);
 		};
 
@@ -78,10 +80,11 @@ const CreateFavourForm = () => {
 			fullName: yup.string().label('for.name').required().max(101),
 			profilePicture: yup.string().label('for.profilePicture')
 		}),
-		act: yup.string().label('Act').required().oneOf(
-			actList,
-			'Invalid act selection.'
-		)
+		act: yup
+			.string()
+			.label('Act')
+			.required()
+			.oneOf(actList, 'Invalid act selection.')
 	});
 
 	const submitHandler = async (values) => {
@@ -96,7 +99,7 @@ const CreateFavourForm = () => {
 					feedback: SNACKBAR
 				})
 			);
-			
+
 			// route to new favour view
 			const favour = await result.data;
 			history.push({
@@ -132,7 +135,7 @@ const CreateFavourForm = () => {
 							authUser={authUser}
 							userList={userList}
 							value={formik.values.from}
-							onChange={newValue => formik.setFieldValue('from', newValue)}
+							onChange={(newValue) => formik.setFieldValue('from', newValue)}
 							error={!!formik.touched.from && !!formik.errors.from}
 							autoFocus={true}
 						/>
@@ -145,7 +148,7 @@ const CreateFavourForm = () => {
 							authUser={authUser}
 							userList={userList}
 							value={formik.values.for}
-							onChange={newValue => formik.setFieldValue('for', newValue)}
+							onChange={(newValue) => formik.setFieldValue('for', newValue)}
 							error={!!formik.touched.for && !!formik.errors.for}
 						/>
 					</FormControl>
@@ -174,10 +177,9 @@ const CreateFavourForm = () => {
 				</StyledCardContent>
 
 				<StyledCardActions>
-					{loading
-						?
+					{loading ? (
 						<CircularProgress />
-						:
+					) : (
 						<Fragment>
 							<StyledButton
 								variant="contained"
@@ -186,7 +188,8 @@ const CreateFavourForm = () => {
 								disabled={!formik.isValid}>
 								Create
 							</StyledButton>
-						</Fragment>}
+						</Fragment>
+					)}
 				</StyledCardActions>
 			</form>
 		</Fragment>
