@@ -1,34 +1,18 @@
 import React, { Fragment, useState } from 'react';
-import { CircularProgress } from '@material-ui/core';
-import {
-	StyledCardContent,
-	StyledCardHeader,
-	StyledCardActions
-} from './styled-components';
-
+import { CardActions, CardContent, CircularProgress } from '@material-ui/core';
+import CardHeader from '../../../components/CardHeader';
 
 const CreateFavourForm = () => {
 	const [loading, setLoading] = useState(false);
 
 	return (
 		<Fragment>
-			<StyledCardHeader
-				title="Favours List"
-				subheader="List of stuff.."
-			/>
-			<StyledCardContent>
+			<CardHeader title="Favours List" subheader="List of stuff.." />
+			<CardContent></CardContent>
 
-			</StyledCardContent>
-
-			<StyledCardActions>
-				{loading ?
-					(
-						<CircularProgress />
-					) : (
-						<Fragment>
-						</Fragment>
-					)}
-			</StyledCardActions>
+			<CardActions>
+				{loading ? <CircularProgress /> : <Fragment></Fragment>}
+			</CardActions>
 		</Fragment>
 	);
 };

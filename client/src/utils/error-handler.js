@@ -6,10 +6,10 @@ import {
 	DialogContentText,
 	DialogTitle,
 	Button,
-	Snackbar
+	Snackbar,
+	DialogContent
 } from '@material-ui/core/';
 import { Alert, AlertTitle } from '@material-ui/lab';
-import { StyledDialogContent } from './styled-components';
 import * as errorController from '../controllers/error';
 import { DIALOG, SILENT, SNACKBAR, SERVICE_UNAVAILABLE } from './constants';
 import ErrorMessage from '../models/error-message';
@@ -32,9 +32,9 @@ const ErrorHandler = (props) => {
 						<DialogTitle>
 							{status}: {statusText}
 						</DialogTitle>
-						<StyledDialogContent>
+						<DialogContent>
 							<DialogContentText>{message}</DialogContentText>
-						</StyledDialogContent>
+						</DialogContent>
 						<DialogActions>
 							<Button onClick={errorClearHandler} color="primary" autoFocus>
 								Close

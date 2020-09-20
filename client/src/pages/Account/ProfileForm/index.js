@@ -1,18 +1,12 @@
 import React, { Fragment, useState } from 'react';
 import {
-	FormControl,
-	InputLabel,
 	Grid,
-	CircularProgress
+	CircularProgress,
+	TextField,
+	CardActions,
+	CardContent
 } from '@material-ui/core';
-import {
-	StyledCardContent,
-	StyledCardHeader,
-	StyledCardActions,
-	StyledButton,
-	StyledLink
-} from './styled-components';
-import { StyledInput } from '../../../utils/styled-components';
+import { StyledLink } from './styled-components';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,6 +15,8 @@ import * as messsageActions from '../../../controllers/message';
 import ChangePassword from './ChangePassword';
 import { SNACKBAR } from '../../../utils/constants';
 import AccountAvatar from '../AccountAvatar';
+import FullWidthButton from '../../../components/FullWidthButton';
+import CardHeader from '../../../components/CardHeader';
 
 const ProfileForm = () => {
 	const { authUser } = useSelector((state) => state.authState);
@@ -88,7 +84,7 @@ const ProfileForm = () => {
 				/>
 			)}
 			<form onSubmit={formik.handleSubmit}>
-				<StyledCardHeader
+				<CardHeader
 					title={
 						<Grid container direction="column" alignItems="center">
 							<Grid item>
@@ -101,12 +97,12 @@ const ProfileForm = () => {
 					}
 					subheader="23 favours completed"
 				/>
-				<StyledCardContent>
-					<Grid container spacing={2}>
-						<Grid item xs={6}>
-							<FormControl margin="dense">
-								<InputLabel>First name</InputLabel>
-								<StyledInput
+				<CardContent>
+					<Grid container direction="column" spacing={1}>
+						<Grid item container direction="row" spacing={2}>
+							<Grid item xs={6}>
+								<TextField
+									label="First name"
 									type="text"
 									value={formik.values.firstName}
 									onChange={formik.handleChange('firstName')}
@@ -115,51 +111,56 @@ const ProfileForm = () => {
 										!!formik.touched.firstName && !!formik.errors.firstName
 									}
 									autoFocus={true}
+									fullWidth={true}
 								/>
-							</FormControl>
-						</Grid>
-						<Grid item xs={6}>
-							<FormControl margin="dense">
-								<InputLabel>Last name</InputLabel>
-								<StyledInput
+							</Grid>
+							<Grid item xs={6}>
+								<TextField
+									label="Last name"
 									type="text"
 									value={formik.values.lastName}
 									onChange={formik.handleChange('lastName')}
 									onBlur={formik.handleBlur('lastName')}
 									error={!!formik.touched.lastName && !!formik.errors.lastName}
+									fullWidth={true}
 								/>
-							</FormControl>
+							</Grid>
+						</Grid>
+						<Grid item>
+							<TextField
+								label="Email"
+								value={formik.values.email}
+								onChange={formik.handleChange('email')}
+								onBlur={formik.handleBlur('email')}
+								error={!!formik.touched.email && !!formik.errors.email}
+								fullWidth={true}
+							/>
 						</Grid>
 					</Grid>
-					<FormControl margin="dense">
-						<InputLabel>Email</InputLabel>
-						<StyledInput
-							type="email"
-							value={formik.values.email}
-							onChange={formik.handleChange('email')}
-							onBlur={formik.handleBlur('email')}
-							error={!!formik.touched.email && !!formik.errors.email}
-						/>
-					</FormControl>
-				</StyledCardContent>
-				<StyledCardActions>
+				</CardContent>
+				<CardActions>
 					{loading ? (
 						<CircularProgress />
 					) : (
-						<Fragment>
-							<StyledLink onClick={() => setShowPasswordDialog(true)}>
-								Update Password
-							</StyledLink>
-							<StyledButton
-								variant="contained"
-								color="primary"
-								type="submit"
-								disabled={!formik.isValid}>
-								Update
-							</StyledButton>
-						</Fragment>
+						<Grid container direction="column" spacing={1}>
+							<Grid item container direction="column">
+								<StyledLink onClick={() => setShowPasswordDialog(true)}>
+									Update Password
+								</StyledLink>
+							</Grid>
+							<Grid item>
+								<FullWidthButton
+									variant="contained"
+									color="primary"
+									type="submit"
+									disabled={!formik.isValid}
+								>
+									Update
+								</FullWidthButton>
+							</Grid>
+						</Grid>
 					)}
-				</StyledCardActions>
+				</CardActions>
 			</form>
 		</Fragment>
 	);

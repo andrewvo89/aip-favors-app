@@ -1,25 +1,21 @@
-import { Grid, MenuItem, TextField } from '@material-ui/core';
-import React, { useState } from 'react';
 import {
-	StyledButton,
-	StyledCard,
-	StyledCardActions,
-	StyledCardContent,
-	StyledCardHeader
-} from '../../../utils/styled-components';
+	CardActions,
+	CardContent,
+	Grid,
+	MenuItem,
+	TextField
+} from '@material-ui/core';
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
 import * as requestController from '../../../controllers/request';
+import FullWidthButton from '../../../components/FullWidthButton';
+import Card from '../../../components/Card';
+import CardHeader from '../../../components/CardHeader';
 
 const RequestForm = (props) => {
-	const dummyFavourTypes = [
-		'Coffee',
-		'Chocolate',
-		'Mints',
-		'Pizza',
-		'Cupcakes'
-	];
+	const dummyFavourTypes = ['Coffee', 'Chocolate', 'Mint', 'Pizza', 'Cupcake'];
 	const dispatch = useDispatch();
 	const [loading, setLoading] = useState(false);
 
@@ -62,10 +58,10 @@ const RequestForm = (props) => {
 	});
 
 	return (
-		<StyledCard>
+		<Card>
 			<form onSubmit={formik.handleSubmit}>
-				<StyledCardHeader title="Request Form" />
-				<StyledCardContent>
+				<CardHeader title="Request Form" />
+				<CardContent>
 					<Grid container direction="column" spacing={1}>
 						<Grid item>
 							<TextField
@@ -110,19 +106,19 @@ const RequestForm = (props) => {
 							</Grid>
 						</Grid>
 					</Grid>
-				</StyledCardContent>
-				<StyledCardActions>
-					<StyledButton
+				</CardContent>
+				<CardActions>
+					<FullWidthButton
 						type="submit"
 						variant="contained"
 						color="primary"
 						disabled={!formik.isValid || loading}
 					>
 						Submit
-					</StyledButton>
-				</StyledCardActions>
+					</FullWidthButton>
+				</CardActions>
 			</form>
-		</StyledCard>
+		</Card>
 	);
 };
 

@@ -1,23 +1,21 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import {
 	IconButton,
 	InputAdornment,
 	Grid,
 	CircularProgress,
-	TextField
+	TextField,
+	CardActions,
+	CardContent
 } from '@material-ui/core';
-import {
-	StyledCard,
-	StyledButton,
-	StyledCardContent,
-	StyledCardActions,
-	StyledCardHeader
-} from '../../../utils/styled-components';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
 import * as authController from '../../../controllers/auth';
+import FullWidthButton from '../../../components/FullWidthButton';
+import Card from '../../../components/Card';
+import CardHeader from '../../../components/CardHeader';
 
 export default (props) => {
 	const dispatch = useDispatch();
@@ -77,10 +75,10 @@ export default (props) => {
 	});
 
 	return (
-		<StyledCard>
+		<Card minWidth="300px">
 			<form onSubmit={formik.handleSubmit}>
-				<StyledCardHeader title="Signup" />
-				<StyledCardContent>
+				<CardHeader title="Signup" />
+				<CardContent>
 					<Grid container direction="column" spacing={1}>
 						<Grid item container spacing={2}>
 							<Grid item xs={6}>
@@ -138,7 +136,8 @@ export default (props) => {
 													setShowPassword(
 														(prevShowPassword) => !prevShowPassword
 													)
-												}>
+												}
+											>
 												{showPassword ? <Visibility /> : <VisibilityOff />}
 											</IconButton>
 										</InputAdornment>
@@ -168,7 +167,8 @@ export default (props) => {
 														(prevShowPasswordConfirm) =>
 															!prevShowPasswordConfirm
 													)
-												}>
+												}
+											>
 												{showPasswordConfirm ? (
 													<Visibility />
 												) : (
@@ -181,31 +181,37 @@ export default (props) => {
 							/>
 						</Grid>
 					</Grid>
-				</StyledCardContent>
-				<StyledCardActions>
+				</CardContent>
+				<CardActions>
 					{loading ? (
 						<CircularProgress />
 					) : (
-						<Fragment>
-							<StyledButton
-								variant="contained"
-								color="primary"
-								type="submit"
-								disabled={!formik.isValid}>
-								Signup
-							</StyledButton>
-							{props.login && (
-								<StyledButton
-									variant="outlined"
+						<Grid container direction="column" spacing={1}>
+							<Grid item>
+								<FullWidthButton
+									variant="contained"
 									color="primary"
-									onClick={backClickHandler}>
-									Back
-								</StyledButton>
+									type="submit"
+									disabled={!formik.isValid}
+								>
+									Signup
+								</FullWidthButton>
+							</Grid>
+							{props.login && (
+								<Grid item>
+									<FullWidthButton
+										variant="outlined"
+										color="primary"
+										onClick={backClickHandler}
+									>
+										Back
+									</FullWidthButton>
+								</Grid>
 							)}
-						</Fragment>
+						</Grid>
 					)}
-				</StyledCardActions>
+				</CardActions>
 			</form>
-		</StyledCard>
+		</Card>
 	);
 };

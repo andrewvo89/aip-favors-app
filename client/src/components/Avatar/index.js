@@ -7,8 +7,8 @@ const Avatar = (props) => {
 	const { authUser } = useSelector((state) => state.authState);
 	const { user, iconFallback, customFallback } = props;
 
-	const firstNameInitial = user.firstName.substring(0, 1);
-	const lastNameInitial = user.lastName.substring(0, 1);
+	const firstNameInitial = user.firstName.substring(0, 1).toUpperCase();
+	const lastNameInitial = user.lastName.substring(0, 1).toUpperCase();
 
 	let fallback = `${firstNameInitial}${lastNameInitial}`;
 	if (iconFallback) {
@@ -28,7 +28,8 @@ const Avatar = (props) => {
 			<StyledAvatar
 				src={avatarUrl}
 				darkMode={authUser.settings.darkMode}
-				{...props}>
+				{...props}
+			>
 				{fallback}
 			</StyledAvatar>
 		</Fragment>

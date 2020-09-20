@@ -1,11 +1,5 @@
 import styled from 'styled-components';
-import { CardActions, FormGroup } from '@material-ui/core';
-
-export const StyledCardActions = styled(CardActions)`
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-`;
+import { FormGroup } from '@material-ui/core';
 
 export const StyledFormGroup = styled(FormGroup)`
 	padding-left: 10px;

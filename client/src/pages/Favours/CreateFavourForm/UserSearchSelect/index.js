@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { CircularProgress, Grid, TextField } from '@material-ui/core';
-import { StyledAvatar } from '../../../../utils/styled-components';
+import Avatar from '../../../../components/Avatar';
 
 const UserSearchSelect = (props) => {
 	const {
 		id,
 		label,
-		authUser,
 		userList,
 		value,
 		onChange,
@@ -17,11 +16,6 @@ const UserSearchSelect = (props) => {
 	const [open, setOpen] = useState(false);
 	const loading = open && userList.length === 0;
 
-	const getInitials = (user) => {
-		const names = user.fullName.split(' ');
-		return `${names[0].substring(0, 1)}${names[1].substring(0, 1)}`;
-	};
-
 	return (
 		<Autocomplete
 			id={id}
@@ -29,8 +23,8 @@ const UserSearchSelect = (props) => {
 			onOpen={() => setOpen(true)}
 			onClose={() => setOpen(false)}
 			loading={loading}
-			getOptionSelected={(option, value) => option._id === value._id}
-			getOptionLabel={(option) => option.fullName}
+			getOptionSelected={(option, value) => option.userId === value.userId}
+			getOptionLabel={(option) => `${option.fullName}`}
 			options={userList}
 			value={value}
 			onChange={(e, newVal) => onChange(newVal)}
@@ -45,14 +39,7 @@ const UserSearchSelect = (props) => {
 					autoFocus={autoFocus}
 					InputProps={{
 						...params.InputProps,
-						startAdornment: (
-							<StyledAvatar
-								size={0.66}
-								darkMode={authUser.settings.darkMode}
-								src={value.profilePicture}>
-								{value.fullName ? getInitials(value) : '?'}
-							</StyledAvatar>
-						),
+						// startAdornment: <Avatar size={0.66} user={value} />,
 						endAdornment: (
 							<React.Fragment>
 								{loading ? (
@@ -66,17 +53,12 @@ const UserSearchSelect = (props) => {
 			)}
 			renderOption={(user) => {
 				return (
-					<Grid container alignItems="center">
+					<Grid container alignItems="center" spacing={1}>
 						<Grid item>
-							<StyledAvatar
-								size={0.66}
-								darkMode={authUser.settings.darkMode}
-								src={user.profilePicture}>
-								{getInitials(user)}
-							</StyledAvatar>
+							<Avatar size={0.66} user={user} />
 						</Grid>
 						<Grid item xs>
-							{user.fullName}
+							{`${user.fullName}`}
 						</Grid>
 					</Grid>
 				);

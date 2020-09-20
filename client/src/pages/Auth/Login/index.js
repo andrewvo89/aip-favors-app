@@ -1,23 +1,21 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState } from 'react';
 import {
 	IconButton,
 	InputAdornment,
 	CircularProgress,
 	TextField,
-	Grid
+	Grid,
+	CardActions,
+	CardContent
 } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
-import {
-	StyledCard,
-	StyledButton,
-	StyledCardContent,
-	StyledCardActions,
-	StyledCardHeader
-} from '../../../utils/styled-components';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
 import * as authController from '../../../controllers/auth';
+import FullWidthButton from '../../../components/FullWidthButton';
+import Card from '../../../components/Card';
+import CardHeader from '../../../components/CardHeader';
 
 export default (props) => {
 	const dispatch = useDispatch();
@@ -59,10 +57,10 @@ export default (props) => {
 	});
 
 	return (
-		<StyledCard>
+		<Card>
 			<form onSubmit={formik.handleSubmit}>
-				<StyledCardHeader title="Login" />
-				<StyledCardContent>
+				<CardHeader title="Login" />
+				<CardContent>
 					<Grid container direction="column" spacing={1}>
 						<Grid item>
 							<TextField
@@ -96,7 +94,8 @@ export default (props) => {
 														(prevShowPassword) => !prevShowPassword
 													)
 												}
-												tabIndex={-1}>
+												tabIndex={-1}
+											>
 												{showPassword ? <Visibility /> : <VisibilityOff />}
 											</IconButton>
 										</InputAdornment>
@@ -105,29 +104,35 @@ export default (props) => {
 							/>
 						</Grid>
 					</Grid>
-				</StyledCardContent>
-				<StyledCardActions>
+				</CardContent>
+				<CardActions>
 					{loading ? (
 						<CircularProgress />
 					) : (
-						<Fragment>
-							<StyledButton
-								variant="contained"
-								color="primary"
-								type="submit"
-								disabled={!formik.isValid}>
-								Login
-							</StyledButton>
-							<StyledButton
-								variant="outlined"
-								color="primary"
-								onClick={signupClickHandler}>
-								Signup
-							</StyledButton>
-						</Fragment>
+						<Grid container direction="column" spacing={1}>
+							<Grid item>
+								<FullWidthButton
+									variant="contained"
+									color="primary"
+									type="submit"
+									disabled={!formik.isValid}
+								>
+									Login
+								</FullWidthButton>
+							</Grid>
+							<Grid item>
+								<FullWidthButton
+									variant="outlined"
+									color="primary"
+									onClick={signupClickHandler}
+								>
+									Signup
+								</FullWidthButton>
+							</Grid>
+						</Grid>
 					)}
-				</StyledCardActions>
+				</CardActions>
 			</form>
-		</StyledCard>
+		</Card>
 	);
 };

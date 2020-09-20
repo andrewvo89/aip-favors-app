@@ -7,10 +7,3 @@ export const StyledPageContainer = styled.div`
 	align-items: center;
 	width: 50%;
 `;
-
-export const StyledCard = styled(Card)`
-	width: 400px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-`;

@@ -6,10 +6,10 @@ import {
 	DialogContentText,
 	DialogTitle,
 	Button,
-	Snackbar
+	Snackbar,
+	DialogContent
 } from '@material-ui/core/';
 import { Alert, AlertTitle } from '@material-ui/lab';
-import { StyledDialogContent } from './styled-components';
 import * as messageController from '../controllers/message';
 import { DIALOG, SILENT, SNACKBAR } from './constants';
 
@@ -29,9 +29,9 @@ const MessageProvider = (props) => {
 				messageComponent = (
 					<Dialog open={feedback === DIALOG} onClose={messageClearHandler}>
 						<DialogTitle>{title}</DialogTitle>
-						<StyledDialogContent>
+						<DialogContent>
 							<DialogContentText>{text}</DialogContentText>
-						</StyledDialogContent>
+						</DialogContent>
 						<DialogActions>
 							<Button onClick={messageClearHandler} color="primary" autoFocus>
 								Close

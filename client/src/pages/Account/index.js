@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
-import { StyledCard } from './styled-components';
 import ProfileForm from './ProfileForm';
+import Card from '../../components/Card';
 
 const Account = () => {
 	return (
 		<Fragment>
-			<StyledCard elevation={6}>
+			<Card elevation={6}>
 				<ProfileForm />
-			</StyledCard>
+			</Card>
 		</Fragment>
 	);
 };

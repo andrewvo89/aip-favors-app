@@ -1,11 +1,11 @@
 import React, { Fragment, useState, useEffect, useCallback } from 'react';
-import { FormControl, CircularProgress, TextField } from '@material-ui/core';
 import {
-	StyledCardContent,
-	StyledCardHeader,
-	StyledCardActions,
-	StyledButton
-} from './styled-components';
+	CircularProgress,
+	TextField,
+	CardActions,
+	Grid,
+	CardContent
+} from '@material-ui/core';
 import { SNACKBAR } from '../../../utils/constants';
 import { actList } from '../../../utils/actList';
 import { useFormik } from 'formik';
@@ -17,6 +17,8 @@ import * as favourController from '../../../controllers/favour';
 import * as userController from '../../../controllers/user';
 import UserSearchSelect from './UserSearchSelect';
 import { Autocomplete } from '@material-ui/lab';
+import FullWidthButton from '../../../components/FullWidthButton';
+import CardHeader from '../../../components/CardHeader';
 
 const CreateFavourForm = () => {
 	const dispatch = useDispatch();
@@ -29,12 +31,12 @@ const CreateFavourForm = () => {
 	const stableDispatch = useCallback(dispatch, []);
 	useEffect(() => {
 		const fetchUsers = async () => {
-			const users = await stableDispatch(
-				userController.getUsers({
-					firstName: 'David for example'
+			const users = (await stableDispatch(userController.getUsers())).map(
+				(user) => ({
+					...user,
+					fullName: `${user.firstName} ${user.lastName}`
 				})
 			);
-			// const users = await result.data;
 			setUserList(users);
 		};
 
@@ -43,12 +45,12 @@ const CreateFavourForm = () => {
 
 	const initialValues = {
 		from: {
-			_id: authUser.userId,
+			userId: authUser.userId,
 			fullName: `${authUser.firstName} ${authUser.lastName}`,
 			profilePicture: ''
 		},
 		for: {
-			_id: '',
+			userId: '',
 			fullName: '',
 			profilePicture: ''
 		},
@@ -120,77 +122,84 @@ const CreateFavourForm = () => {
 		validationSchema: validationSchema
 	});
 
+	if (!userList) {
+		return <CircularProgress />;
+	}
+
 	return (
 		<Fragment>
 			<form onSubmit={formik.handleSubmit}>
-				<StyledCardHeader
+				<CardHeader
 					title="Create a Favour"
 					subheader="Provided a favour to someone or vice versa? Note it here."
 				/>
-				<StyledCardContent>
-					<FormControl margin="dense">
-						<UserSearchSelect
-							id="from-name-input"
-							label="From"
-							authUser={authUser}
-							userList={userList}
-							value={formik.values.from}
-							onChange={(newValue) => formik.setFieldValue('from', newValue)}
-							error={!!formik.touched.from && !!formik.errors.from}
-							autoFocus={true}
-						/>
-					</FormControl>
+				<CardContent>
+					<Grid container direction="column" spacing={1} alignItems="stretch">
+						<Grid item>
+							<UserSearchSelect
+								id="from-name-input"
+								label="From"
+								userList={userList}
+								value={formik.values.from}
+								onChange={(newValue) => formik.setFieldValue('from', newValue)}
+								error={!!formik.touched.from && !!formik.errors.from}
+								autoFocus={true}
+							/>
+						</Grid>
+						<Grid item>
+							<UserSearchSelect
+								id="for-name-input"
+								label="For"
+								userList={userList}
+								value={formik.values.for}
+								onChange={(newValue) => formik.setFieldValue('for', newValue)}
+								error={!!formik.touched.for && !!formik.errors.for}
+							/>
+						</Grid>
+						<Grid item>
+							<Autocomplete
+								id="act-input"
+								options={actList}
+								value={formik.values.act}
+								onChange={(e, newValue) =>
+									formik.setFieldValue('act', newValue)
+								}
+								getOptionLabel={(option) => option}
+								autoHighlight
+								autoSelect
+								renderInput={(params) => (
+									<TextField
+										{...params}
+										label="Act"
+										error={!!formik.touched.act && !!formik.errors.act}
+										InputProps={{
+											...params.InputProps
+										}}
+									/>
+								)}
+							/>
+						</Grid>
+					</Grid>
+				</CardContent>
 
-					<FormControl margin="dense">
-						<UserSearchSelect
-							id="for-name-input"
-							label="For"
-							authUser={authUser}
-							userList={userList}
-							value={formik.values.for}
-							onChange={(newValue) => formik.setFieldValue('for', newValue)}
-							error={!!formik.touched.for && !!formik.errors.for}
-						/>
-					</FormControl>
-
-					<FormControl margin="dense">
-						<Autocomplete
-							id="act-input"
-							options={actList}
-							value={formik.values.act}
-							onChange={(e, newValue) => formik.setFieldValue('act', newValue)}
-							getOptionLabel={(option) => option}
-							autoHighlight
-							autoSelect
-							renderInput={(params) => (
-								<TextField
-									{...params}
-									label="Act"
-									error={!!formik.touched.act && !!formik.errors.act}
-									InputProps={{
-										...params.InputProps
-									}}
-								/>
-							)}
-						/>
-					</FormControl>
-				</StyledCardContent>
-
-				<StyledCardActions>
+				<CardActions>
 					{loading ? (
 						<CircularProgress />
 					) : (
-						<Fragment>
-							<StyledButton
-								variant="contained"
-								color="primary"
-								type="submit"
-								disabled={!formik.isValid}>
-								Create
-							</StyledButton>
-						</Fragment>
+						<Grid container direction="column" spacing={1}>
+							<Grid item>
+								<FullWidthButton
+									variant="contained"
+									color="primary"
+									type="submit"
+									disabled={!formik.isValid}
+								>
+									Create
+								</FullWidthButton>
+							</Grid>
+						</Grid>
 					)}
-				</StyledCardActions>
+				</CardActions>
 			</form>
 		</Fragment>
 	);

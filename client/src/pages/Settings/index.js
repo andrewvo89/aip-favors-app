@@ -4,14 +4,10 @@ import {
 	ListItem,
 	ListItemIcon,
 	ListItemText,
-	ListItemSecondaryAction
+	ListItemSecondaryAction,
+	CardContent
 } from '@material-ui/core';
 import Switch from '@material-ui/core/Switch';
-import {
-	StyledCard,
-	StyledCardHeader,
-	StyledCardContent
-} from '../../utils/styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import * as userController from '../../controllers/user';
 import {
@@ -19,6 +15,8 @@ import {
 	Email as EmailIcon,
 	NotificationsActive as NotificationsActiveIcon
 } from '@material-ui/icons';
+import Card from '../../components/Card';
+import CardHeader from '../../components/CardHeader';
 
 const Settings = (props) => {
 	const { authUser } = useSelector((state) => state.authState);
@@ -29,9 +27,9 @@ const Settings = (props) => {
 	};
 
 	return (
-		<StyledCard elevation={6}>
-			<StyledCardHeader title="Settings" />
-			<StyledCardContent>
+		<Card elevation={6}>
+			<CardHeader title="Settings" />
+			<CardContent>
 				<List>
 					<ListItem>
 						<ListItemIcon>
@@ -85,8 +83,8 @@ const Settings = (props) => {
 						</ListItemSecondaryAction>
 					</ListItem>
 				</List>
-			</StyledCardContent>
-		</StyledCard>
+			</CardContent>
+		</Card>
 	);
 };
 
