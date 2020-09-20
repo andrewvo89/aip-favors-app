@@ -28,8 +28,14 @@ export const StyledDialogContent = styled(DialogContent)`
 	width: 400px;
 `;
 
-export const StyledCard = styled(Card)`
-	min-width: 400px;
+// eslint-disable-next-line no-unused-vars
+export const StyledCard = styled(({ minWidth, ...otherProps }) => (
+	<Card {...otherProps} />
+))`
+	min-width: ${(props) => (props.minWidth ? props.minWidth : '400px')};
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
 `;
 
 export const StyledCardContent = styled(CardContent)`

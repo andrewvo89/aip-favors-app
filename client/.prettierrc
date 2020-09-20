@@ -5,5 +5,5 @@
 	"trailingComma": "none",
 	"singleQuote": true,
 	"bracketSpacing": true,
-	"jsxBracketSameLine": true
+	"jsxBracketSameLine": false
 }

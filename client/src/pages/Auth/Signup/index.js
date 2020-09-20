@@ -2,15 +2,13 @@ import React, { Fragment, useState } from 'react';
 import {
 	IconButton,
 	InputAdornment,
-	FormControl,
-	InputLabel,
 	Grid,
-	CircularProgress
+	CircularProgress,
+	TextField
 } from '@material-ui/core';
 import {
 	StyledCard,
 	StyledButton,
-	StyledInput,
 	StyledCardContent,
 	StyledCardActions,
 	StyledCardHeader
@@ -83,11 +81,11 @@ export default (props) => {
 			<form onSubmit={formik.handleSubmit}>
 				<StyledCardHeader title="Signup" />
 				<StyledCardContent>
-					<Grid container spacing={2}>
-						<Grid item xs={6}>
-							<FormControl margin="dense">
-								<InputLabel>First name</InputLabel>
-								<StyledInput
+					<Grid container direction="column" spacing={1}>
+						<Grid item container spacing={2}>
+							<Grid item xs={6}>
+								<TextField
+									label="First name"
 									type="text"
 									value={formik.values.firstName}
 									onChange={formik.handleChange('firstName')}
@@ -96,79 +94,93 @@ export default (props) => {
 										!!formik.touched.firstName && !!formik.errors.firstName
 									}
 									autoFocus={true}
+									fullWidth={true}
 								/>
-							</FormControl>
-						</Grid>
-						<Grid item xs={6}>
-							<FormControl margin="dense">
-								<InputLabel>Last name</InputLabel>
-								<StyledInput
+							</Grid>
+							<Grid item xs={6}>
+								<TextField
+									label="Last name"
 									type="text"
 									value={formik.values.lastName}
 									onChange={formik.handleChange('lastName')}
 									onBlur={formik.handleBlur('lastName')}
 									error={!!formik.touched.lastName && !!formik.errors.lastName}
+									fullWidth={true}
 								/>
-							</FormControl>
+							</Grid>
+						</Grid>
+						<Grid item>
+							<TextField
+								label="Email"
+								type="email"
+								value={formik.values.email}
+								onChange={formik.handleChange('email')}
+								onBlur={formik.handleBlur('email')}
+								error={!!formik.touched.email && !!formik.errors.email}
+								fullWidth={true}
+							/>
+						</Grid>
+						<Grid item>
+							<TextField
+								label="Password"
+								type={showPassword ? 'text' : 'password'}
+								value={formik.values.password}
+								onChange={formik.handleChange('password')}
+								onBlur={formik.handleBlur('password')}
+								error={!!formik.touched.password && !!formik.errors.password}
+								fullWidth={true}
+								InputProps={{
+									endAdornment: (
+										<InputAdornment position="end">
+											<IconButton
+												tabIndex={-1}
+												onClick={() =>
+													setShowPassword(
+														(prevShowPassword) => !prevShowPassword
+													)
+												}>
+												{showPassword ? <Visibility /> : <VisibilityOff />}
+											</IconButton>
+										</InputAdornment>
+									)
+								}}
+							/>
+						</Grid>
+						<Grid item>
+							<TextField
+								label="Confirm password"
+								type={showPasswordConfirm ? 'text' : 'password'}
+								value={formik.values.passwordConfirm}
+								onChange={formik.handleChange('passwordConfirm')}
+								onBlur={formik.handleBlur('passwordConfirm')}
+								error={
+									!!formik.touched.passwordConfirm &&
+									!!formik.errors.passwordConfirm
+								}
+								fullWidth={true}
+								InputProps={{
+									endAdornment: (
+										<InputAdornment position="end">
+											<IconButton
+												tabIndex={-1}
+												onClick={() =>
+													setShowPasswordConfirm(
+														(prevShowPasswordConfirm) =>
+															!prevShowPasswordConfirm
+													)
+												}>
+												{showPasswordConfirm ? (
+													<Visibility />
+												) : (
+													<VisibilityOff />
+												)}
+											</IconButton>
+										</InputAdornment>
+									)
+								}}
+							/>
 						</Grid>
 					</Grid>
-					<FormControl margin="dense">
-						<InputLabel>Email</InputLabel>
-						<StyledInput
-							type="email"
-							value={formik.values.email}
-							onChange={formik.handleChange('email')}
-							onBlur={formik.handleBlur('email')}
-							error={!!formik.touched.email && !!formik.errors.email}
-						/>
-					</FormControl>
-					<FormControl margin="dense">
-						<InputLabel>Password</InputLabel>
-						<StyledInput
-							type={showPassword ? 'text' : 'password'}
-							value={formik.values.password}
-							onChange={formik.handleChange('password')}
-							onBlur={formik.handleBlur('password')}
-							error={!!formik.touched.password && !!formik.errors.password}
-							endAdornment={
-								<InputAdornment position="end">
-									<IconButton
-										tabIndex={-1}
-										onClick={() =>
-											setShowPassword((prevShowPassword) => !prevShowPassword)
-										}>
-										{showPassword ? <Visibility /> : <VisibilityOff />}
-									</IconButton>
-								</InputAdornment>
-							}
-						/>
-					</FormControl>
-					<FormControl margin="dense">
-						<InputLabel>Confirm password</InputLabel>
-						<StyledInput
-							type={showPasswordConfirm ? 'text' : 'password'}
-							value={formik.values.passwordConfirm}
-							onChange={formik.handleChange('passwordConfirm')}
-							onBlur={formik.handleBlur('passwordConfirm')}
-							error={
-								!!formik.touched.passwordConfirm &&
-								!!formik.errors.passwordConfirm
-							}
-							endAdornment={
-								<InputAdornment position="end">
-									<IconButton
-										tabIndex={-1}
-										onClick={() =>
-											setShowPasswordConfirm(
-												(prevShowPasswordConfirm) => !prevShowPasswordConfirm
-											)
-										}>
-										{showPasswordConfirm ? <Visibility /> : <VisibilityOff />}
-									</IconButton>
-								</InputAdornment>
-							}
-						/>
-					</FormControl>
 				</StyledCardContent>
 				<StyledCardActions>
 					{loading ? (

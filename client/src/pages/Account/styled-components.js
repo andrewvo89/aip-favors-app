@@ -1,9 +1,6 @@
 import styled from 'styled-components';
-import { Card } from '@material-ui/core';
+import { StyledCard as Card } from '../../utils/styled-components';
 
 export const StyledCard = styled(Card)`
 	width: 400px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
 `;

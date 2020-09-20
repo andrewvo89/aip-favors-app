@@ -3,7 +3,6 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { CircularProgress, Grid, TextField } from '@material-ui/core';
 import { StyledAvatar } from '../../../../utils/styled-components';
 
-
 const UserSearchSelect = (props) => {
 	const {
 		id,
@@ -50,17 +49,18 @@ const UserSearchSelect = (props) => {
 							<StyledAvatar
 								size={0.66}
 								darkMode={authUser.settings.darkMode}
-								src={value.profilePicture}
-							>
-								{(value.fullName) ? getInitials(value) : '?'}
+								src={value.profilePicture}>
+								{value.fullName ? getInitials(value) : '?'}
 							</StyledAvatar>
 						),
 						endAdornment: (
 							<React.Fragment>
-								{loading ? <CircularProgress color="inherit" size={20} /> : null}
+								{loading ? (
+									<CircularProgress color="inherit" size={20} />
+								) : null}
 								{params.InputProps.endAdornment}
 							</React.Fragment>
-						),
+						)
 					}}
 				/>
 			)}
@@ -71,8 +71,7 @@ const UserSearchSelect = (props) => {
 							<StyledAvatar
 								size={0.66}
 								darkMode={authUser.settings.darkMode}
-								src={user.profilePicture}
-							>
+								src={user.profilePicture}>
 								{getInitials(user)}
 							</StyledAvatar>
 						</Grid>

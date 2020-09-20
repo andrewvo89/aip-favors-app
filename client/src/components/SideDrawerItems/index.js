@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import List from '@material-ui/core/List';
-import { ListItem, ListItemText, ListItemIcon, Collapse } from '@material-ui/core';
+import {
+	ListItem,
+	ListItemText,
+	ListItemIcon,
+	Collapse
+} from '@material-ui/core';
 import { StyledListContainer } from './styled-components';
 import {
 	ExpandLess,
@@ -12,54 +17,80 @@ import { Link } from 'react-router-dom';
 
 const SideDrawerItems = (props) => {
 	const [expandFavourGroup, setExpandFavourGroup] = useState(false);
-	const [expandSecondGroup, setExpandSecondGroup] = useState(false);
+	const [expandRequestsGroup, setExpandRequestsGroup] = useState(false);
 	const IconExpandFavourGroup = expandFavourGroup ? ExpandLess : ExpandMore;
-	const IconExpandSecondGroup = expandSecondGroup ? ExpandLess : ExpandMore;
+	const IconExpandSecondGroup = expandRequestsGroup ? ExpandLess : ExpandMore;
 
-	const onExpandFavourGroupHandler = () => {
+	const expandFavourGroupHandler = () => {
 		setExpandFavourGroup((prevState) => !prevState);
 	};
 
-	const onExpandSecondGroupHandler = () => {
-		setExpandSecondGroup((prevState) => !prevState);
+	const expandRequestsGroupHandler = () => {
+		setExpandRequestsGroup((prevState) => !prevState);
 	};
 
-	const handleItemClick = () => {
+	const itemClickHandler = () => {
 		props.setDrawerOpen(false);
-	}
+	};
 
 	return (
 		<StyledListContainer>
 			<List>
-				<ListItem button onClick={onExpandFavourGroupHandler}>
+				<ListItem button onClick={expandFavourGroupHandler}>
 					<ListItemText primary="Favours" />
 					{<IconExpandFavourGroup />}
 				</ListItem>
 				<Collapse in={expandFavourGroup} timeout="auto">
-					<ListItem button onClick={handleItemClick} component={Link} to="/favours/create">
+					<ListItem
+						button
+						onClick={itemClickHandler}
+						component={Link}
+						to="/favours/create"
+					>
 						<ListItemIcon>
 							<IconAdd />
 						</ListItemIcon>
 						<ListItemText primary="Create Favour" />
 					</ListItem>
-					<ListItem button onClick={handleItemClick} component={Link} to="/favours/view/all">
+					<ListItem
+						button
+						onClick={itemClickHandler}
+						component={Link}
+						to="/favours/view/all"
+					>
 						<ListItemIcon>
 							<IconList />
 						</ListItemIcon>
 						<ListItemText primary="View Favours" />
 					</ListItem>
 				</Collapse>
-				
-				<ListItem button onClick={onExpandSecondGroupHandler}>
-					<ListItemText primary="option-2" />
+				<ListItem button onClick={expandRequestsGroupHandler}>
+					<ListItemText primary="Public Requests" />
 					{<IconExpandSecondGroup />}
 				</ListItem>
-				<Collapse in={expandSecondGroup} timeout="auto" unmountOnExit>
-					{['sub-option-1', 'sub-option-2', 'sub-option-3'].map((text) => (
-						<ListItem button key={text}>
-							<ListItemText primary={text} />
-						</ListItem>
-					))}
+				<Collapse in={expandRequestsGroup} timeout="auto" unmountOnExit>
+					<ListItem
+						button
+						onClick={itemClickHandler}
+						component={Link}
+						to="/requests/create"
+					>
+						<ListItemIcon>
+							<IconAdd />
+						</ListItemIcon>
+						<ListItemText primary="Create Request" />
+					</ListItem>
+					<ListItem
+						button
+						onClick={itemClickHandler}
+						component={Link}
+						to="/requests"
+					>
+						<ListItemIcon>
+							<IconList />
+						</ListItemIcon>
+						<ListItemText primary="View Requests" />
+					</ListItem>
 				</Collapse>
 			</List>
 		</StyledListContainer>

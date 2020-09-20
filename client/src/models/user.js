@@ -59,7 +59,6 @@ export default class User {
 		data.append('userId', this.userId);
 		data.append('file', reizedFile);
 		const result = await axios.patch('/user/upload-picture', data, config);
-		console.log('result', result);
 		this.profilePicture = result.data.profilePicture;
 	}
 
@@ -75,13 +74,10 @@ export default class User {
 		await axios.post('/auth/logout', data, config);
 	}
 
-	static async get(filters) {
-		const data = { ...filters };
-		const result = await axios.get('/user/get-users', data, config);
-		const users = [];
-		for (const user of result.users) {
-			users.push(new User({ ...user }));
-		}
+	static async get(filter) {
+		const data = { filter };
+		const result = await axios.post('/user/get-users', data, config);
+		const users = result.data.users.map((user) => new User({ ...user }));
 		return users;
 	}
 

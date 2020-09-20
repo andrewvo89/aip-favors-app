@@ -20,6 +20,7 @@ import * as userController from '../../../controllers/user';
 import * as messsageActions from '../../../controllers/message';
 import ChangePassword from './ChangePassword';
 import { SNACKBAR } from '../../../utils/constants';
+import AccountAvatar from '../AccountAvatar';
 
 const ProfileForm = () => {
 	const { authUser } = useSelector((state) => state.authState);
@@ -88,7 +89,16 @@ const ProfileForm = () => {
 			)}
 			<form onSubmit={formik.handleSubmit}>
 				<StyledCardHeader
-					title="User Profile"
+					title={
+						<Grid container direction="column" alignItems="center">
+							<Grid item>
+								<AccountAvatar />
+							</Grid>
+							<Grid item>
+								<span>User Profile</span>
+							</Grid>
+						</Grid>
+					}
 					subheader="23 favours completed"
 				/>
 				<StyledCardContent>

@@ -5,7 +5,7 @@ import './App.css';
 import AppContainer from './components/AppContainer';
 import { useSelector, useDispatch } from 'react-redux';
 import * as authController from './controllers/auth';
-import Home from './pages/Home';
+import Requests from './pages/Requests';
 import Account from './pages/Account';
 import Settings from './pages/Settings';
 import Login from './pages/Auth/Login';
@@ -38,7 +38,7 @@ const App = withRouter((props) => {
 			<Switch>
 				<Route path="/login" component={Login} />
 				<Route path="/signup" component={Signup} />
-				<Route path="/" component={Home} />
+				<Redirect from="/" to="/login" />
 			</Switch>
 		);
 
@@ -48,8 +48,9 @@ const App = withRouter((props) => {
 					<Route path="/favours" component={Favours} />
 					<Route path="/account" component={Account} />
 					<Route path="/settings" component={Settings} />
-					<Route path="/" component={Home} />
+					<Route path="/requests" component={Requests} />
 					<Redirect from="/login" to="/" />
+					<Redirect from="/" to="/requests" />
 				</Switch>
 			);
 		}

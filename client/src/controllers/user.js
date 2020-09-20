@@ -37,7 +37,6 @@ export const update = (values) => {
 			return true;
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
-
 			dispatch({
 				type: SET_ERROR,
 				error: errorMessage
@@ -109,14 +108,18 @@ export const removePicture = () => {
 	};
 };
 
-export const getUsers = (filters) => {
+export const getUsers = (filter) => {
 	return async (dispatch) => {
 		try {
+			let transformedFilter = {};
+			if (filter) {
+				transformedFilter = filter;
+			}
 			// TODO: maybe implement filter to grab specific users
 			// instead of returning all? e.g.:
 			// { firtName: 'David', email: 'blah@example.com' }
 			// const result = await axios.get('/user/get-users', config);
-			const users = await User.get(filters);
+			const users = await User.get(transformedFilter);
 			return users;
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);

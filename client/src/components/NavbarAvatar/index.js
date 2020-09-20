@@ -2,9 +2,8 @@ import React, { Fragment, useState } from 'react';
 import { Menu, MenuItem } from '@material-ui/core/';
 import { useDispatch } from 'react-redux';
 import * as authController from '../../controllers/auth';
-import { StyledAvatar } from '../../utils/styled-components';
 import { withRouter } from 'react-router-dom';
-const { REACT_APP_REST_URL: REST_URL } = process.env;
+import Avatar from '../Avatar';
 
 const NavbarAvatar = withRouter((props) => {
 	const dispatch = useDispatch();
@@ -28,25 +27,14 @@ const NavbarAvatar = withRouter((props) => {
 		menuCloseHandler();
 	};
 
-	let avatarUrl;
-	if (props.authUser.profilePicture) {
-		avatarUrl = `${REST_URL}/${props.authUser.profilePicture
-			.split('\\')
-			.join('/')}`;
-	}
-
 	return (
 		<Fragment>
-			<StyledAvatar
-				size={1}
-				darkMode={props.authUser.settings.darkMode}
+			<Avatar
+				user={props.authUser}
+				size={1.5}
+				clickable={true}
 				onClick={(event) => setAnchorElement(event.target)}
-				src={avatarUrl}>
-				{`${props.authUser.firstName.substring(
-					0,
-					1
-				)}${props.authUser.lastName.substring(0, 1)}`}
-			</StyledAvatar>
+			/>
 			<Menu
 				id="simple-menu"
 				anchorEl={anchorElement}

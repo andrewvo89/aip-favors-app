@@ -13,7 +13,7 @@ module.exports.update = async (req, res, next) => {
 	try {
 		const validationErrors = validationResult(req);
 		if (!validationErrors.isEmpty()) {
-			//Catches any errors detected through express-validator middlware
+			//Catches any errors detected through express-validator middleware
 			throw getError(422, validationErrors.errors[0].msg, DIALOG);
 		}
 		const {
@@ -39,7 +39,7 @@ module.exports.update = async (req, res, next) => {
 		existingUser.email = email;
 		existingUser.profilePicture = profilePicture;
 		existingUser.settings = settings;
-		existingUser.save(); //Save updated user into the database
+		await existingUser.save(); //Save updated user into the database
 		res.status(204).send();
 	} catch (error) {
 		next(error);
@@ -76,8 +76,7 @@ module.exports.updatePassword = async (req, res, next) => {
 		);
 		const hash = bcrypt.hashSync(password, salt);
 		existingUser.password = hash;
-
-		existingUser.save(); //Save updated user into the database
+		await existingUser.save(); //Save updated user into the database
 		res.status(204).send();
 	} catch (error) {
 		next(error);
@@ -99,7 +98,7 @@ module.exports.updateSettings = async (req, res, next) => {
 			throw getError(404, 'User not found', DIALOG);
 		}
 		existingUser.settings = settings;
-		existingUser.save(); //Save updated user into the database;
+		await existingUser.save(); //Save updated user into the database;
 		res.status(204).send();
 	} catch (error) {
 		next(error);
@@ -117,7 +116,7 @@ module.exports.uploadPicture = async (req, res, next) => {
 			throw getError(404, 'User not found', DIALOG);
 		}
 		existingUser.profilePicture = imagePath;
-		existingUser.save(); //Save updated user into the database;
+		await existingUser.save(); //Save updated user into the database;
 		res.status(200).json({ profilePicture: existingUser.profilePicture });
 	} catch (error) {
 		next(error);
@@ -140,7 +139,7 @@ module.exports.removePicture = async (req, res, next) => {
 		);
 		fs.rmdirSync(destination, { recursive: true });
 		existingUser.profilePicture = '';
-		existingUser.save(); //Save updated user into the database;
+		await existingUser.save(); //Save updated user into the database;
 		res.status(204).send();
 	} catch (error) {
 		next(error);
@@ -149,22 +148,19 @@ module.exports.removePicture = async (req, res, next) => {
 
 module.exports.getUsers = async (req, res, next) => {
 	try {
-		// const { filter } = req.params;
-		const filter = {};
-
-		const userDocs = await User.find(filter)
-			.select({ firstName: 1, lastName: 1, profilePicture: 1 })
-			.sort({ firstName: 'asc' });
-
+		const { filter } = req.body;
+		const userDocs = await User.find(filter).sort({ firstName: 'asc' });
 		const users = userDocs.map((user) => {
 			return {
-				_id: user._id,
-				fullName: user.fullName,
-				profilePicture: user.profilePicture
+				userId: user._id,
+				email: user.email,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				profilePicture: user.profilePicture,
+				settings: user.settings
 			};
 		});
-
-		res.status(200).send(users);
+		res.status(200).json({ users });
 	} catch (error) {
 		next(error);
 	}

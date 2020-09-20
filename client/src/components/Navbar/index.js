@@ -18,7 +18,7 @@ export default withRouter((props) => {
 	const { authUser, touched } = useSelector((state) => state.authState);
 
 	const onLoginClickHandler = () => {
-		dispatch(authController.showLoginDialog(null));
+		dispatch(authController.showLoginDialog());
 	};
 
 	const onSignupClickHandler = () => {
@@ -35,8 +35,7 @@ export default withRouter((props) => {
 					<IconButton
 						edge="start"
 						color="inherit"
-						onClick={() => props.setDrawerOpen(true)}
-					>
+						onClick={() => props.setDrawerOpen(true)}>
 						<StyledMenuIcon />
 					</IconButton>
 				)}

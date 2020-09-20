@@ -11,8 +11,6 @@ const initialState = {
 	authUser: null,
 	touched: false,
 	login: false,
-	resume: null,
-	resumeAction: null,
 	signup: false
 };
 
@@ -23,8 +21,7 @@ export default (state = initialState, action) => {
 				...state,
 				authUser: action.authUser,
 				login: false,
-				signup: false,
-				resume: action.resume
+				signup: false
 			};
 		case AUTH_TOUCHED:
 			return {
@@ -39,8 +36,7 @@ export default (state = initialState, action) => {
 		case SHOW_LOGIN_DIALOG:
 			return {
 				...state,
-				login: true,
-				resumeAction: action.resumeAction
+				login: true
 			};
 		case SHOW_SIGNUP_DIALOG:
 			return {
@@ -51,9 +47,7 @@ export default (state = initialState, action) => {
 			return {
 				...state,
 				login: initialState.login,
-				signup: initialState.signup,
-				resume: false,
-				resumeAction: null
+				signup: initialState.signup
 			};
 		default:
 			return state;

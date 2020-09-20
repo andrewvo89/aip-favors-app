@@ -2,15 +2,14 @@ import React, { useState, Fragment } from 'react';
 import {
 	IconButton,
 	InputAdornment,
-	FormControl,
-	InputLabel,
-	CircularProgress
+	CircularProgress,
+	TextField,
+	Grid
 } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import {
 	StyledCard,
 	StyledButton,
-	StyledInput,
 	StyledCardContent,
 	StyledCardActions,
 	StyledCardHeader
@@ -54,7 +53,7 @@ export default (props) => {
 
 	const formik = useFormik({
 		initialValues: initialValues,
-		initialStatus: initialErrors,
+		initialErrors: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
@@ -64,38 +63,48 @@ export default (props) => {
 			<form onSubmit={formik.handleSubmit}>
 				<StyledCardHeader title="Login" />
 				<StyledCardContent>
-					<FormControl margin="dense">
-						<InputLabel>Email</InputLabel>
-						<StyledInput
-							type="email"
-							value={formik.values.email}
-							onChange={formik.handleChange('email')}
-							onBlur={formik.handleBlur('email')}
-							error={!!formik.touched.email && !!formik.errors.email}
-							autoFocus={true}
-						/>
-					</FormControl>
-					<FormControl margin="dense">
-						<InputLabel>Password</InputLabel>
-						<StyledInput
-							type={showPassword ? 'text' : 'password'}
-							value={formik.values.password}
-							onChange={formik.handleChange('password')}
-							onBlur={formik.handleBlur('password')}
-							error={!!formik.touched.password && !!formik.errors.password}
-							endAdornment={
-								<InputAdornment position="end">
-									<IconButton
-										onClick={() =>
-											setShowPassword((prevShowPassword) => !prevShowPassword)
-										}
-										tabIndex={-1}>
-										{showPassword ? <Visibility /> : <VisibilityOff />}
-									</IconButton>
-								</InputAdornment>
-							}
-						/>
-					</FormControl>
+					<Grid container direction="column" spacing={1}>
+						<Grid item>
+							<TextField
+								label="Email"
+								margin="dense"
+								type="email"
+								value={formik.values.email}
+								onChange={formik.handleChange('email')}
+								onBlur={formik.handleBlur('email')}
+								error={!!formik.touched.email && !!formik.errors.email}
+								autoFocus={true}
+								fullWidth={true}
+							/>
+						</Grid>
+						<Grid item>
+							<TextField
+								label="Password"
+								margin="dense"
+								type={showPassword ? 'text' : 'password'}
+								value={formik.values.password}
+								onChange={formik.handleChange('password')}
+								onBlur={formik.handleBlur('password')}
+								error={!!formik.touched.password && !!formik.errors.password}
+								fullWidth={true}
+								InputProps={{
+									endAdornment: (
+										<InputAdornment position="end">
+											<IconButton
+												onClick={() =>
+													setShowPassword(
+														(prevShowPassword) => !prevShowPassword
+													)
+												}
+												tabIndex={-1}>
+												{showPassword ? <Visibility /> : <VisibilityOff />}
+											</IconButton>
+										</InputAdornment>
+									)
+								}}
+							/>
+						</Grid>
+					</Grid>
 				</StyledCardContent>
 				<StyledCardActions>
 					{loading ? (
