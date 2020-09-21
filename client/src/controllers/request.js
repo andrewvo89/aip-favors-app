@@ -111,3 +111,21 @@ export const handleSocketUpdate = (socketData, requests) => {
 	}
 	return newRequests;
 };
+
+export const getSearchResults = (searchParams, requests) => {
+	return requests.filter((request) => {
+		const textMatch = request.act
+			.trim()
+			.toLowerCase()
+			.includes(searchParams.text.trim().toLowerCase());
+		const requestRewards = request.rewards.map((reward) =>
+			reward.favourType.trim().toLowerCase()
+		);
+		const rewardMatch = requestRewards.some((requestReward) =>
+			searchParams.rewards
+				.map((reward) => reward.trim().toLowerCase())
+				.includes(requestReward)
+		);
+		return textMatch && rewardMatch;
+	});
+};

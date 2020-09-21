@@ -58,7 +58,7 @@ const RequestForm = (props) => {
 	});
 
 	return (
-		<Card>
+		<Card width="400px">
 			<form onSubmit={formik.handleSubmit}>
 				<CardHeader title="Request Form" />
 				<CardContent>
