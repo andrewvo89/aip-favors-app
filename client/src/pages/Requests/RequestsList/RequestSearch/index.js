@@ -1,16 +1,9 @@
 import {
 	Card,
-	DialogContent,
-	DialogTitle,
 	Divider,
 	Grid,
 	IconButton,
 	InputBase,
-	List,
-	ListItem,
-	ListItemSecondaryAction,
-	ListItemText,
-	Checkbox,
 	Tooltip
 } from '@material-ui/core';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -19,7 +12,7 @@ import {
 	Close as CloseIcon
 } from '@material-ui/icons';
 import { StyledSearchIcon } from './styled-components';
-import Dialog from '../../../../components/Dialog';
+import RewardsFilterDialog from './RewardsFilterDialog';
 
 const RequestSearch = (props) => {
 	const { setSearchParams, requestRewards } = props;
@@ -34,49 +27,15 @@ const RequestSearch = (props) => {
 		});
 	}, [searchText, selectedRewards, setSearchParams]);
 
-	const closeHandler = () => {
-		setRewardsDialogOpen(false);
-	};
-
-	const rewardCheckHandler = (reward, checked) => {
-		const newSelectedRewards = [...selectedRewards];
-		if (checked) {
-			const index = newSelectedRewards.indexOf(reward);
-			newSelectedRewards.splice(index, 1);
-		} else {
-			newSelectedRewards.push(reward);
-		}
-		setSelectedRewards(newSelectedRewards);
-	};
-
 	return (
 		<Fragment>
-			<Dialog open={rewardsDialogOpen} onClose={closeHandler}>
-				<DialogTitle>Rewards</DialogTitle>
-				<DialogContent>
-					<List>
-						{requestRewards.map((reward) => {
-							const checked = selectedRewards.includes(reward);
-							return (
-								<ListItem
-									key={reward}
-									button
-									onClick={() => rewardCheckHandler(reward, checked)}
-								>
-									<ListItemText primary={reward} />
-									<ListItemSecondaryAction>
-										<Checkbox
-											edge="end"
-											checked={checked}
-											onChange={() => rewardCheckHandler(reward, checked)}
-										/>
-									</ListItemSecondaryAction>
-								</ListItem>
-							);
-						})}
-					</List>
-				</DialogContent>
-			</Dialog>
+			<RewardsFilterDialog
+				open={rewardsDialogOpen}
+				close={() => setRewardsDialogOpen(false)}
+				requestRewards={requestRewards}
+				selectedRewards={selectedRewards}
+				setSelectedRewards={setSelectedRewards}
+			/>
 			<Card>
 				<Grid container direction="row" alignItems="center">
 					<Grid item>

@@ -42,7 +42,7 @@ const RequestsList = () => {
 			setSocketData(null);
 		}
 	}, [socketData, requests]);
-	//Set unique rewards based on requests
+	//Set unique list rewards based on requests
 	useEffect(() => {
 		if (requests) {
 			const extractedRewards = requests.map((request) =>
@@ -54,7 +54,7 @@ const RequestsList = () => {
 			setRequestRewards(uniqueRewards);
 		}
 	}, [requests]);
-
+	//Update search results
 	useEffect(() => {
 		if (searchParams) {
 			const searchResults = requestController.getSearchResults(

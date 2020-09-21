@@ -48,14 +48,13 @@ const Request = (props) => {
 	}
 	//Get unique reward givers
 	const rewardUsers = rewards.map((reward) => reward.createdBy);
+	//https://stackoverflow.com/questions/2218999/remove-duplicates-from-an-array-of-objects-in-javascript
 	const uniqueRewardUsers = rewardUsers.filter(
-		(filterUser, index, array) =>
-			array.findIndex(
-				(findIndexUser) => findIndexUser.userId === filterUser.userId
-			) === index
+		(userA, index, array) =>
+			array.findIndex((userB) => userB.userId === userA.userId) === index
 	);
-	const rewardUsersRewards = [];
-	//For every user, calculate total of rewards
+	uniqueRewardUsers.sort((a, b) => (a.firstName > b.firstName ? 1 : -1));
+	//For every user, aggregate the total quantity of each reward
 	uniqueRewardUsers.forEach((rewardUser) => {
 		const rewardTotals = [];
 		rewards.forEach((reward) => {
@@ -65,19 +64,19 @@ const Request = (props) => {
 					(rewardTotal) => rewardTotal.favourType === favourType
 				);
 				if (indexOfFavourType !== -1) {
+					//If already in the arry of rewards, accumulate the total
 					rewardTotals[indexOfFavourType].quantity += reward.quantity;
 				} else {
 					rewardTotals.push({
+						//If not yet in the array, create a new entry
 						favourType: reward.favourType,
 						quantity: reward.quantity
 					});
 				}
 			}
 		});
-		rewardUsersRewards.push(rewardTotals);
+		rewardUser.rewards = rewardTotals;
 	});
-
-	console.log('rewardUsersRewards', rewardUsersRewards);
 
 	return (
 		<Fragment>
@@ -112,7 +111,7 @@ const Request = (props) => {
 								</ListSubheader>
 							}
 						>
-							{uniqueRewardUsers.map((rewardUser, index) => (
+							{uniqueRewardUsers.map((rewardUser) => (
 								<Fragment key={rewardUser.userId}>
 									<ListItem key={rewardUser.userId}>
 										<ListItemAvatar>
@@ -123,7 +122,7 @@ const Request = (props) => {
 										/>
 									</ListItem>
 									<List dense={true}>
-										{rewardUsersRewards[index].map((reward) => (
+										{rewardUser.rewards.map((reward) => (
 											<ListItem key={reward.favourType}>
 												<ListItemText
 													secondary={`${reward.quantity}x ${reward.favourType}`}
