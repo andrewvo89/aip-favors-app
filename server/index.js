@@ -42,9 +42,14 @@ mongoose
 		pass: DB_PASS,
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
-		useCreateIndex: true
+		useCreateIndex: true,
+		useFindAndModify: false
 	})
 	.then((_result) => {
-		app.listen(PORT || 3000);
+		const server = app.listen(PORT || 3000);
+		const io = require('./utils/socket').init(server);
+		io.on('connection', (_socket) => {
+			console.log('Client connected to socket');
+		});
 	})
 	.catch((error) => console.log(error));

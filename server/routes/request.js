@@ -13,4 +13,11 @@ router.post(
 	requestController.create
 );
 
+router.patch(
+	'/add-reward',
+	verifyAuth,
+	requestValidator.addReward,
+	requestController.addReward
+);
+
 module.exports = router;

@@ -2,10 +2,12 @@ import ErrorMessage from '../models/error-message';
 import Message from '../models/message';
 import Request from '../models/request';
 import {
+	CREATE,
 	DIALOG,
 	NETWORK_ERROR,
 	SET_ERROR,
-	SET_MESSAGE
+	SET_MESSAGE,
+	UPDATE
 } from '../utils/constants';
 import { get503Error } from '../utils/error-handler';
 
@@ -49,7 +51,7 @@ export const addRequest = (values) => {
 				act: values.act.trim(),
 				rewards: [
 					{
-						favourType: values.favourType.trim(),
+						favourType: values.favourType,
 						quantity: values.quantity
 					}
 				]
@@ -73,4 +75,39 @@ export const addRequest = (values) => {
 			return false;
 		}
 	};
+};
+
+export const addReward = (request, values) => {
+	return async (dispatch, _getState) => {
+		try {
+			await request.addReward(values);
+			return true;
+		} catch (error) {
+			const errorMessage = getErrorMessage(error);
+			dispatch({
+				type: SET_ERROR,
+				error: errorMessage
+			});
+			return false;
+		}
+	};
+};
+
+export const handleSocketUpdate = (socketData, requests) => {
+	let newRequests = [...requests];
+	const newRequest = new Request({ ...socketData.request });
+	switch (socketData.action) {
+		case CREATE:
+			newRequests.unshift(newRequest);
+			break;
+		case UPDATE:
+			var index = requests.findIndex(
+				(request) => request.requestId === newRequest.requestId
+			);
+			newRequests.splice(index, 1, newRequest);
+			break;
+		default:
+			break;
+	}
+	return newRequests;
 };

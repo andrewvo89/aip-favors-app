@@ -15,3 +15,5 @@ export const SHOW_LOGIN_DIALOG = 'SHOW_LOGIN_DIALOG';
 export const SHOW_SIGNUP_DIALOG = 'SHOW_SIGNUP_DIALOG';
 export const CLOSE_AUTH_DIALOG = 'CLOSE_AUTH_DIALOG';
 export const AUTH_TOUCHED = 'AUTH_TOUCHED';
+export const CREATE = 'CREATE';
+export const UPDATE = 'UPDATE';

@@ -4,7 +4,7 @@ const PageContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	width: 50%;
+	width: ${(props) => (props.width ? props.width : '50%')};
 `;
 
 export default PageContainer;

@@ -13,6 +13,12 @@ export default class Request {
 	async save() {
 		if (this.requestId) {
 			//If requestId exists, update existing entry in database
+			// const data = {
+			// 	requestId: this.requestId,
+			// 	rewards: this.rewards,
+			// 	complete: this.complete
+			// };
+			// await axios.patch('/request/update', data, config);
 		} else {
 			//If no requestId, create a new Request in the database
 			const data = {
@@ -21,6 +27,15 @@ export default class Request {
 			};
 			await axios.post('/request/create', data, config);
 		}
+	}
+
+	async addReward(values) {
+		const data = {
+			requestId: this.requestId,
+			favourType: values.favourType,
+			quantity: values.quantity
+		};
+		await axios.patch('/request/add-reward', data, config);
 	}
 
 	static async get(filter) {
