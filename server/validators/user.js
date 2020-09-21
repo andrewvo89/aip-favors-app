@@ -14,8 +14,8 @@ module.exports.update = [
 	body('settings').custom(async (value, { _req }) => {
 		if (
 			typeof value.darkMode !== BOOLEAN ||
-			typeof value.emailNotifications !== BOOLEAN ||
-			typeof value.appNotifications !== BOOLEAN
+			typeof value.expandFavoursGroup !== BOOLEAN ||
+			typeof value.expandRequestsGroup !== BOOLEAN
 		) {
 			throw new Error('Settings are invalid');
 		}
@@ -54,8 +54,8 @@ module.exports.updateSettings = [
 	body('settings').custom(async (value, { req }) => {
 		if (
 			typeof value.darkMode !== BOOLEAN ||
-			typeof value.emailNotifications !== BOOLEAN ||
-			typeof value.appNotifications !== BOOLEAN
+			typeof value.expandFavoursGroup !== BOOLEAN ||
+			typeof value.expandRequestsGroup !== BOOLEAN
 		) {
 			throw new Error('Settings are invalid');
 		}

@@ -35,11 +35,11 @@ const userSchema = new Schema(
 				type: Boolean,
 				default: false
 			},
-			emailNotifications: {
+			expandFavoursGroup: {
 				type: Boolean,
 				default: true
 			},
-			appNotifications: {
+			expandRequestsGroup: {
 				type: Boolean,
 				default: true
 			}
@@ -51,7 +51,7 @@ const userSchema = new Schema(
 );
 
 // cannot be queried on the db directly
-userSchema.virtual('fullName').get(function() {
+userSchema.virtual('fullName').get(function () {
 	return `${this.firstName} ${this.lastName}`;
 });
 
