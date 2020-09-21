@@ -8,8 +8,6 @@ import * as authController from './controllers/auth';
 import Requests from './pages/Requests';
 import Account from './pages/Account';
 import Settings from './pages/Settings';
-import Login from './pages/Auth/Login';
-import Signup from './pages/Auth/Signup';
 import Favours from './pages/Favours';
 
 const App = withRouter((props) => {
@@ -36,9 +34,8 @@ const App = withRouter((props) => {
 	if (!authLoading) {
 		children = (
 			<Switch>
-				<Route path="/login" component={Login} />
-				<Route path="/signup" component={Signup} />
-				<Redirect from="/" to="/login" />
+				<Route path="/requests" component={Requests} />
+				<Redirect from="/" to="/requests" />
 			</Switch>
 		);
 

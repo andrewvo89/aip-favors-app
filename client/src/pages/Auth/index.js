@@ -6,7 +6,7 @@ const Auth = (props) => {
 	const [signup, setSignup] = useState(false);
 
 	return signup ? (
-		<Signup setSignup={setSignup} login={true} />
+		<Signup setSignup={setSignup} />
 	) : (
 		<Login setSignup={setSignup} />
 	);

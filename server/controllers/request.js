@@ -47,6 +47,7 @@ module.exports.getRequests = async (req, res, next) => {
 				createdAt: request.createdAt,
 				act: request.act,
 				rewards: request.rewards.map((reward) => ({
+					rewardId: reward._id,
 					favourType: reward.favourType,
 					quantity: reward.quantity,
 					createdBy: {

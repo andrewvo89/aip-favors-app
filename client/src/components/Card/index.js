@@ -3,10 +3,10 @@ import { Card as MaterialCard } from '@material-ui/core';
 import styled from 'styled-components';
 
 // eslint-disable-next-line no-unused-vars
-const Card = styled(({ minWidth, ...otherProps }) => (
+const Card = styled(({ width, ...otherProps }) => (
 	<MaterialCard {...otherProps} />
 ))`
-	min-width: ${(props) => (props.minWidth ? props.minWidth : '400px')};
+	width: ${(props) => (props.width ? props.width : '400px')};
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;

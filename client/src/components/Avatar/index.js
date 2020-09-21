@@ -27,7 +27,7 @@ const Avatar = (props) => {
 		<Fragment>
 			<StyledAvatar
 				src={avatarUrl}
-				darkMode={authUser.settings.darkMode}
+				darkMode={authUser ? authUser.settings.darkMode : false}
 				{...props}
 			>
 				{fallback}

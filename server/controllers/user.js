@@ -150,14 +150,15 @@ module.exports.getUsers = async (req, res, next) => {
 	try {
 		const { filter } = req.body;
 		const userDocs = await User.find(filter).sort({ firstName: 'asc' });
+		//These users can be pulled without authentication so do not expose email, and app settings
 		const users = userDocs.map((user) => {
 			return {
 				userId: user._id,
-				email: user.email,
+				email: null,
 				firstName: user.firstName,
 				lastName: user.lastName,
 				profilePicture: user.profilePicture,
-				settings: user.settings
+				settings: null
 			};
 		});
 		res.status(200).json({ users });

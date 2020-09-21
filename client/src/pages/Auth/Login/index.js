@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import {
 	IconButton,
 	InputAdornment,
@@ -106,31 +106,40 @@ export default (props) => {
 					</Grid>
 				</CardContent>
 				<CardActions>
-					{loading ? (
-						<CircularProgress />
-					) : (
-						<Grid container direction="column" spacing={1}>
+					<Grid
+						container
+						direction="column"
+						spacing={1}
+						alignItems={loading ? 'center' : 'stretch'}
+					>
+						{loading ? (
 							<Grid item>
-								<FullWidthButton
-									variant="contained"
-									color="primary"
-									type="submit"
-									disabled={!formik.isValid}
-								>
-									Login
-								</FullWidthButton>
+								<CircularProgress />
 							</Grid>
-							<Grid item>
-								<FullWidthButton
-									variant="outlined"
-									color="primary"
-									onClick={signupClickHandler}
-								>
-									Signup
-								</FullWidthButton>
-							</Grid>
-						</Grid>
-					)}
+						) : (
+							<Fragment>
+								<Grid item>
+									<FullWidthButton
+										variant="contained"
+										color="primary"
+										type="submit"
+										disabled={!formik.isValid}
+									>
+										Login
+									</FullWidthButton>
+								</Grid>
+								<Grid item>
+									<FullWidthButton
+										variant="outlined"
+										color="primary"
+										onClick={signupClickHandler}
+									>
+										Signup
+									</FullWidthButton>
+								</Grid>
+							</Fragment>
+						)}
+					</Grid>
 				</CardActions>
 			</form>
 		</Card>

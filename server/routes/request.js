@@ -4,7 +4,7 @@ const requestValidator = require('../validators/request');
 const router = express.Router();
 const verifyAuth = require('../middleware/verify-auth');
 
-router.post('/get-requests', verifyAuth, requestController.getRequests);
+router.post('/get-requests', requestController.getRequests);
 
 router.post(
 	'/create',

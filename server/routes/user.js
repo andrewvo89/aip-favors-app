@@ -35,6 +35,6 @@ router.patch(
 
 router.delete('/remove-picture', verifyAuth, userController.removePicture);
 
-router.post('/get-users', verifyAuth, userController.getUsers);
+router.post('/get-users', userController.getUsers);
 
 module.exports = router;

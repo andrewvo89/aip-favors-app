@@ -17,12 +17,8 @@ export default withRouter((props) => {
 	const dispatch = useDispatch();
 	const { authUser, touched } = useSelector((state) => state.authState);
 
-	const onLoginClickHandler = () => {
+	const loginClickHandler = () => {
 		dispatch(authController.showLoginDialog());
-	};
-
-	const onSignupClickHandler = () => {
-		dispatch(authController.showSignupDialog());
 	};
 
 	return (
@@ -35,7 +31,8 @@ export default withRouter((props) => {
 					<IconButton
 						edge="start"
 						color="inherit"
-						onClick={() => props.setDrawerOpen(true)}>
+						onClick={() => props.setDrawerOpen(true)}
+					>
 						<StyledMenuIcon />
 					</IconButton>
 				)}
@@ -51,11 +48,8 @@ export default withRouter((props) => {
 				) : (
 					touched && (
 						<Fragment>
-							<Button color="inherit" onClick={onLoginClickHandler}>
-								Login
-							</Button>
-							<Button color="inherit" onClick={onSignupClickHandler}>
-								Signup
+							<Button color="inherit" onClick={loginClickHandler}>
+								Login / Signup
 							</Button>
 						</Fragment>
 					)

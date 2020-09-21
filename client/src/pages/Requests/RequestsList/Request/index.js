@@ -16,9 +16,28 @@ import {
 import React from 'react';
 import Avatar from '../../../../components/Avatar';
 import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
+import * as authController from '../../../../controllers/auth';
 
 const Request = (props) => {
+	const { authUser } = useSelector((state) => state.authState);
+	const dispatch = useDispatch();
 	const { act, rewards, createdAt, createdBy } = props.request;
+
+	const addRewardClickHandler = () => {
+		if (authUser) {
+		} else {
+			dispatch(authController.showLoginDialog());
+		}
+	};
+
+	const completeTaskClickHandler = () => {
+		if (authUser) {
+		} else {
+			dispatch(authController.showLoginDialog());
+		}
+	};
+
 	return (
 		<Card>
 			<CardHeader
@@ -39,7 +58,7 @@ const Request = (props) => {
 				subheader={<ListSubheader>Rewards on offer</ListSubheader>}
 			>
 				{rewards.map((reward) => (
-					<ListItem key={reward._id}>
+					<ListItem key={reward.rewardId}>
 						<ListItemAvatar>
 							<Avatar user={reward.createdBy} />
 						</ListItemAvatar>
@@ -53,10 +72,14 @@ const Request = (props) => {
 			<CardActions>
 				<Grid container direction="row" justify="flex-end">
 					<Grid item>
-						<Button color="primary">Add a reward</Button>
+						<Button color="primary" onClick={addRewardClickHandler}>
+							Add a reward
+						</Button>
 					</Grid>
 					<Grid item>
-						<Button color="primary">Complete the task</Button>
+						<Button color="primary" onClick={completeTaskClickHandler}>
+							Complete the task
+						</Button>
 					</Grid>
 				</Grid>
 			</CardActions>

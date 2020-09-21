@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import {
 	IconButton,
 	InputAdornment,
@@ -75,7 +75,7 @@ export default (props) => {
 	});
 
 	return (
-		<Card minWidth="300px">
+		<Card>
 			<form onSubmit={formik.handleSubmit}>
 				<CardHeader title="Signup" />
 				<CardContent>
@@ -183,21 +183,28 @@ export default (props) => {
 					</Grid>
 				</CardContent>
 				<CardActions>
-					{loading ? (
-						<CircularProgress />
-					) : (
-						<Grid container direction="column" spacing={1}>
+					<Grid
+						container
+						direction="column"
+						spacing={1}
+						alignItems={loading ? 'center' : 'stretch'}
+					>
+						{loading ? (
 							<Grid item>
-								<FullWidthButton
-									variant="contained"
-									color="primary"
-									type="submit"
-									disabled={!formik.isValid}
-								>
-									Signup
-								</FullWidthButton>
+								<CircularProgress />
 							</Grid>
-							{props.login && (
+						) : (
+							<Fragment>
+								<Grid item>
+									<FullWidthButton
+										variant="contained"
+										color="primary"
+										type="submit"
+										disabled={!formik.isValid}
+									>
+										Signup
+									</FullWidthButton>
+								</Grid>
 								<Grid item>
 									<FullWidthButton
 										variant="outlined"
@@ -207,9 +214,9 @@ export default (props) => {
 										Back
 									</FullWidthButton>
 								</Grid>
-							)}
-						</Grid>
-					)}
+							</Fragment>
+						)}
+					</Grid>
 				</CardActions>
 			</form>
 		</Card>

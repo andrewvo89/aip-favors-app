@@ -6,7 +6,6 @@ import {
 	NETWORK_ERROR,
 	CLOSE_AUTH_DIALOG,
 	SHOW_LOGIN_DIALOG,
-	SHOW_SIGNUP_DIALOG,
 	SET_MESSAGE,
 	SNACKBAR
 } from '../utils/constants';
@@ -164,10 +163,6 @@ export const logout = () => {
 
 export const showLoginDialog = () => {
 	return { type: SHOW_LOGIN_DIALOG };
-};
-
-export const showSignupDialog = () => {
-	return { type: SHOW_SIGNUP_DIALOG };
 };
 
 export const closeAuthDialog = () => {

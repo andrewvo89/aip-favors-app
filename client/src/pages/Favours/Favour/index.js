@@ -56,7 +56,7 @@ const Favour = () => {
 			{loading ? (
 				<CircularProgress />
 			) : (
-				<Card minWidth="300px">
+				<Card width="300px">
 					<CardMedia
 						component="img"
 						image="https://i.imgur.com/YXScr0c.jpeg" // TODO: make dynamic
