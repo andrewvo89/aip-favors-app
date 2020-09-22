@@ -6,7 +6,6 @@ import {
 	CardActions,
 	CardContent
 } from '@material-ui/core';
-import { StyledLink } from './styled-components';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +16,7 @@ import { SNACKBAR } from '../../../utils/constants';
 import AccountAvatar from '../AccountAvatar';
 import FullWidthButton from '../../../components/FullWidthButton';
 import CardHeader from '../../../components/CardHeader';
+import Link from '../../../components/Link';
 
 const ProfileForm = () => {
 	const { authUser } = useSelector((state) => state.authState);
@@ -144,9 +144,9 @@ const ProfileForm = () => {
 					) : (
 						<Grid container direction="column" spacing={1}>
 							<Grid item container direction="column">
-								<StyledLink onClick={() => setShowPasswordDialog(true)}>
+								<Link onClick={() => setShowPasswordDialog(true)}>
 									Update Password
-								</StyledLink>
+								</Link>
 							</Grid>
 							<Grid item>
 								<FullWidthButton

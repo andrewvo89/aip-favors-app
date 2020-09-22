@@ -8,18 +8,18 @@ import { useSelector } from 'react-redux';
 const Requests = () => {
 	const { authUser } = useSelector((state) => state.authState);
 	return (
-		<PageContainer>
+		<PageContainer width="500px">
 			<Switch>
 				{authUser ? (
 					<Fragment>
 						<Route path="/requests/create" component={RequestForm} />
 						<Route path="/requests/view/all" component={RequestsList} />
-						<Redirect from="/requests" to="/requests/view/all" />
+						<Redirect from="/" to="/requests/view/all" />
 					</Fragment>
 				) : (
 					<Fragment>
 						<Route path="/requests/view/all" component={RequestsList} />
-						<Redirect from="/requests" to="/requests/view/all" />
+						<Redirect from="/" to="/requests/view/all" />
 					</Fragment>
 				)}
 			</Switch>

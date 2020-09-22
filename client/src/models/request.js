@@ -1,13 +1,22 @@
 import axios from '../utils/axios';
 const config = { withCredentials: true };
 export default class Request {
-	constructor({ requestId, createdBy, createdAt, act, rewards, complete }) {
+	constructor({
+		requestId,
+		createdBy,
+		createdAt,
+		act,
+		rewards,
+		closed,
+		proof
+	}) {
 		this.requestId = requestId;
 		this.createdBy = createdBy;
 		this.createdAt = createdAt;
 		this.act = act;
 		this.rewards = rewards;
-		this.complete = complete;
+		this.closed = closed;
+		this.proof = proof;
 	}
 
 	async save() {
@@ -16,7 +25,7 @@ export default class Request {
 			// const data = {
 			// 	requestId: this.requestId,
 			// 	rewards: this.rewards,
-			// 	complete: this.complete
+			// 	closed: this.closed
 			// };
 			// await axios.patch('/request/update', data, config);
 		} else {
@@ -36,6 +45,34 @@ export default class Request {
 			quantity: values.quantity
 		};
 		await axios.patch('/request/add-reward', data, config);
+	}
+
+	async deleteReward(rewardIndex, favourTypeIndex) {
+		const data = {
+			requestId: this.requestId,
+			rewardIndex: rewardIndex,
+			favourTypeIndex: favourTypeIndex
+		};
+		await axios.patch('/request/delete-reward', data, config);
+	}
+
+	async udpateRewardQuantity(quantity, rewardIndex, favourTypeIndex) {
+		const data = {
+			requestId: this.requestId,
+			quantity: quantity,
+			rewardIndex: rewardIndex,
+			favourTypeIndex: favourTypeIndex
+		};
+		await axios.patch('/request/udpate-reward-quantity', data, config);
+	}
+
+	static async create(values) {
+		const data = {
+			act: values.act,
+			favourType: values.favourType,
+			quantity: values.quantity
+		};
+		await axios.post('/request/create', data, config);
 	}
 
 	static async get(filter) {

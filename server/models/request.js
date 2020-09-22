@@ -25,26 +25,34 @@ const requestSchema = new Schema(
 		// ],
 		rewards: [
 			{
-				favourType: {
-					type: String,
-					required: true
-				},
-				quantity: {
-					type: Number,
-					required: true,
-					min: 1,
-					max: 10
-				},
-				createdBy: {
+				fromUser: {
 					type: Schema.Types.ObjectId,
 					ref: 'User',
 					required: true
-				}
+				},
+				favourTypes: [
+					{
+						favourType: {
+							type: String,
+							required: true
+						},
+						quantity: {
+							type: Number,
+							required: true,
+							min: 1,
+							max: 1000
+						}
+					}
+				]
 			}
 		],
-		complete: {
+		closed: {
 			type: Boolean,
 			default: false
+		},
+		proof: {
+			type: String,
+			default: ''
 		}
 	},
 	{

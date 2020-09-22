@@ -20,4 +20,18 @@ router.patch(
 	requestController.addReward
 );
 
+router.patch(
+	'/delete-reward',
+	verifyAuth,
+	requestValidator.deleteReward,
+	requestController.deleteReward
+);
+
+router.patch(
+	'/udpate-reward-quantity',
+	verifyAuth,
+	requestValidator.udpateRewardQuantity,
+	requestController.udpateRewardQuantity
+);
+
 module.exports = router;

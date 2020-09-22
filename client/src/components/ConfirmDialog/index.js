@@ -1,25 +1,26 @@
 import React from 'react';
 import {
 	Button,
-	Dialog,
 	DialogActions,
 	DialogContent,
 	DialogContentText,
 	DialogTitle
 } from '@material-ui/core';
+import Dialog from '../Dialog';
 
 const ConfirmDialog = (props) => {
+	const { open, cancel, confirm, title, message } = props;
 	return (
-		<Dialog open={props.open} onClose={props.cancel}>
-			<DialogTitle>{props.title}</DialogTitle>
+		<Dialog open={open} onClose={cancel}>
+			<DialogTitle>{title}</DialogTitle>
 			<DialogContent>
-				<DialogContentText>{props.message}</DialogContentText>
+				<DialogContentText>{message}</DialogContentText>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={props.cancel} color="primary">
+				<Button onClick={cancel} color="primary">
 					Cancel
 				</Button>
-				<Button onClick={props.confirm} color="primary" autoFocus>
+				<Button onClick={confirm} color="primary" autoFocus>
 					Confirm
 				</Button>
 			</DialogActions>
