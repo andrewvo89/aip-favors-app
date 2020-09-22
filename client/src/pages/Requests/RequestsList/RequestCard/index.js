@@ -6,11 +6,14 @@ import {
 	CardHeader,
 	Divider,
 	Grid,
+	IconButton,
 	List,
 	ListItem,
 	ListItemAvatar,
+	ListItemSecondaryAction,
 	ListItemText,
 	ListSubheader,
+	TextField,
 	Typography
 } from '@material-ui/core';
 import React, { Fragment, useState } from 'react';
@@ -18,12 +21,18 @@ import Avatar from '../../../../components/Avatar';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import * as authController from '../../../../controllers/auth';
+import * as requestController from '../../../../controllers/request';
 import AddRewardDialog from './AddRewardDialog';
+import { Delete as DeleteIcon } from '@material-ui/icons';
+import ConfirmDialog from '../../../../components/ConfirmDialog';
 
 const Request = (props) => {
 	const { authUser } = useSelector((state) => state.authState);
 	const dispatch = useDispatch();
-	const { act, rewards, createdAt, createdBy } = props.request;
+	const { request } = props;
+	const { act, rewards, createdAt, createdBy } = request;
+	const [selectedReward, setSelectedReward] = useState();
+	const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
 	const [addRewardDialogOpen, setAddRewardDialogOpen] = useState(false);
 	// const [completeTaskDialogOpen, setCompleteTaskDialogOpen] = useState(false);
 
@@ -35,6 +44,31 @@ const Request = (props) => {
 		}
 	};
 
+	const deleteRewardClickHandler = async () => {
+		const result = await dispatch(
+			requestController.deleteReward(request, selectedReward)
+		);
+		if (result) {
+			setSelectedReward(null);
+			setConfirmDeleteDialogOpen(false);
+		}
+	};
+
+	const quantityChangeHandler = async (
+		quantity,
+		rewardIndex,
+		favourTypeIndex
+	) => {
+		await dispatch(
+			requestController.udpateRewardQuantity(
+				request,
+				quantity,
+				rewardIndex,
+				favourTypeIndex
+			)
+		);
+	};
+
 	const completeTaskClickHandler = () => {
 		if (authUser) {
 		} else {
@@ -42,49 +76,49 @@ const Request = (props) => {
 		}
 	};
 
-	let buttonDisabled = false;
+	let completeButtonDisabled = false;
 	if (authUser) {
-		buttonDisabled = authUser.userId === createdBy.userId;
+		completeButtonDisabled = authUser.userId === createdBy.userId;
 	}
-	//Get unique reward givers
-	const rewardUsers = rewards.map((reward) => reward.createdBy);
-	//https://stackoverflow.com/questions/2218999/remove-duplicates-from-an-array-of-objects-in-javascript
-	const uniqueRewardUsers = rewardUsers.filter(
-		(userA, index, array) =>
-			array.findIndex((userB) => userB.userId === userA.userId) === index
-	);
-	uniqueRewardUsers.sort((a, b) => (a.firstName > b.firstName ? 1 : -1));
-	//For every user, aggregate the total quantity of each reward
-	uniqueRewardUsers.forEach((rewardUser) => {
-		const rewardTotals = [];
-		rewards.forEach((reward) => {
-			if (reward.createdBy.userId === rewardUser.userId) {
-				const favourType = reward.favourType;
-				const indexOfFavourType = rewardTotals.findIndex(
-					(rewardTotal) => rewardTotal.favourType === favourType
-				);
-				if (indexOfFavourType !== -1) {
-					//If already in the arry of rewards, accumulate the total
-					rewardTotals[indexOfFavourType].quantity += reward.quantity;
-				} else {
-					rewardTotals.push({
-						//If not yet in the array, create a new entry
-						favourType: reward.favourType,
-						quantity: reward.quantity
-					});
-				}
-			}
-		});
-		rewardUser.rewards = rewardTotals;
-	});
+
+	let confirmDeleteDialogComponent = null;
+	if (selectedReward) {
+		const selectedFavourType =
+			request.rewards[selectedReward.rewardIndex].favourTypes[
+				selectedReward.favourTypeIndex
+			];
+		let message = `Are you sure you want to remove ${
+			selectedFavourType.quantity
+		}x ${selectedFavourType.favourType}${
+			selectedFavourType.quantity > 1 ? 's' : ''
+		}.`;
+		const lastReward =
+			request.rewards.length === 1 &&
+			request.rewards[0].favourTypes.length === 1;
+		if (lastReward) {
+			message = message.concat(
+				' Caution: removing this last reward will remove the entire request.'
+			);
+		}
+		confirmDeleteDialogComponent = (
+			<ConfirmDialog
+				open={confirmDeleteDialogOpen}
+				cancel={() => setConfirmDeleteDialogOpen(false)}
+				confirm={deleteRewardClickHandler}
+				title="Delete Reward"
+				message={message}
+			/>
+		);
+	}
 
 	return (
 		<Fragment>
 			<AddRewardDialog
 				open={addRewardDialogOpen}
 				setOpen={setAddRewardDialogOpen}
-				request={props.request}
+				request={request}
 			/>
+			{confirmDeleteDialogComponent}
 			<Card>
 				<Grid container direction="column" spacing={2}>
 					<Grid item>
@@ -111,24 +145,64 @@ const Request = (props) => {
 								</ListSubheader>
 							}
 						>
-							{uniqueRewardUsers.map((rewardUser) => (
-								<Fragment key={rewardUser.userId}>
-									<ListItem key={rewardUser.userId}>
+							{rewards.map((reward, rewardIndex) => (
+								<Fragment key={reward.fromUser.userId}>
+									<ListItem>
 										<ListItemAvatar>
-											<Avatar user={rewardUser} />
+											<Avatar user={reward.fromUser} />
 										</ListItemAvatar>
 										<ListItemText
-											primary={`${rewardUser.firstName} ${rewardUser.lastName}`}
+											primary={`${reward.fromUser.firstName} ${reward.fromUser.lastName}`}
 										/>
 									</ListItem>
 									<List dense={true}>
-										{rewardUser.rewards.map((reward) => (
-											<ListItem key={reward.favourType}>
-												<ListItemText
-													secondary={`${reward.quantity}x ${reward.favourType}`}
-												/>
-											</ListItem>
-										))}
+										{reward.favourTypes.map((favourType, favourTypeIndex) => {
+											const disabled =
+												!authUser || reward.fromUser.userId !== authUser.userId;
+											return (
+												<ListItem key={favourType.favourType} button>
+													<Typography>{favourType.favourType}</Typography>
+													<ListItemSecondaryAction>
+														<Grid container direction="row" alignItems="center">
+															<Grid item>
+																<TextField
+																	type="number"
+																	inputProps={{
+																		min: 1,
+																		max: 100,
+																		style: { textAlign: 'right' }
+																	}}
+																	value={favourType.quantity}
+																	disabled={disabled}
+																	onChange={(event) =>
+																		quantityChangeHandler(
+																			event.target.value,
+																			rewardIndex,
+																			favourTypeIndex
+																		)
+																	}
+																/>
+															</Grid>
+															<Grid item>
+																<IconButton
+																	edge="end"
+																	onClick={() => {
+																		setConfirmDeleteDialogOpen(true);
+																		setSelectedReward({
+																			rewardIndex: rewardIndex,
+																			favourTypeIndex: favourTypeIndex
+																		});
+																	}}
+																	disabled={disabled}
+																>
+																	<DeleteIcon />
+																</IconButton>
+															</Grid>
+														</Grid>
+													</ListItemSecondaryAction>
+												</ListItem>
+											);
+										})}
 									</List>
 								</Fragment>
 							))}
@@ -147,7 +221,7 @@ const Request = (props) => {
 							<Button
 								color="primary"
 								onClick={completeTaskClickHandler}
-								disabled={buttonDisabled}
+								disabled={completeButtonDisabled}
 							>
 								Complete the task
 							</Button>
