@@ -47,21 +47,12 @@ export const getRequests = (filter) => {
 export const addRequest = (values) => {
 	return async (dispatch, _getState) => {
 		try {
-			const request = new Request({
-				act: values.act.trim(),
-				rewards: [
-					{
-						favourType: values.favourType,
-						quantity: values.quantity
-					}
-				]
-			});
-			await request.save();
+			await Request.create(values);
 			dispatch({
 				type: SET_MESSAGE,
 				message: new Message({
 					title: 'Request Successful',
-					text: `Your request "${values.act.trim()}" has been added successfully`,
+					text: `Your request for "${values.act.trim()}" has been added successfully`,
 					feedback: DIALOG
 				})
 			});
@@ -93,6 +84,48 @@ export const addReward = (request, values) => {
 	};
 };
 
+export const deleteReward = (request, selectedReward) => {
+	return async (dispatch, _getState) => {
+		try {
+			const { rewardIndex, favourTypeIndex } = selectedReward;
+			await request.deleteReward(rewardIndex, favourTypeIndex);
+			return true;
+		} catch (error) {
+			const errorMessage = getErrorMessage(error);
+			dispatch({
+				type: SET_ERROR,
+				error: errorMessage
+			});
+			return false;
+		}
+	};
+};
+
+export const udpateRewardQuantity = (
+	request,
+	quantity,
+	rewardIndex,
+	favourTypeIndex
+) => {
+	return async (dispatch, _getState) => {
+		try {
+			await request.udpateRewardQuantity(
+				quantity,
+				rewardIndex,
+				favourTypeIndex
+			);
+			return true;
+		} catch (error) {
+			const errorMessage = getErrorMessage(error);
+			dispatch({
+				type: SET_ERROR,
+				error: errorMessage
+			});
+			return false;
+		}
+	};
+};
+
 export const handleSocketUpdate = (socketData, requests) => {
 	let newRequests = [...requests];
 	const newRequest = new Request({ ...socketData.request });
@@ -109,7 +142,7 @@ export const handleSocketUpdate = (socketData, requests) => {
 		default:
 			break;
 	}
-	return newRequests;
+	return newRequests.filter((request) => request.closed === false);
 };
 
 export const getSearchResults = (searchParams, requests) => {
@@ -118,8 +151,11 @@ export const getSearchResults = (searchParams, requests) => {
 			.trim()
 			.toLowerCase()
 			.includes(searchParams.text.trim().toLowerCase());
-		const requestRewards = request.rewards.map((reward) =>
-			reward.favourType.trim().toLowerCase()
+		const requestRewards = [];
+		request.rewards.forEach((reward) =>
+			reward.favourTypes.forEach((favourType) =>
+				requestRewards.push(favourType.favourType.trim().toLowerCase())
+			)
 		);
 		const rewardMatch = requestRewards.some((requestReward) =>
 			searchParams.rewards

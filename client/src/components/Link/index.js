@@ -1,8 +1,8 @@
 import styled from 'styled-components';
-import { Link } from '@material-ui/core';
-import colors from '../../../utils/colors';
+import { Link as MaterialLink } from '@material-ui/core';
+import colors from '../../utils/colors';
 
-export const StyledLink = styled(Link)`
+const Link = styled(MaterialLink)`
 	text-align: center;
 	&:hover {
 		cursor: pointer;
@@ -10,3 +10,5 @@ export const StyledLink = styled(Link)`
 		color: ${colors.primary.lighter};
 	}
 `;
+
+export default Link;

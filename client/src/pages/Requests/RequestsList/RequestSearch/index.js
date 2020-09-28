@@ -15,7 +15,7 @@ import { StyledSearchIcon } from './styled-components';
 import RewardsFilterDialog from './RewardsFilterDialog';
 
 const RequestSearch = (props) => {
-	const { setSearchParams, requestRewards } = props;
+	const { setSearchParams, requestRewards, disabled } = props;
 	const [rewardsDialogOpen, setRewardsDialogOpen] = useState(false);
 	const [searchText, setSearchText] = useState('');
 	const [selectedRewards, setSelectedRewards] = useState(requestRewards);
@@ -48,6 +48,7 @@ const RequestSearch = (props) => {
 							fullWidth={true}
 							value={searchText}
 							onChange={(event) => setSearchText(event.target.value)}
+							disabled={disabled}
 							endAdornment={
 								searchText ? (
 									<IconButton onClick={() => setSearchText('')}>
@@ -60,9 +61,14 @@ const RequestSearch = (props) => {
 					<Divider orientation="vertical" style={{ height: '35px' }} />
 					<Grid item>
 						<Tooltip title="Filter rewards">
-							<IconButton onClick={() => setRewardsDialogOpen(true)}>
-								<FilterListIcon />
-							</IconButton>
+							<Fragment>
+								<IconButton
+									onClick={() => setRewardsDialogOpen(true)}
+									disabled={disabled}
+								>
+									<FilterListIcon />
+								</IconButton>
+							</Fragment>
 						</Tooltip>
 					</Grid>
 				</Grid>

@@ -13,9 +13,11 @@ import * as requestController from '../../../controllers/request';
 import FullWidthButton from '../../../components/FullWidthButton';
 import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
+import { useHistory } from 'react-router-dom';
 
 const RequestForm = (props) => {
 	const dummyFavourTypes = ['Coffee', 'Chocolate', 'Mint', 'Pizza', 'Cupcake'];
+	const history = useHistory();
 	const dispatch = useDispatch();
 	const [loading, setLoading] = useState(false);
 
@@ -47,6 +49,7 @@ const RequestForm = (props) => {
 		setLoading(false);
 		if (result) {
 			formik.setValues(initialValues, true);
+			history.push('/requests/view/all');
 		}
 	};
 
