@@ -12,12 +12,14 @@ import Paper from '@material-ui/core/Paper';
 import CardHeader from '../../components/CardHeader';
 import Card from '../../components/Card';
 import * as userController from '../../controllers/user';
+import * as requestController from '../../controllers/request';
 import Avatar from '../../components/Avatar';
 
 const Leaderboard = (props) => {
 	const dispatch = useDispatch();
 	const [loading] = useState(false);
 	const [userList, setUserList] = useState([]);
+	const [requestList, setRequestList] = useState([]);
 
 	const stableDispatch = useCallback(dispatch, []);
 	useEffect(() => {
@@ -33,6 +35,19 @@ const Leaderboard = (props) => {
 
 		fetchUsers();
 	}, [stableDispatch]);
+
+	useEffect(() => {
+		const fetchRequests = async () => {
+			const requests = await dispatch(
+				requestController.getRequests()
+			);
+			setRequestList(requests);
+		};
+
+		fetchRequests();
+	}, [stableDispatch]);
+
+	console.log(requestList);
 
 	const useStyles = makeStyles({
 		table: {}
