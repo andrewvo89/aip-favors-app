@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { CardActions, CardContent, CircularProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -11,43 +11,23 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import CardHeader from '../../components/CardHeader';
 import Card from '../../components/Card';
-import * as userController from '../../controllers/user';
-import * as requestController from '../../controllers/request';
+import * as favourController from '../../controllers/favour';
 import Avatar from '../../components/Avatar';
 
 const Leaderboard = (props) => {
 	const dispatch = useDispatch();
 	const [loading] = useState(false);
-	const [userList, setUserList] = useState([]);
-	const [requestList, setRequestList] = useState([]);
-
-	const stableDispatch = useCallback(dispatch, []);
-	useEffect(() => {
-		const fetchUsers = async () => {
-			const users = (await stableDispatch(userController.getUsers())).map(
-				(user) => ({
-					...user,
-					fullName: `${user.firstName} ${user.lastName}`
-				})
-			);
-			setUserList(users);
-		};
-
-		fetchUsers();
-	}, [stableDispatch]);
+	const [leaderboardList, setLeaderboardList] = useState([]);
 
 	useEffect(() => {
-		const fetchRequests = async () => {
-			const requests = await dispatch(
-				requestController.getRequests()
+		const fetchFavoursCount = async () => {
+			const results = await dispatch(
+				favourController.getLeaderboard()
 			);
-			setRequestList(requests);
+			setLeaderboardList(results.data.data);
 		};
-
-		fetchRequests();
-	}, [stableDispatch]);
-
-	console.log(requestList);
+		fetchFavoursCount();
+	});
 
 	const useStyles = makeStyles({
 		table: {}
@@ -59,7 +39,7 @@ const Leaderboard = (props) => {
         <Card elevation={6}>
             <CardHeader
 				title="Leaderboard"
-				subheader="Showing the 'best' users"
+				subheader="Ranking users by favours provided"
 			/>
 			<CardContent>
 			<TableContainer component={Paper}>
@@ -69,20 +49,20 @@ const Leaderboard = (props) => {
 						<TableCell>#</TableCell>
 						<TableCell>&nbsp;</TableCell>
 						<TableCell>User</TableCell>
-						<TableCell>Criteria</TableCell>
+						<TableCell>Favours</TableCell>
 					</TableRow>
 					</TableHead>
 					<TableBody>						
-						{userList.map((row, index) => (
-							<TableRow key={row.userId.toString()}>
+						{leaderboardList.map((row, index) => (
+							<TableRow key={row.userId}>
 								<TableCell component="th" scope="row">
 									{index + 1}
 								</TableCell>
 								<TableCell>
 									<Avatar user={row} size={1} />
 								</TableCell>
-								<TableCell>{row.fullName}</TableCell>
-								<TableCell>99</TableCell>
+								<TableCell>{row.firstName + ' ' + row.lastName}</TableCell>
+								<TableCell>{row.favourCount}</TableCell>
 							</TableRow>
 						))}
 					</TableBody>

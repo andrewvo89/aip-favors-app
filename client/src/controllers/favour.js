@@ -67,3 +67,21 @@ export const getFavour = favourId => {
 		}
 	};
 };
+
+export const getLeaderboard = () => {
+	return async (dispatch) => {
+		try {
+			const result = await axios.post(`/favours/get-leaderboard`, config);
+			return result;
+		} catch (error) {
+			const errorMessage = getErrorMessage(error);
+
+			dispatch({
+				type: SET_ERROR,
+				error: errorMessage
+			});
+
+			return false;
+		}
+	};
+};
