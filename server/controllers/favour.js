@@ -3,6 +3,8 @@ const { DIALOG } = require('../utils/constants');
 const { getError } = require('../utils/error');
 const mongoose = require('mongoose');
 const Favour = require('../models/favour');
+const User = require('../models/user');
+const _ = require('lodash');
 
 
 const catchValidationErrors = req => {
@@ -108,6 +110,41 @@ module.exports.delete = async (req, res, next) => {
 		await Favour.findByIdAndDelete(favourId);
 
 		res.status(204).end();
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports.getLeaderboard = async (req, res, next) => {
+	try {
+		// find distinct users
+		const userIds = await Favour.distinct("fromId");
+
+		// populate data with distinct users and their number of favours
+		data = [];
+
+		for (let i = 0; i < userIds.length; i++) {
+			const favoursCount = await Favour.countDocuments({
+				fromId: userIds[i]
+			});
+
+			const user = await User.findOne({
+				_id: new mongoose.Types.ObjectId(userIds[i])
+			});
+
+			dataObj = {};
+			dataObj.userId = userIds[i];
+			dataObj.firstName = user.firstName;
+			dataObj.lastName = user.lastName;
+			dataObj.profilePicture = user.profilePicture;
+			dataObj.favourCount = favoursCount;
+			data.push(dataObj);
+		}
+		
+		// order by favour count descending for leaderboard output
+		data = _.orderBy(data, ['favourCount'], ['desc']);
+
+		res.status(200).json({data});
 	} catch (error) {
 		next(error);
 	}

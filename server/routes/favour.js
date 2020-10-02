@@ -8,6 +8,8 @@ const favourValidator = require('../validators/favour');
 
 // TODO: upload handling
 
+router.post('/get-leaderboard', favourController.getLeaderboard);
+
 router.get(
 	'/view/:favourId',
 	verifyAuth,

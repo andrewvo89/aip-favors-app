@@ -38,6 +38,17 @@ const SideDrawerItems = (props) => {
 			<List>
 				<ListItem
 					button
+					onClick={itemClickHandler}
+					component={Link}
+					to="/leaderboard"
+				>
+					<ListItemIcon>
+						<IconList />
+					</ListItemIcon>
+					<ListItemText primary="View Leaderboard" />
+				</ListItem>
+				<ListItem
+					button
 					onClick={() =>
 						expandClickHandler({
 							...authUser.settings,

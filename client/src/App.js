@@ -9,6 +9,7 @@ import Requests from './pages/Requests';
 import Account from './pages/Account';
 import Settings from './pages/Settings';
 import Favours from './pages/Favours';
+import Leaderboard from './pages/Leaderboard';
 
 const App = withRouter((props) => {
 	const [authLoading, setAuthLoading] = useState(true);
@@ -46,6 +47,7 @@ const App = withRouter((props) => {
 					<Route path="/account" component={Account} />
 					<Route path="/settings" component={Settings} />
 					<Route path="/requests" component={Requests} />
+					<Route path="/leaderboard" component={Leaderboard} />
 					<Redirect from="/login" to="/" />
 					<Redirect from="/" to="/requests" />
 				</Switch>
