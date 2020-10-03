@@ -19,12 +19,15 @@ import UserSearchSelect from './UserSearchSelect';
 import { Autocomplete } from '@material-ui/lab';
 import FullWidthButton from '../../../components/FullWidthButton';
 import CardHeader from '../../../components/CardHeader';
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
 
 const CreateFavourForm = () => {
 	const dispatch = useDispatch();
 	const history = useHistory();
 	const { authUser } = useSelector((state) => state.authState);
-
+	const [favourstypes,setFavoursTypes] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [userList, setUserList] = useState([]);
 
@@ -42,7 +45,16 @@ const CreateFavourForm = () => {
 
 		fetchUsers();
 	}, [stableDispatch]);
+	
+	useEffect(() => {
+		const fetchUsers = async () => {
+			const users = await stableDispatch(favourController.getFavorsTypes());
+			console.log(users)
+			setFavoursTypes(users.data.favortypesname);
+		};
 
+		fetchUsers();
+	}, [stableDispatch]);
 	const initialValues = {
 		from: {
 			userId: authUser.userId,
@@ -178,6 +190,18 @@ const CreateFavourForm = () => {
 									/>
 								)}
 							/>
+						</Grid>
+						<Grid item>
+							<InputLabel id="demo-simple-select-label">FavourType</InputLabel>
+							<Select
+							labelId="demo-simple-select-label"
+							id="demo-simple-select"
+							>
+							{favourstypes.map((item, index) => {
+								return <MenuItem value={index}>{item}</MenuItem>;
+							})
+							}
+							</Select>
 						</Grid>
 					</Grid>
 				</CardContent>

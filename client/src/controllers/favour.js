@@ -1,6 +1,7 @@
 import {
 	SET_ERROR,
-	NETWORK_ERROR
+	NETWORK_ERROR,
+	FAVOUR_TYPES
 } from '../utils/constants';
 import axios from '../utils/axios';
 import ErrorMessage from '../models/error-message';
@@ -67,3 +68,29 @@ export const getFavour = favourId => {
 		}
 	};
 };
+
+export const getFavorsTypes = () => {
+	return async (dispatch, getState) => {
+	  try {
+		const result = await axios.put('/favours/getfavourtype', null, config);
+		console.log(result)
+		dispatch({
+		  type: FAVOUR_TYPES,
+		  favours: result.favortypesname
+		});
+		return result;
+	  } catch (error) {
+		dispatch({
+		  type: SET_ERROR,
+		  error: error.message === NETWORK_ERROR
+			? get503Error()
+			: new ErrorMessage(
+			  error.response.status,
+			  error.response.statusText,
+			  error.response.data.message,
+			  error.response.data.feedback
+			)
+		});
+	  }
+	}
+  }

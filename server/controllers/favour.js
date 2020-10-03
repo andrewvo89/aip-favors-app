@@ -119,7 +119,7 @@ module.exports.getfavourtype = async (req, res, next)=>{
 		const favortypesname = result.map((item)=>{
 			return item.favorname;
 		});
-		res.status(201).send(favortypesname);
+		res.status(201).send({favortypesname});
 	} catch (error) {
 		next(error);
 	}

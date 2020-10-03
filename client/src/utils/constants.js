@@ -17,3 +17,4 @@ export const CLOSE_AUTH_DIALOG = 'CLOSE_AUTH_DIALOG';
 export const AUTH_TOUCHED = 'AUTH_TOUCHED';
 export const CREATE = 'CREATE';
 export const UPDATE = 'UPDATE';
+export const FAVOUR_TYPES = 'FAVOUR_TYPES'
