@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect, useCallback } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import {
 	CircularProgress,
 	TextField,
@@ -28,10 +28,11 @@ const CreateFavourForm = () => {
 	const [loading, setLoading] = useState(false);
 	const [userList, setUserList] = useState([]);
 
-	const stableDispatch = useCallback(dispatch, []);
+	// fetch list of users on page load
 	useEffect(() => {
 		const fetchUsers = async () => {
-			const users = (await stableDispatch(userController.getUsers())).map(
+			const result = await dispatch(userController.getUsers());
+			const users = result.map(
 				(user) => ({
 					...user,
 					fullName: `${user.firstName} ${user.lastName}`
@@ -41,16 +42,17 @@ const CreateFavourForm = () => {
 		};
 
 		fetchUsers();
-	}, [stableDispatch]);
+	}, [dispatch]);
 
 	const initialValues = {
 		from: {
-			userId: authUser.userId,
+			...authUser,
 			fullName: `${authUser.firstName} ${authUser.lastName}`,
-			profilePicture: ''
 		},
 		for: {
 			userId: '',
+			firstName: '',
+			lastName: '',
 			fullName: '',
 			profilePicture: ''
 		},
@@ -59,12 +61,16 @@ const CreateFavourForm = () => {
 
 	const initialErrors = {
 		from: {
-			_id: true,
+			userId: true,
+			firstName: true,
+			lastName: true,
 			fullName: true,
 			profilePicture: true
 		},
 		for: {
-			_id: true,
+			userId: true,
+			firstName: true,
+			lastName: true,
 			fullName: true,
 			profilePicture: true
 		},
@@ -73,13 +79,17 @@ const CreateFavourForm = () => {
 
 	const validationSchema = yup.object().shape({
 		from: yup.object().shape({
-			_id: yup.string().label('from._id').required().length(24),
+			userId: yup.string().label('from.userId').required().length(24),
+			firstName: yup.string().label('from.firstName').required().max(50),
+			lastName: yup.string().label('from.lastName').required().max(50),
 			fullName: yup.string().label('from.name').required().max(101),
 			profilePicture: yup.string().label('from.profilePicture')
 		}),
 		for: yup.object().shape({
-			_id: yup.string().label('for._id').required().length(24),
-			fullName: yup.string().label('for.name').required().max(101),
+			userId: yup.string().label('for.userId').required().length(24),
+			firstName: yup.string().label('for.firstName').required().max(50),
+			lastName: yup.string().label('for.lastName').required().max(50),
+			fullName: yup.string().label('from.name').required().max(101),
 			profilePicture: yup.string().label('for.profilePicture')
 		}),
 		act: yup
@@ -118,13 +128,10 @@ const CreateFavourForm = () => {
 	const formik = useFormik({
 		initialValues: initialValues,
 		initialStatus: initialErrors,
+		initialErrors: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
-
-	if (!userList) {
-		return <CircularProgress />;
-	}
 
 	return (
 		<Fragment>
@@ -140,10 +147,10 @@ const CreateFavourForm = () => {
 								id="from-name-input"
 								label="From"
 								userList={userList}
-								value={formik.values.from}
 								onChange={(newValue) => formik.setFieldValue('from', newValue)}
 								error={!!formik.touched.from && !!formik.errors.from}
 								autoFocus={true}
+								defaultValue={initialValues.from}
 							/>
 						</Grid>
 						<Grid item>
@@ -151,7 +158,6 @@ const CreateFavourForm = () => {
 								id="for-name-input"
 								label="For"
 								userList={userList}
-								value={formik.values.for}
 								onChange={(newValue) => formik.setFieldValue('for', newValue)}
 								error={!!formik.touched.for && !!formik.errors.for}
 							/>
@@ -160,7 +166,6 @@ const CreateFavourForm = () => {
 							<Autocomplete
 								id="act-input"
 								options={actList}
-								value={formik.values.act}
 								onChange={(e, newValue) =>
 									formik.setFieldValue('act', newValue)
 								}
@@ -183,11 +188,15 @@ const CreateFavourForm = () => {
 				</CardContent>
 
 				<CardActions>
-					{loading ? (
-						<CircularProgress />
-					) : (
-						<Grid container direction="column" spacing={1}>
-							<Grid item>
+					<Grid container
+						direction="column"
+						alignItems={loading ? 'center' : 'stretch'}
+						spacing={1}
+					>
+						<Grid item>
+							{loading ? (
+								<CircularProgress />
+							) : (
 								<FullWidthButton
 									variant="contained"
 									color="primary"
@@ -196,9 +205,9 @@ const CreateFavourForm = () => {
 								>
 									Create
 								</FullWidthButton>
-							</Grid>
+							)}
 						</Grid>
-					)}
+					</Grid>
 				</CardActions>
 			</form>
 		</Fragment>
