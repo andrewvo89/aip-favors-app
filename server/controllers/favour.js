@@ -3,7 +3,7 @@ const { DIALOG } = require('../utils/constants');
 const { getError } = require('../utils/error');
 const mongoose = require('mongoose');
 const Favour = require('../models/favour');
-
+const FavourTypes = require('../models/favourstypes');
 
 const catchValidationErrors = req => {
 	// Catches any errors detected through express-validator middlware
@@ -108,6 +108,18 @@ module.exports.delete = async (req, res, next) => {
 		await Favour.findByIdAndDelete(favourId);
 
 		res.status(204).end();
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports.getfavourtype = async (req, res, next)=>{
+	try {
+		const result = await FavourTypes.find();
+		const favortypesname = result.map((item)=>{
+			return item.favorname;
+		});
+		res.status(201).send(favortypesname);
 	} catch (error) {
 		next(error);
 	}
