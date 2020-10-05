@@ -24,7 +24,7 @@ const UserSearchSelect = (props) => {
 			onClose={() => setOpen(false)}
 			loading={loading}
 			getOptionSelected={(option, value) => option.userId === value.userId}
-			getOptionLabel={(option) => `${option.fullName}`}
+			getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
 			options={userList}
 			onChange={(e, newVal) => onChange(newVal)}
 			autoHighlight
@@ -38,11 +38,6 @@ const UserSearchSelect = (props) => {
 					autoFocus={autoFocus}
 					InputProps={{
 						...params.InputProps,
-						// startAdornment: (
-						// 	<React.Fragment>
-						// 		{value.firstName ? <Avatar size={0.66} user={value} /> : null}
-						// 	</React.Fragment>
-						// ),
 						endAdornment: (
 							<React.Fragment>
 								{loading ? <CircularProgress color="inherit" size={20} /> : null}
@@ -59,7 +54,7 @@ const UserSearchSelect = (props) => {
 							<Avatar size={0.66} user={user} />
 						</Grid>
 						<Grid item xs>
-							{`${user.fullName}`}
+							{`${user.firstName} ${user.lastName}`}
 						</Grid>
 					</Grid>
 				);

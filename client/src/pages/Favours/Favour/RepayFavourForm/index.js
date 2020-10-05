@@ -1,22 +1,30 @@
-import React, { Fragment } from 'react';
-import { Typography } from '@material-ui/core';
-import { StyledButton } from './styled-components';
+import React from 'react';
+import { Box, makeStyles, Typography } from '@material-ui/core';
+import FullWidthButton from '../../../../components/FullWidthButton';
+
+const useStyles = makeStyles({
+	actionArea: {
+		paddingTop: 12
+	}
+});
 
 function RepayFavourForm() {
+	const classes = useStyles();
+
 	return (
-		<Fragment>
-			<Typography variant="h5" align="center">
+		<Box className={classes.actionArea}>
+			<Typography variant="h5" align="center" gutterBottom>
 				Repay Favour
 			</Typography>
 
-			<StyledButton
+			<FullWidthButton
 				variant="contained"
 				color="primary"
 				type="submit"
 			>
 				Repay
-			</StyledButton>
-		</Fragment>
+			</FullWidthButton>
+		</Box>
 	);
 }
 

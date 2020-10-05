@@ -1,10 +1,9 @@
-import React, { Fragment, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	CardMedia,
 	CircularProgress,
 	Typography,
 	Divider,
-	CardActions,
 	CardContent
 } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
@@ -20,7 +19,10 @@ const Favour = () => {
 	const { favourId } = useParams();
 
 	const [loading, setLoading] = useState(false);
-	const [favour, setFavour] = useState({});
+	const [favour, setFavour] = useState({
+		fromUser: {},
+		forUser: {}
+	});
 
 	const updateFavour = (favourData) => {
 		setFavour({
@@ -30,18 +32,15 @@ const Favour = () => {
 		});
 	};
 
-	const stableDispatch = useCallback(dispatch, []);
 	useEffect(() => {
+		setLoading(true);
+
 		const fetchFavour = async () => {
-			setLoading(true);
-
-			const result = await stableDispatch(favourController.getFavour(favourId));
-
-			const favourData = await result.data;
-			updateFavour(favourData);
+			const favour = await dispatch(favourController.getFavour(favourId));
+			updateFavour(favour);
 		};
 
-		// gets favour from db if not passed in route state after creation
+		// get favour from db if not in route state (added after favour creation)
 		if (location.state == null) {
 			fetchFavour();
 		} else {
@@ -49,37 +48,34 @@ const Favour = () => {
 		}
 
 		setLoading(false);
-	}, [stableDispatch, favourId, location]);
+	}, [dispatch, favourId, location]);
+
+	if (loading) {
+		return <CircularProgress />;
+	}
 
 	return (
-		<Fragment>
-			{loading ? (
-				<CircularProgress />
-			) : (
-				<Card width="300px">
-					<CardMedia
-						component="img"
-						image="https://i.imgur.com/YXScr0c.jpeg" // TODO: make dynamic
-						title="Proof of act"
-						alt="Proof of act"
-						height="180"
-					/>
-					<CardHeader title="Favour" subheader={favour.createdAt} />
-					<CardContent>
-						<Typography variant="body1" align="center" gutterBottom>
-							{favour.fromName}
-							<strong> {favour.act} </strong>
-							for {favour.forName}.
-						</Typography>
-						<Divider variant="middle" />
-					</CardContent>
+		<Card>
+			<CardMedia
+				component="img"
+				image="https://i.imgur.com/YXScr0c.jpeg" // TODO: make dynamic
+				title="Proof of act"
+				alt="Proof of act"
+				height="180"
+			/>
+			<CardHeader title="Favour" subheader={favour.createdAt} />
+			<CardContent>
+				<Typography variant="body1" align="center" gutterBottom>
+					{favour.fromUser.firstName}
+					<strong> {favour.act} </strong>
+					for {favour.forUser.firstName}.
+				</Typography>
 
-					<CardActions>
-						{favour.repaid ? <Fragment /> : <RepayFavourForm />}
-					</CardActions>
-				</Card>
-			)}
-		</Fragment>
+				<Divider variant="middle" />
+
+				{favour.repaid ? null : <RepayFavourForm />}
+			</CardContent>
+		</Card>
 	);
 };
 

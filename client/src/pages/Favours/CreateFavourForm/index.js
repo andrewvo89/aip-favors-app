@@ -6,13 +6,11 @@ import {
 	Grid,
 	CardContent
 } from '@material-ui/core';
-import { SNACKBAR } from '../../../utils/constants';
 import { actList } from '../../../utils/actList';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
-import * as messsageActions from '../../../controllers/message';
 import * as favourController from '../../../controllers/favour';
 import * as userController from '../../../controllers/user';
 import UserSearchSelect from './UserSearchSelect';
@@ -23,7 +21,7 @@ import CardHeader from '../../../components/CardHeader';
 const CreateFavourForm = () => {
 	const dispatch = useDispatch();
 	const history = useHistory();
-	const { authUser } = useSelector((state) => state.authState);
+	const authUser = useSelector((state) => state.authState.authUser);
 
 	const [loading, setLoading] = useState(false);
 	const [userList, setUserList] = useState([]);
@@ -31,13 +29,8 @@ const CreateFavourForm = () => {
 	// fetch list of users on page load
 	useEffect(() => {
 		const fetchUsers = async () => {
-			const result = await dispatch(userController.getUsers());
-			const users = result.map(
-				(user) => ({
-					...user,
-					fullName: `${user.firstName} ${user.lastName}`
-				})
-			);
+			const users = await dispatch(userController.getUsers());
+
 			setUserList(users);
 		};
 
@@ -45,77 +38,61 @@ const CreateFavourForm = () => {
 	}, [dispatch]);
 
 	const initialValues = {
-		from: {
-			...authUser,
-			fullName: `${authUser.firstName} ${authUser.lastName}`,
-		},
-		for: {
-			userId: '',
-			firstName: '',
-			lastName: '',
-			fullName: '',
-			profilePicture: ''
-		},
-		act: ''
+		fromUser: authUser,
+		forUser: {},
+		act: '',
+		proof: {
+			actImage: ''
+		}
 	};
 
 	const initialErrors = {
-		from: {
-			userId: true,
-			firstName: true,
-			lastName: true,
-			fullName: true,
-			profilePicture: true
-		},
-		for: {
-			userId: true,
-			firstName: true,
-			lastName: true,
-			fullName: true,
-			profilePicture: true
-		},
-		act: true
+		fromUser: true,
+		forUser: true,
+		act: true,
+		proof: {
+			actImage: true
+		}
 	};
 
 	const validationSchema = yup.object().shape({
-		from: yup.object().shape({
-			userId: yup.string().label('from.userId').required().length(24),
-			firstName: yup.string().label('from.firstName').required().max(50),
-			lastName: yup.string().label('from.lastName').required().max(50),
-			fullName: yup.string().label('from.name').required().max(101),
-			profilePicture: yup.string().label('from.profilePicture')
+		fromUser: yup.object().shape({
+			userId: yup.string().label('fromUser.userId').required().length(24),
+			firstName: yup.string().label('fromUser.firstName').required().max(50),
+			lastName: yup.string().label('fromUser.lastName').required().max(50),
+			profilePicture: yup.string().label('fromUser.profilePicture')
 		}),
-		for: yup.object().shape({
-			userId: yup.string().label('for.userId').required().length(24),
-			firstName: yup.string().label('for.firstName').required().max(50),
-			lastName: yup.string().label('for.lastName').required().max(50),
-			fullName: yup.string().label('from.name').required().max(101),
-			profilePicture: yup.string().label('for.profilePicture')
+		forUser: yup.object().shape({
+			userId: yup.string().label('fromUser.userId').required().length(24),
+			firstName: yup.string().label('fromUser.firstName').required().max(50),
+			lastName: yup.string().label('fromUser.lastName').required().max(50),
+			profilePicture: yup.string().label('fromUser.profilePicture')
 		}),
 		act: yup
 			.string()
 			.label('Act')
 			.required()
-			.oneOf(actList, 'Invalid act selection.')
+			.oneOf(actList, 'Invalid act selection.'),
+		proof: yup.object().shape({
+			actImage: yup.string().label('proof.actImage')
+		})
 	});
 
 	const submitHandler = async (values) => {
 		setLoading(true);
 
-		const result = await dispatch(favourController.create(values));
-		if (result) {
-			dispatch(
-				messsageActions.setMessage({
-					title: 'Favour Created!',
-					text: 'The new favour as been created successfully.',
-					feedback: SNACKBAR
-				})
-			);
+		// document population only requires userId
+		values = {
+			...values,
+			fromUser: values.fromUser.userId,
+			forUser: values.forUser.userId
+		};
 
-			// route to new favour view
-			const favour = await result.data;
+		const favour = await dispatch(favourController.create(values));
+		if (favour) {
+			// route to the new favour's page
 			history.push({
-				pathname: `/favours/view/${favour._id}`,
+				pathname: `/favours/view/${favour.favourId}`,
 				state: favour
 			});
 		}
@@ -147,10 +124,10 @@ const CreateFavourForm = () => {
 								id="from-name-input"
 								label="From"
 								userList={userList}
-								onChange={(newValue) => formik.setFieldValue('from', newValue)}
+								onChange={(newValue) => formik.setFieldValue('fromUser', newValue)}
 								error={!!formik.touched.from && !!formik.errors.from}
 								autoFocus={true}
-								defaultValue={initialValues.from}
+								defaultValue={initialValues.fromUser}
 							/>
 						</Grid>
 						<Grid item>
@@ -158,7 +135,7 @@ const CreateFavourForm = () => {
 								id="for-name-input"
 								label="For"
 								userList={userList}
-								onChange={(newValue) => formik.setFieldValue('for', newValue)}
+								onChange={(newValue) => formik.setFieldValue('forUser', newValue)}
 								error={!!formik.touched.for && !!formik.errors.for}
 							/>
 						</Grid>
