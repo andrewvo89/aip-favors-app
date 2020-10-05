@@ -29,11 +29,11 @@ const dispatchError = (error, dispatch) => {
 	});
 };
 
-export const create = data => {
+export const create = (data) => {
 	return async (dispatch) => {
 		try {
 			const result = await Favour.create(data);
-			
+
 			dispatch({
 				type: SET_MESSAGE,
 				message: new Message({
@@ -64,7 +64,7 @@ export const getAllFavours = () => {
 	};
 };
 
-export const getFavour = favourId => {
+export const getFavour = (favourId) => {
 	return async (dispatch) => {
 		try {
 			const result = await Favour.getFavour(favourId);
@@ -77,11 +77,35 @@ export const getFavour = favourId => {
 	};
 };
 
+export const repay = (data) => {
+	return async (dispatch) => {
+		try {
+			const result = await Favour.repay(data);
+
+			if (result) {
+				dispatch({
+					type: SET_MESSAGE,
+					message: new Message({
+						title: 'Favour repaid!',
+						text: 'You have repaid the favour.',
+						feedback: SNACKBAR
+					})
+				});
+			}
+			
+			return result;
+		} catch (error) {
+			dispatchError(error, dispatch);
+			return false;
+		}
+	};
+};
+
 export const getLeaderboard = () => {
 	return async (dispatch) => {
 		try {
 			const result = await Favour.getLeaderboard();
-			
+
 			return result;
 		} catch (error) {
 			dispatchError(error, dispatch);

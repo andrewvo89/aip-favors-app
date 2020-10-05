@@ -6,9 +6,8 @@ const Favour = require('../models/favour');
 // const User = require('../models/user');
 // const _ = require('lodash');
 
-
+// Catches any errors detected through express-validator middlware
 const catchValidationErrors = req => {
-	// Catches any errors detected through express-validator middlware
 	const validationErrors = validationResult(req);
 	if (!validationErrors.isEmpty()) {
 		throw getError(422, validationErrors.errors[0].msg, DIALOG);
@@ -44,7 +43,7 @@ module.exports.getAll = async (req, res, next) => {
 		const favourDocs = await Favour
 			.find().or([{ fromUser: userId }, { forUser: userId }])
 			.populate('fromUser forUser', '_id firstName lastName profilePicture')
-			.sort({ createdAt: 'asc' })
+			.sort({ repaid: 1, createdAt: 'desc' })
 			.exec();
 
 		res.status(200).send(favourDocs);
@@ -87,14 +86,16 @@ module.exports.repay = async (req, res, next) => {
 		catchValidationErrors(req);
 
 		// TODO: upload handling - repaidImage
-
+		
 		const { favourId, repaidImage } = req.body;
 		const favourDoc = await Favour.findById(favourId);
+
 		favourDoc.proof.repaidImage = repaidImage;
 		favourDoc.repaid = true;
 
 		await favourDoc.save();
-		res.status(204).end();
+
+		res.status(200).end();
 	} catch (error) {
 		next(error);
 	}

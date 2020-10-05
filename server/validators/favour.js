@@ -14,7 +14,6 @@ module.exports.create = [
 ];
 
 module.exports.repay = [
-	body('userId').not().isEmpty().withMessage('User is invalid'),
 	body('favourId').not().isEmpty().withMessage('favourId is invalid')
 ];
 

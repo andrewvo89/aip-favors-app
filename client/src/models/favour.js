@@ -4,13 +4,23 @@ const config = { withCredentials: true };
 export default class Favour {
 	constructor(favour) {
 		this.favourId = favour._id;
-		this.fromUser = favour.fromUser;
-		this.forUser = favour.forUser;
+		this.fromUser = {
+			userId: favour.fromUser._id,
+			...favour.fromUser
+		};
+		this.forUser = {
+			userId: favour.forUser._id,
+			...favour.forUser
+		};
 		this.act = favour.act;
 		this.repaid = favour.repaid;
 		this.proof = favour.proof;
 		this.createdAt = favour.createdAt;
 		this.updatedAt = favour.updatedAt;
+
+		// remove unnecessary _id property
+		delete this.fromUser._id;
+		delete this.forUser._id;
 	}
 
 	static async create(data) {
@@ -35,6 +45,12 @@ export default class Favour {
 
 		const favour = new Favour(result.data);
 		return favour;
+	}
+
+	static async repay(data) {
+		const result = await axios.patch('/favours/repay', data, config);
+
+		return result.status === 200;
 	}
 
 	static async getLeaderboard() {

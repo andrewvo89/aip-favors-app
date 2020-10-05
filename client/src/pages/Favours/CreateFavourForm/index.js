@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	CircularProgress,
 	TextField,
@@ -16,6 +16,7 @@ import * as userController from '../../../controllers/user';
 import UserSearchSelect from './UserSearchSelect';
 import { Autocomplete } from '@material-ui/lab';
 import FullWidthButton from '../../../components/FullWidthButton';
+import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
 
 const CreateFavourForm = () => {
@@ -111,7 +112,7 @@ const CreateFavourForm = () => {
 	});
 
 	return (
-		<Fragment>
+		<Card>
 			<form onSubmit={formik.handleSubmit}>
 				<CardHeader
 					title="Create a Favour"
@@ -163,7 +164,6 @@ const CreateFavourForm = () => {
 						</Grid>
 					</Grid>
 				</CardContent>
-
 				<CardActions>
 					<Grid container
 						direction="column"
@@ -187,7 +187,7 @@ const CreateFavourForm = () => {
 					</Grid>
 				</CardActions>
 			</form>
-		</Fragment>
+		</Card>
 	);
 };
 
