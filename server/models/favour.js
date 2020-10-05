@@ -3,20 +3,14 @@ const Schema = mongoose.Schema;
 
 const favourSchema = new Schema(
 	{
-		fromId: {
+		fromUser: {
 			type: Schema.Types.ObjectId,
+			ref: 'User',
 			required: true
 		},
-		fromName: {
-			type: String,
-			required: true
-		},
-		forId: {
+		forUser: {
 			type: Schema.Types.ObjectId,
-			required: true
-		},
-		forName: {
-			type: String,
+			ref: 'User',
 			required: true
 		},
 		act: {

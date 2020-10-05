@@ -20,10 +20,11 @@ module.exports.getById = async (req, res, next) => {
 		catchValidationErrors(req);
 
 		// TODO: auth/permission handling (user is involved in this favour)
-		
-		const { favourId } = req.params;
 
-		const favourDoc = await Favour.findById(favourId);
+		const { favourId } = req.params;
+		const favourDoc = await Favour
+			.findById(favourId)
+			.populate('fromUser forUser', '_id firstName lastName profilePicture');
 
 		if (!favourDoc) {
 			throw getError(404, 'Favour not found', DIALOG);
@@ -39,14 +40,12 @@ module.exports.getAll = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
 
-		// TODO: auth/permission handling (user is involved in these favours)
-
-		const { userId } = req.body;
-
+		const userId = res.locals.userId;
 		const favourDocs = await Favour
-			.find({ fromId: userId })
-			.or([{ forId: userId }])
-			.sort({ createdAt: 'asc' });
+			.find().or([{ fromUser: userId }, { forUser: userId }])
+			.populate('fromUser forUser', '_id firstName lastName profilePicture')
+			.sort({ createdAt: 'asc' })
+			.exec();
 
 		res.status(200).send(favourDocs);
 	} catch (error) {
@@ -60,18 +59,23 @@ module.exports.create = async (req, res, next) => {
 
 		// TODO: upload handling - actImage
 
-		const { fromId, fromName, forId, forName, act } = req.body;
-
+		const { fromUser, forUser, act, actImage } = req.body;
 		const favour = new Favour({
-			fromId: new mongoose.Types.ObjectId(fromId),
-			fromName,
-			forId: new mongoose.Types.ObjectId(forId),
-			forName,
-			act
+			fromUser: fromUser,
+			forUser: forUser,
+			act: act,
+			proof: {
+				actImage: actImage
+			}
 		});
 
-		// Save new favour to db and add doc to response
 		const favourDoc = await favour.save();
+
+		// populate favour with user data and add to response
+		await favourDoc
+			.populate('fromUser forUser', '_id firstName lastName profilePicture')
+			.execPopulate();
+
 		res.status(201).send(favourDoc);
 	} catch (error) {
 		next(error);
@@ -85,12 +89,10 @@ module.exports.repay = async (req, res, next) => {
 		// TODO: upload handling - repaidImage
 
 		const { favourId, repaidImage } = req.body;
-
 		const favourDoc = await Favour.findById(favourId);
 		favourDoc.proof.repaidImage = repaidImage;
 		favourDoc.repaid = true;
 
-		// Save updated favour to db
 		await favourDoc.save();
 		res.status(204).end();
 	} catch (error) {
@@ -105,8 +107,6 @@ module.exports.delete = async (req, res, next) => {
 		// TODO: image file deletion handling (if we're doing this)
 
 		const { favourId } = req.body;
-
-		// Find and delete favour
 		await Favour.findByIdAndDelete(favourId);
 
 		res.status(204).end();
