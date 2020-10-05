@@ -1,5 +1,6 @@
 export default class Notification {
-	constructor({ createdBy, link, recipient, title }) {
+	constructor({ notificationId, createdBy, link, recipient, title }) {
+		this.notificationId = notificationId;
 		this.createdBy = createdBy;
 		this.link = link;
 		this.recipient = recipient;

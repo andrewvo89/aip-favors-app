@@ -4,6 +4,7 @@ const { DIALOG, CREATE, UPDATE } = require('../utils/constants');
 const { getError } = require('../utils/error');
 const mongoose = require('mongoose');
 const socket = require('../utils/socket');
+const notificationController = require('./notification');
 
 module.exports.create = async (req, res, next) => {
 	try {
@@ -91,6 +92,14 @@ module.exports.addReward = async (req, res, next) => {
 			action: UPDATE,
 			request: getRequestForClient(request)
 		});
+		//TEST START
+		await notificationController.create(
+			res.locals.userId,
+			'/requests/view/all',
+			res.locals.userId,
+			'New Rewards Notification'
+		);
+		//TEST END
 		res.status(201).send();
 	} catch (error) {
 		next(error);
@@ -159,6 +168,7 @@ module.exports.udpateRewardQuantity = async (req, res, next) => {
 			action: UPDATE,
 			request: getRequestForClient(request)
 		});
+		await createNo;
 		res.status(201).send();
 	} catch (error) {
 		next(error);

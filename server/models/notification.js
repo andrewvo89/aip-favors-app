@@ -8,17 +8,17 @@ const notificationSchema = new Schema(
 			ref: 'User',
 			required: true
 		},
+		link: {
+			type: String,
+			required: true,
+			maxlength: 100
+		},
 		recipient: {
 			type: Schema.Types.ObjectId,
 			ref: 'User',
 			required: true
 		},
 		title: {
-			type: String,
-			required: true,
-			maxlength: 100
-		},
-		link: {
 			type: String,
 			required: true,
 			maxlength: 100

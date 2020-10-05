@@ -1,5 +1,13 @@
 const { body } = require('express-validator');
 
+module.exports.getRequests = [
+	body('filter').custom(async (value, { _req }) => {
+		if (typeof value !== Object) {
+			throw new Error('Filter is invalid');
+		}
+	})
+];
+
 module.exports.create = [
 	body('act').trim().not().isEmpty().withMessage('Act is invalid'),
 	body('favourType')
