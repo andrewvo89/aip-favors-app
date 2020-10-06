@@ -6,3 +6,5 @@ module.exports.JSON_WEB_TOKEN_ERROR = 'JsonWebTokenError';
 module.exports.BOOLEAN = 'boolean';
 module.exports.CREATE = 'CREATE';
 module.exports.UPDATE = 'UPDATE';
+module.exports.DELETE = 'DELETE';
+module.exports.DELETE_ALL = 'DELETE_ALL';

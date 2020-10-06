@@ -15,7 +15,6 @@ const NotificationItem = (props) => {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const { title, link, createdAt } = props.notification;
-
 	const deleteClickHandler = () => {
 		dispatch(notificationController.clearNotification(props.notification));
 	};

@@ -7,6 +7,14 @@ export default class Notification {
 		this.title = title;
 	}
 
+	async delete() {
+		await axios.delete(`/notification/delete/${this.notificationId}`, config);
+	}
+
+	static async deleteAll() {
+		await axios.delete('/notification/deleteAll', config);
+	}
+
 	static async getAll() {
 		const result = await axios.post('/notification/get-all', null, config);
 		const notifications = result.data.notifications.map(

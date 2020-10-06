@@ -18,4 +18,5 @@ export const AUTH_TOUCHED = 'AUTH_TOUCHED';
 export const CREATE = 'CREATE';
 export const UPDATE = 'UPDATE';
 export const DELETE = 'DELETE';
+export const DELETE_ALL = 'DELETE_ALL';
 export const SET_NOTIFICACTIONS = 'SET_NOTIFICACTIONS';

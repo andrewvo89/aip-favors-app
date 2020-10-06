@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { param } = require('express-validator');
 
 // module.exports.getNotifications = [
 // 	body('filter').custom(async (value, { _req }) => {
@@ -7,3 +7,7 @@ const { body } = require('express-validator');
 // 		}
 // 	})
 // ];
+
+module.exports.delete = [
+	param('notificationId').not().isEmpty().withMessage('Request is invalid')
+];

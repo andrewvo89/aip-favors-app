@@ -28,7 +28,8 @@ const Navbar = withTheme((props) => {
 		<AppBar position="sticky">
 			<Toolbar
 				style={{
-					padding: `${props.theme.spacing(1)}px ${props.theme.spacing(10)}px`
+					padding: `${props.theme.spacing(1)}px ${props.theme.spacing(10)}px`,
+					minHeight: `${props.theme.spacing(10)}px`
 				}}
 			>
 				<Grid
@@ -53,12 +54,18 @@ const Navbar = withTheme((props) => {
 									color="inherit"
 									onClick={() => props.setDrawerOpen(true)}
 								>
-									<MenuIcon style={{ fontSize: '40px' }} />
+									<MenuIcon
+										style={{ fontSize: `${props.theme.spacing(5)}px` }}
+									/>
 								</IconButton>
 							</Grid>
 						)}
 						<Grid item>
-							<Typography variant="h5" onClick={() => history.push('/')}>
+							<Typography
+								style={{ cursor: 'pointer' }}
+								variant="h5"
+								onClick={() => history.push('/')}
+							>
 								Favours App
 							</Typography>
 						</Grid>

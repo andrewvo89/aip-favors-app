@@ -15,7 +15,7 @@ const NotificationsPopover = (props) => {
 	const { anchorEl, setAnchorEl, notifications } = props;
 
 	const notificationsClearHandler = async () => {
-		dispatch(notificationController.clearNotifications());
+		await dispatch(notificationController.clearNotifications());
 	};
 
 	const closePopoverHandler = () => {

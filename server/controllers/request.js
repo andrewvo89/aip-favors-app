@@ -5,6 +5,7 @@ const { getError } = require('../utils/error');
 const mongoose = require('mongoose');
 const socket = require('../utils/socket');
 const notificationController = require('./notification');
+const User = require('../models/user');
 
 module.exports.create = async (req, res, next) => {
 	try {
@@ -50,11 +51,12 @@ module.exports.addReward = async (req, res, next) => {
 			throw getError(422, validationErrors.errors[0].msg, DIALOG);
 		}
 		const { requestId, favourType, quantity } = req.body;
+		const { userId } = res.locals;
 		const request = await Request.findById(
 			new mongoose.Types.ObjectId(requestId)
 		);
 		const indexOfFromId = request.rewards.findIndex(
-			(reward) => reward.fromUser.toString() === res.locals.userId
+			(reward) => reward.fromUser.toString() === userId
 		);
 		if (indexOfFromId !== -1) {
 			//If a user record exist in .rewards, find if favour exists in user record
@@ -76,7 +78,7 @@ module.exports.addReward = async (req, res, next) => {
 		} else {
 			//If a user record does not exist in .rewards, push new user record in
 			request.rewards.push({
-				fromUser: res.locals.userId,
+				fromUser: userId,
 				favourTypes: [
 					{
 						favourType: favourType,
@@ -93,11 +95,12 @@ module.exports.addReward = async (req, res, next) => {
 			request: getRequestForClient(request)
 		});
 		//TEST START
+		const fromUser = await User.findById(new mongoose.Types.ObjectId(userId));
 		await notificationController.create(
-			res.locals.userId,
+			userId,
 			'/requests/view/all',
-			res.locals.userId,
-			'New Rewards Notification'
+			userId,
+			`${fromUser.fullName} added ${quantity}x ${favourType} as a reward for the request to "${request.act}"`
 		);
 		//TEST END
 		res.status(201).send();

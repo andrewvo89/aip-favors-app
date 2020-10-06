@@ -53,7 +53,7 @@ const MessageProvider = (props) => {
 							variant="filled"
 							elevation={6}
 						>
-							<AlertTitle>{title}</AlertTitle>
+							{title && <AlertTitle>{title}</AlertTitle>}
 							{text}
 						</Alert>
 					</Snackbar>
