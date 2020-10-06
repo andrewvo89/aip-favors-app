@@ -11,7 +11,13 @@ import {
 } from '@material-ui/core/';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import * as errorController from '../controllers/error';
-import { DIALOG, SILENT, SNACKBAR, SERVICE_UNAVAILABLE } from './constants';
+import {
+	DIALOG,
+	SILENT,
+	SNACKBAR,
+	SERVICE_UNAVAILABLE,
+	NETWORK_ERROR
+} from './constants';
 import ErrorMessage from '../models/error-message';
 
 const ErrorHandler = (props) => {
@@ -78,6 +84,19 @@ const ErrorHandler = (props) => {
 			{props.children}
 		</Fragment>
 	);
+};
+
+export const getErrorMessage = (error) => {
+	if (error.message === NETWORK_ERROR) {
+		return get503Error();
+	} else {
+		return new ErrorMessage({
+			status: error.response.status,
+			statusText: error.response.statusText,
+			message: error.response.data.message,
+			feedback: error.response.data.feedback
+		});
+	}
 };
 
 export const get503Error = () => {

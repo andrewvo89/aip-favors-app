@@ -4,8 +4,6 @@ const notificationsController = require('../controllers/notification');
 const router = express.Router();
 const verifyAuth = require('../middleware/verify-auth');
 
-router.get(
-	'/get-notifications',
-	verifyAuth,
-	notificationsController.getNotifications
-);
+router.post('/get-all', verifyAuth, notificationsController.getAll);
+
+module.exports = router;

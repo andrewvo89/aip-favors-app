@@ -1,9 +1,9 @@
 import React, { Fragment, useState } from 'react';
 import { Menu, MenuItem } from '@material-ui/core/';
 import { useDispatch } from 'react-redux';
-import * as authController from '../../controllers/auth';
+import * as authController from '../../../controllers/auth';
 import { withRouter } from 'react-router-dom';
-import Avatar from '../Avatar';
+import Avatar from '../../Avatar';
 
 const NavbarAvatar = withRouter((props) => {
 	const dispatch = useDispatch();
@@ -49,7 +49,8 @@ const NavbarAvatar = withRouter((props) => {
 					vertical: 'top',
 					horizontal: 'center'
 				}}
-				getContentAnchorEl={null}>
+				getContentAnchorEl={null}
+			>
 				<MenuItem onClick={accountClickHandler}>Account</MenuItem>
 				<MenuItem onClick={settingsClickHandler}>Settings</MenuItem>
 				<MenuItem onClick={logoutClickHandler}>Logout</MenuItem>

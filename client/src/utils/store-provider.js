@@ -1,21 +1,24 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { applyMiddleware, combineReducers, createStore, compose } from 'redux';
+import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { reduxBatch } from '@manaflair/redux-batch';
 import ReduxThunk from 'redux-thunk';
 import authReducer from '../store/auth';
 import errorReducer from '../store/error';
 import messageReducer from '../store/message';
+import notificationReducer from '../store/notification';
+import { composeWithDevTools } from 'redux-devtools-extension';
 
 const rootReducer = combineReducers({
 	authState: authReducer,
 	errorState: errorReducer,
-	messageState: messageReducer
+	messageState: messageReducer,
+	notificationState: notificationReducer
 });
 
 const store = createStore(
 	rootReducer,
-	compose(applyMiddleware(ReduxThunk), reduxBatch)
+	composeWithDevTools(applyMiddleware(ReduxThunk), reduxBatch)
 );
 
 const StoreProvider = (props) => {

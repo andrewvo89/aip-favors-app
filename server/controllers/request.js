@@ -168,7 +168,6 @@ module.exports.udpateRewardQuantity = async (req, res, next) => {
 			action: UPDATE,
 			request: getRequestForClient(request)
 		});
-		await createNo;
 		res.status(201).send();
 	} catch (error) {
 		next(error);

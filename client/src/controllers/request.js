@@ -1,28 +1,13 @@
-import ErrorMessage from '../models/error-message';
 import Message from '../models/message';
 import Request from '../models/request';
 import {
 	CREATE,
 	DIALOG,
-	NETWORK_ERROR,
 	SET_ERROR,
 	SET_MESSAGE,
 	UPDATE
 } from '../utils/constants';
-import { get503Error } from '../utils/error-handler';
-
-const getErrorMessage = (error) => {
-	if (error.message === NETWORK_ERROR) {
-		return get503Error();
-	} else {
-		return new ErrorMessage({
-			status: error.response.status,
-			statusText: error.response.statusText,
-			message: error.response.data.message,
-			feedback: error.response.data.feedback
-		});
-	}
-};
+import { getErrorMessage } from '../utils/error-handler';
 
 export const getRequests = (filter) => {
 	return async (dispatch, _getState) => {

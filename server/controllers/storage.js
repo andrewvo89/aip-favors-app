@@ -7,6 +7,7 @@ const rootPath = require('../utils/root-path');
 module.exports.getProfilePicture = (req, res, next) => {
 	try {
 		const imagePath = path.join(rootPath, req.originalUrl);
+		console.log(imagePath);
 		if (res.locals.userId !== req.params.userId) {
 			throw getError(
 				404,

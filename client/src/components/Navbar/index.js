@@ -1,17 +1,15 @@
 import React, { Fragment } from 'react';
-import { AppBar, IconButton, Badge, Button } from '@material-ui/core';
+import { AppBar, IconButton, Button, Grid } from '@material-ui/core';
 import { useSelector, useDispatch } from 'react-redux';
-import NavbarAvatar from '../NavbarAvatar';
+import NavbarAvatar from './NavbarAvatar';
 import {
 	StyledMenuIcon,
 	StyledTitle,
-	StyledToolbar,
-	StyledIconButton,
-	StyledDiv
+	StyledToolbar
 } from './styled-components';
 import { withRouter } from 'react-router-dom';
-import { Notifications as NotificationsIcon } from '@material-ui/icons';
 import * as authController from '../../controllers/auth';
+import NotificationsIconButton from './NotificationsIconButton';
 
 export default withRouter((props) => {
 	const dispatch = useDispatch();
@@ -37,14 +35,10 @@ export default withRouter((props) => {
 					</IconButton>
 				)}
 				{authUser ? (
-					<StyledDiv>
-						<StyledIconButton edge="start" color="inherit">
-							<Badge badgeContent={100} max={10} color="secondary">
-								<NotificationsIcon />
-							</Badge>
-						</StyledIconButton>
+					<Grid container alignContent="center">
+						<NotificationsIconButton />
 						<NavbarAvatar authUser={authUser} />
-					</StyledDiv>
+					</Grid>
 				) : (
 					touched && (
 						<Fragment>
