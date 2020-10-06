@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import RequestForm from './RequestForm';
 import RequestsList from './RequestsList';
 import { Redirect, Route, Switch } from 'react-router-dom';
@@ -10,18 +10,18 @@ const Requests = () => {
 	return (
 		<PageContainer width="500px">
 			<Switch>
-				{authUser ? (
-					<Fragment>
-						<Route path="/requests/create" component={RequestForm} />
-						<Route path="/requests/view/all" component={RequestsList} />
-						<Redirect from="/" to="/requests/view/all" />
-					</Fragment>
-				) : (
-					<Fragment>
-						<Route path="/requests/view/all" component={RequestsList} />
-						<Redirect from="/" to="/requests/view/all" />
-					</Fragment>
+				{authUser && (
+					<Route path="/requests/create">
+						<RequestForm />
+					</Route>
 				)}
+				<Route path="/" exact>
+					<RequestsList />
+				</Route>
+				<Route path="/requests/view/all">
+					<RequestsList />
+				</Route>
+				<Redirect to="/" />
 			</Switch>
 		</PageContainer>
 	);

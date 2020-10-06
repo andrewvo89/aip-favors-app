@@ -16,7 +16,6 @@ const App = withRouter((props) => {
 	const dispatch = useDispatch();
 	const [authLoading, setAuthLoading] = useState(true);
 	const { authUser } = useSelector((state) => state.authState);
-	const notificationState = useSelector((state) => state.notificationState);
 	//Check authentication as first action upon loading
 	useEffect(() => {
 		const verifyAuth = async () => {
@@ -28,15 +27,17 @@ const App = withRouter((props) => {
 
 	//Get notifications when user is logged in
 	useEffect(() => {
-		if (authUser && !notificationState.touched) {
+		if (authUser) {
 			dispatch(notificationController.subscribeToNotifications());
 		}
 		return () => {
-			if (!authUser && notificationState.touched) {
-				dispatch(notificationController.unsubscribeToNotifications());
+			if (authUser) {
+				dispatch(
+					notificationController.unsubscribeToNotifications(authUser.userId)
+				);
 			}
 		};
-	}, [authUser, notificationState.touched, dispatch]);
+	}, [authUser, dispatch]);
 
 	let children = <CircularProgress />;
 
@@ -44,9 +45,6 @@ const App = withRouter((props) => {
 		children = (
 			<Switch>
 				<Route path="/" exact>
-					<Requests />
-				</Route>
-				<Route path="/requests">
 					<Requests />
 				</Route>
 				<Redirect to="/" />

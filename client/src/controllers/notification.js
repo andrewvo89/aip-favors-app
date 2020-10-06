@@ -4,8 +4,7 @@ import {
 	CREATE,
 	DELETE,
 	SET_ERROR,
-	SET_NOTIFICACTIONS,
-	SET_NOTIFICACTIONS_TOUCHED
+	SET_NOTIFICACTIONS
 } from '../utils/constants';
 import { getErrorMessage } from '../utils/error-handler';
 const { REACT_APP_REST_URL: REST_URL } = process.env;
@@ -17,22 +16,15 @@ export const clearNotification = () => {};
 export const subscribeToNotifications = () => {
 	return async (dispatch, getState) => {
 		try {
-			console.log('subscribe');
 			const { authUser } = getState().authState;
 			const notifications = await Notification.getAll(authUser.userId);
-			dispatch(
-				{
-					type: SET_NOTIFICACTIONS,
-					notifications: notifications
-				},
-				{
-					type: SET_NOTIFICACTIONS_TOUCHED
-				}
-			);
+			dispatch({
+				type: SET_NOTIFICACTIONS,
+				notifications: notifications
+			});
 			//Subscribe to the socket.io for notification updates
-			console.log(`notifications-${authUser.userId}`);
+			dispatch(unsubscribeToNotifications(authUser.userId));
 			socket.on(`notifications-${authUser.userId}`, (data) => {
-				console.log('update', data);
 				let newNotifications = [...getState().notificationState.notifications];
 				console.log(newNotifications);
 				if (data.action === CREATE) {
@@ -60,16 +52,13 @@ export const subscribeToNotifications = () => {
 	};
 };
 
-export const unsubscribeToNotifications = () => {
-	return async (dispatch, getState) => {
-		console.log('ubsubscribe');
+export const unsubscribeToNotifications = (userId) => {
+	return async (dispatch, _getState) => {
 		try {
-			const { authUser } = getState().authState;
-			socket.off(`notifications-${authUser.userId}`);
-			dispatch({
-				type: SET_NOTIFICACTIONS,
-				notifications: []
-			});
+			const socketEvent = `notifications-${userId}`;
+			if (socket.hasListeners(socketEvent)) {
+				socket.off(socketEvent);
+			}
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
 			dispatch({

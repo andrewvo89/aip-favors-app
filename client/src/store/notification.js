@@ -1,11 +1,7 @@
-import {
-	SET_NOTIFICACTIONS,
-	SET_NOTIFICACTIONS_TOUCHED
-} from '../utils/constants';
+import { SET_NOTIFICACTIONS } from '../utils/constants';
 
 const initialState = {
-	notifications: [],
-	touched: false
+	notifications: []
 };
 
 export default (state = initialState, action) => {
@@ -14,11 +10,6 @@ export default (state = initialState, action) => {
 			return {
 				...state,
 				notifications: action.notifications
-			};
-		case SET_NOTIFICACTIONS_TOUCHED:
-			return {
-				...state,
-				touched: true
 			};
 		default:
 			return state;

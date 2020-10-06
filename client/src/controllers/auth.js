@@ -7,7 +7,8 @@ import {
 	CLOSE_AUTH_DIALOG,
 	SHOW_LOGIN_DIALOG,
 	SET_MESSAGE,
-	SNACKBAR
+	SNACKBAR,
+	SET_NOTIFICACTIONS
 } from '../utils/constants';
 import User from '../models/user';
 import ErrorMessage from '../models/error-message';
@@ -156,7 +157,13 @@ export const logout = () => {
 				error: errorMessage
 			});
 		} finally {
-			dispatch({ type: LOGOUT });
+			dispatch([
+				{ type: LOGOUT },
+				{
+					type: SET_NOTIFICACTIONS,
+					notifications: []
+				}
+			]);
 		}
 	};
 };

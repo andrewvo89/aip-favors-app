@@ -1,17 +1,22 @@
 import React, { Fragment } from 'react';
-import { AppBar, IconButton, Button, Grid } from '@material-ui/core';
+import {
+	AppBar,
+	IconButton,
+	Button,
+	Grid,
+	Toolbar,
+	Typography
+} from '@material-ui/core';
+import { Menu as MenuIcon } from '@material-ui/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import NavbarAvatar from './NavbarAvatar';
-import {
-	StyledMenuIcon,
-	StyledTitle,
-	StyledToolbar
-} from './styled-components';
-import { withRouter } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import * as authController from '../../controllers/auth';
 import NotificationsIconButton from './NotificationsIconButton';
+import { withTheme } from '@material-ui/core/styles';
 
-export default withRouter((props) => {
+const Navbar = withTheme((props) => {
+	const history = useHistory();
 	const dispatch = useDispatch();
 	const { authUser, touched } = useSelector((state) => state.authState);
 
@@ -20,35 +25,74 @@ export default withRouter((props) => {
 	};
 
 	return (
-		<AppBar position="static">
-			<StyledToolbar authUser={authUser}>
-				<StyledTitle variant="h4" onClick={() => props.history.push('/')}>
-					Favours App
-				</StyledTitle>
-				{authUser && (
-					<IconButton
-						edge="start"
-						color="inherit"
-						onClick={() => props.setDrawerOpen(true)}
+		<AppBar position="sticky">
+			<Toolbar
+				style={{
+					padding: `${props.theme.spacing(1)}px ${props.theme.spacing(10)}px`
+				}}
+			>
+				<Grid
+					container
+					direction="row"
+					justify="space-between"
+					alignItems="center"
+					wrap="nowrap"
+				>
+					<Grid
+						item
+						container
+						direction="row"
+						alignItems="center"
+						justify="flex-start"
+						spacing={2}
 					>
-						<StyledMenuIcon />
-					</IconButton>
-				)}
-				{authUser ? (
-					<Grid container alignContent="center">
-						<NotificationsIconButton />
-						<NavbarAvatar authUser={authUser} />
+						{authUser && (
+							<Grid item>
+								<IconButton
+									edge="start"
+									color="inherit"
+									onClick={() => props.setDrawerOpen(true)}
+								>
+									<MenuIcon style={{ fontSize: '40px' }} />
+								</IconButton>
+							</Grid>
+						)}
+						<Grid item>
+							<Typography variant="h5" onClick={() => history.push('/')}>
+								Favours App
+							</Typography>
+						</Grid>
 					</Grid>
-				) : (
-					touched && (
-						<Fragment>
-							<Button color="inherit" onClick={loginClickHandler}>
-								Login / Signup
-							</Button>
-						</Fragment>
-					)
-				)}
-			</StyledToolbar>
+					<Grid
+						item
+						container
+						direction="row"
+						alignItems="center"
+						justify="flex-end"
+						spacing={2}
+					>
+						{authUser && (
+							<Fragment>
+								<Grid item>
+									<NotificationsIconButton />
+								</Grid>
+								<Grid item>
+									<NavbarAvatar authUser={authUser} />
+								</Grid>
+							</Fragment>
+						)}
+						{!authUser && touched && (
+							<Grid item>
+								<Button color="inherit" onClick={loginClickHandler}>
+									Login / Signup
+								</Button>
+							</Grid>
+						)}
+					</Grid>
+				</Grid>
+			</Toolbar>
 		</AppBar>
 	);
 });
+
+export default Navbar;
