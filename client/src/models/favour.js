@@ -50,7 +50,8 @@ export default class Favour {
 	static async repay(data) {
 		const result = await axios.patch('/favours/repay', data, config);
 
-		return result.status === 200;
+		const favour = new Favour(result.data);
+		return favour;
 	}
 
 	static async getLeaderboard() {

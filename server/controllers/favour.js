@@ -88,14 +88,18 @@ module.exports.repay = async (req, res, next) => {
 		// TODO: upload handling - repaidImage
 		
 		const { favourId, repaidImage } = req.body;
-		const favourDoc = await Favour.findById(favourId);
+		const favour = await Favour.findById(favourId);
 
-		favourDoc.proof.repaidImage = repaidImage;
-		favourDoc.repaid = true;
+		favour.proof.repaidImage = repaidImage;
+		favour.repaid = true;
 
-		await favourDoc.save();
+		const favourDoc = await favour.save();
 
-		res.status(200).end();
+		await favourDoc
+			.populate('fromUser forUser', '_id firstName lastName profilePicture')
+			.execPopulate();
+
+		res.status(200).send(favourDoc);
 	} catch (error) {
 		next(error);
 	}

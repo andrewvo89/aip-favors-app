@@ -82,16 +82,14 @@ export const repay = (data) => {
 		try {
 			const result = await Favour.repay(data);
 
-			if (result) {
-				dispatch({
-					type: SET_MESSAGE,
-					message: new Message({
-						title: 'Favour repaid!',
-						text: 'You have repaid the favour.',
-						feedback: SNACKBAR
-					})
-				});
-			}
+			dispatch({
+				type: SET_MESSAGE,
+				message: new Message({
+					title: 'Favour repaid!',
+					text: 'You have repaid the favour.',
+					feedback: SNACKBAR
+				})
+			});
 			
 			return result;
 		} catch (error) {

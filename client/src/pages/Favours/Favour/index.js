@@ -8,12 +8,10 @@ import {
 	Button,
 	Grid,
 	makeStyles,
-	CardActionArea,
-	Chip
+	CardActionArea
 } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
-import DoneIcon from '@material-ui/icons/Done';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import * as favourController from '../../../controllers/favour';
@@ -35,14 +33,6 @@ const useStyles = makeStyles({
 	},
 	act: {
 		fontWeight: 500
-	},
-	repaidChip: {
-		marginLeft: 'auto',
-		marginRight: 'auto',
-		marginTop: 12,
-		borderRadius: 6,
-		display: 'flex',
-		width: 'fit-content'
 	}
 });
 
@@ -169,20 +159,7 @@ const Favour = () => {
 
 						<Divider variant="middle" className={classes.divider} />
 
-						{favour.repaid ? (
-							<Grid>
-								<CardHeader title="Repaid" subheader={favour.updatedAt} />
-								<Chip
-									className={classes.repaidChip}
-									label="Repaid"
-									color="secondary"
-									clickable
-									icon={<DoneIcon />}
-								/>
-							</Grid>
-						) : (
-							<RepayFavourForm favourId={favour.favourId} />
-						)}
+						<RepayFavourForm favour={favour} setFavour={setFavour} />
 					</CardContent>
 				</Card>
 			)}

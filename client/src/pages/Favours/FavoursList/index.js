@@ -6,18 +6,16 @@ import {
 	CircularProgress,
 	List,
 	ListItem,
-	ListItemText,
 	ListItemAvatar,
-	Divider,
 	Grid,
 	Button,
 	ButtonGroup, 
 	Chip,
-	Box,
 	Typography,
 	makeStyles
 } from '@material-ui/core';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
 import DoneIcon from '@material-ui/icons/Done';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import Avatar from '../../../components/Avatar';
@@ -37,12 +35,18 @@ const useStyles = makeStyles({
 		borderWidth: 2,
 		borderRadius: 6
 	},
-	mainInfoChip: {
-		display: 'block',
-		width: 'fit-content'
+	arrow: {
+		fontSize: '2.5rem',
+		marginTop: 2
+	},
+	mainInfo: {
+		height: 32,
+		marginBottom: 4,
+		marginTop: -10
 	},
 	subInfo: {
 		display: 'flex',
+		marginTop: 2,
 		'& span': {
 			marginLeft: 4,
 			marginRight: 4
@@ -88,7 +92,7 @@ const FavourList = () => {
 	};
 
 	const getColour = (user) => {
-		return user.userId === authUserId ? 'primary' : 'secondary';
+		return user.userId === authUserId ? 'default' : 'primary';
 	};
 
 	const filteredFavours = () => {
@@ -137,13 +141,15 @@ const FavourList = () => {
 						</ButtonGroup>
 					</Grid>
 					<List>
-						{filteredFavours().map((favour, index) => {
+						{filteredFavours().map((favour) => {
 							return (
 								<Fragment key={favour.favourId}>
 									<ListItem
 										button
 										component={Link}
 										to={`/favours/view/${favour.favourId}`}
+										divider
+										disableGutters
 									>
 										<ListItemAvatar>
 											<Avatar user={
@@ -152,35 +158,50 @@ const FavourList = () => {
 													: favour.fromUser
 											} />
 										</ListItemAvatar>
-										<ListItemText
-											primary={
-												<Fragment>
+										<Grid container>
+											<Grid
+												className={classes.mainInfo}
+												container
+												alignItems="center"
+											>
+												<Grid item xs={5}>
 													<Chip 
-														className={`${classes.chip} ${classes.mainInfoChip}`}
+														className={`${classes.chip}`}
 														label={getName(favour.fromUser)}
-														variant="outlined"
+														variant="default"
 														color={getColour(favour.fromUser)}
 														size="small"
 														clickable
 													/>
-													<span>{favour.act} for </span>
+												</Grid>
+												<Grid container item xs={2} justify="center">
+													<ArrowRightAltIcon 
+														className={classes.arrow}
+														fontSize="large" 
+														color="primary" 
+													/>
+												</Grid>
+												<Grid container item xs={5} justify="flex-end">
 													<Chip 
-														className={classes.chip}
+														className={`${classes.chip}`}
 														label={getName(favour.forUser)}
-														variant="outlined"
+														variant="default"
 														color={getColour(favour.forUser)}
 														size="small"
 														clickable
 													/>
-												</Fragment>
-											}
-											secondary={
-												<Box component="span" className={classes.subInfo}>
-													<AccessTimeIcon fontSize="small" />
-													<span>
-														{formattedDate(favour.createdAt)}
-													</span>
-													{favour.repaid && (
+												</Grid>
+											</Grid>
+											<Grid container item justify="center">
+												{favour.act}
+											</Grid>
+											<Grid container className={classes.subInfo}>
+												<AccessTimeIcon fontSize="small" />
+												<span>
+													{formattedDate(favour.createdAt)}
+												</span>
+												{favour.repaid && (
+													<Grid container item xs justify="flex-end">
 														<Chip
 															className={classes.chip}
 															label="Repaid"
@@ -188,17 +209,13 @@ const FavourList = () => {
 															color="secondary"
 															size="small"
 															clickable
-															component="span"
 															icon={<DoneIcon />}
 														/>
-													)}
-												</Box>
-											}
-										/>
+													</Grid>
+												)}
+											</Grid>
+										</Grid>
 									</ListItem>
-									{(index !== filteredFavours().length - 1) && (
-										<Divider variant="middle" component="li" />
-									)}
 								</Fragment>
 							);
 						})}
