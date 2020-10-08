@@ -9,7 +9,7 @@ import {
 	ListItemAvatar,
 	Grid,
 	Button,
-	ButtonGroup, 
+	ButtonGroup,
 	Chip,
 	Typography,
 	makeStyles
@@ -22,9 +22,11 @@ import Avatar from '../../../components/Avatar';
 import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
 import * as favourController from '../../../controllers/favour';
+import FullWidthButton from '../../../components/FullWidthButton';
 
 const useStyles = makeStyles({
 	buttonGroup: {
+		marginTop: 16,
 		'& button': {
 			fontSize: '.75rem',
 			padding: 6
@@ -120,31 +122,40 @@ const FavourList = () => {
 	return (
 		<Card width="450px">
 			<CardHeader title="Favours" subheader="All your favours" />
-			{loading ? (
-				<CircularProgress />
-			) : (
-				<CardContent>
-					<Grid container justify="center">
-						<ButtonGroup
-							className={classes.buttonGroup}
-							component={ToggleButtonGroup}
-							value={filter}
-							onChange={(e, newValue) => setFilter(newValue)}
-							variant="text"
-							exclusive
-							fullWidth
-						>
-							<Button component={ToggleButton} value='all'>All</Button>
-							<Button component={ToggleButton} value='from'>From you</Button>
-							<Button component={ToggleButton} value='for'>For you</Button>
-							<Button component={ToggleButton} value='repaid'>Repaid</Button>
-						</ButtonGroup>
-					</Grid>
-					<List>
-						{filteredFavours().map((favour) => {
-							return (
-								<Fragment key={favour.favourId}>
+			<CardContent>
+				<FullWidthButton 
+					variant="contained" 
+					color="primary"
+					component={Link}
+					to="/favours/create"
+				>
+					New Favour
+				</FullWidthButton>
+				{loading ? (
+					<CircularProgress />
+				) : (
+					<Fragment>
+						<Grid container justify="center">
+							<ButtonGroup
+								className={classes.buttonGroup}
+								component={ToggleButtonGroup}
+								value={filter}
+								onChange={(e, newValue) => setFilter(newValue)}
+								variant="text"
+								exclusive
+								fullWidth
+							>
+								<Button component={ToggleButton} value='all'>All</Button>
+								<Button component={ToggleButton} value='from'>From you</Button>
+								<Button component={ToggleButton} value='for'>For you</Button>
+								<Button component={ToggleButton} value='repaid'>Repaid</Button>
+							</ButtonGroup>
+						</Grid>
+						<List>
+							{filteredFavours().map((favour) => {
+								return (
 									<ListItem
+										key={favour.favourId}
 										button
 										component={Link}
 										to={`/favours/view/${favour.favourId}`}
@@ -153,8 +164,8 @@ const FavourList = () => {
 									>
 										<ListItemAvatar>
 											<Avatar user={
-												favour.fromUser.userId === authUserId 
-													? favour.forUser 
+												favour.fromUser.userId === authUserId
+													? favour.forUser
 													: favour.fromUser
 											} />
 										</ListItemAvatar>
@@ -165,7 +176,7 @@ const FavourList = () => {
 												alignItems="center"
 											>
 												<Grid item xs={5}>
-													<Chip 
+													<Chip
 														className={`${classes.chip}`}
 														label={getName(favour.fromUser)}
 														variant="default"
@@ -175,14 +186,14 @@ const FavourList = () => {
 													/>
 												</Grid>
 												<Grid container item xs={2} justify="center">
-													<ArrowRightAltIcon 
+													<ArrowRightAltIcon
 														className={classes.arrow}
-														fontSize="large" 
-														color="primary" 
+														fontSize="large"
+														color="primary"
 													/>
 												</Grid>
 												<Grid container item xs={5} justify="flex-end">
-													<Chip 
+													<Chip
 														className={`${classes.chip}`}
 														label={getName(favour.forUser)}
 														variant="default"
@@ -216,17 +227,17 @@ const FavourList = () => {
 											</Grid>
 										</Grid>
 									</ListItem>
-								</Fragment>
-							);
-						})}
-						{(filteredFavours().length === 0) && (
-							<Typography variant="subtitle1" align="center">
-								There&apos;s nothing here.
-							</Typography>
-						)}
-					</List>
-				</CardContent>
-			)}
+								);
+							})}
+							{(filteredFavours().length === 0) && (
+								<Typography variant="subtitle1" align="center">
+									There&apos;s nothing here.
+								</Typography>
+							)}
+						</List>
+					</Fragment>
+				)}
+			</CardContent>
 		</Card>
 	);
 };

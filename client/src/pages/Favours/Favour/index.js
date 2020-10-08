@@ -74,7 +74,7 @@ const Favour = () => {
 				act: favourData.act.toLowerCase()
 			};
 
-			favourData.proof.actImage = favourData.proof.actImage
+			favourData.proof.actImage = (favourData.proof.actImage !== '')
 				? favourData.proof.actImage
 				: 'https://i.imgur.com/YXScr0c.jpeg';
 

@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react';
 import {
 	CircularProgress,
 	TextField,
+	Button,
 	CardActions,
 	Grid,
-	CardContent
+	CardContent,
+	Typography,
+	makeStyles
 } from '@material-ui/core';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { actList } from '../../../utils/actList';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 import * as favourController from '../../../controllers/favour';
 import * as userController from '../../../controllers/user';
@@ -19,7 +23,15 @@ import FullWidthButton from '../../../components/FullWidthButton';
 import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
 
+const useStyles = makeStyles({
+	backButton: {
+		paddingLeft: 0,
+		marginBottom: 8
+	}
+});
+
 const CreateFavourForm = () => {
+	const classes = useStyles();
 	const dispatch = useDispatch();
 	const history = useHistory();
 	const authUser = useSelector((state) => state.authState.authUser);
@@ -112,82 +124,94 @@ const CreateFavourForm = () => {
 	});
 
 	return (
-		<Card>
-			<form onSubmit={formik.handleSubmit}>
-				<CardHeader
-					title="Create a Favour"
-					subheader="Provided a favour to someone or vice versa? Note it here."
-				/>
-				<CardContent>
-					<Grid container direction="column" spacing={1} alignItems="stretch">
-						<Grid item>
-							<UserSearchSelect
-								id="from-name-input"
-								label="From"
-								userList={userList}
-								onChange={(newValue) => formik.setFieldValue('fromUser', newValue)}
-								error={!!formik.touched.from && !!formik.errors.from}
-								autoFocus={true}
-								defaultValue={initialValues.fromUser}
-							/>
+		<Grid>
+			<Button
+				className={classes.backButton}
+				color="primary"
+				component={Link} to="/favours/view/all"
+			>
+				<ArrowBackIcon />
+				<Typography>
+					Favours list
+				</Typography>
+			</Button>
+			<Card>
+				<form onSubmit={formik.handleSubmit}>
+					<CardHeader
+						title="Create a Favour"
+						subheader="Provided a favour to someone or vice versa? Note it here."
+					/>
+					<CardContent>
+						<Grid container direction="column" spacing={1} alignItems="stretch">
+							<Grid item>
+								<UserSearchSelect
+									id="from-name-input"
+									label="From"
+									userList={userList}
+									onChange={(newValue) => formik.setFieldValue('fromUser', newValue)}
+									error={!!formik.touched.from && !!formik.errors.from}
+									autoFocus={true}
+									defaultValue={initialValues.fromUser}
+								/>
+							</Grid>
+							<Grid item>
+								<UserSearchSelect
+									id="for-name-input"
+									label="For"
+									userList={userList}
+									onChange={(newValue) => formik.setFieldValue('forUser', newValue)}
+									error={!!formik.touched.for && !!formik.errors.for}
+								/>
+							</Grid>
+							<Grid item>
+								<Autocomplete
+									id="act-input"
+									options={actList}
+									onChange={(e, newValue) =>
+										formik.setFieldValue('act', newValue)
+									}
+									getOptionLabel={(option) => option}
+									autoHighlight
+									autoSelect
+									renderInput={(params) => (
+										<TextField
+											{...params}
+											label="Act"
+											error={!!formik.touched.act && !!formik.errors.act}
+											InputProps={{
+												...params.InputProps
+											}}
+										/>
+									)}
+								/>
+							</Grid>
 						</Grid>
-						<Grid item>
-							<UserSearchSelect
-								id="for-name-input"
-								label="For"
-								userList={userList}
-								onChange={(newValue) => formik.setFieldValue('forUser', newValue)}
-								error={!!formik.touched.for && !!formik.errors.for}
-							/>
-						</Grid>
-						<Grid item>
-							<Autocomplete
-								id="act-input"
-								options={actList}
-								onChange={(e, newValue) =>
-									formik.setFieldValue('act', newValue)
-								}
-								getOptionLabel={(option) => option}
-								autoHighlight
-								autoSelect
-								renderInput={(params) => (
-									<TextField
-										{...params}
-										label="Act"
-										error={!!formik.touched.act && !!formik.errors.act}
-										InputProps={{
-											...params.InputProps
-										}}
-									/>
+					</CardContent>
+					<CardActions>
+						<Grid container
+							direction="column"
+							alignItems={loading ? 'center' : 'stretch'}
+							spacing={1}
+						>
+							<Grid item>
+								{loading ? (
+									<CircularProgress />
+								) : (
+									<FullWidthButton
+										variant="contained"
+										color="primary"
+										type="submit"
+										disabled={!formik.isValid}
+									>
+										Create
+									</FullWidthButton>
 								)}
-							/>
+							</Grid>
 						</Grid>
-					</Grid>
-				</CardContent>
-				<CardActions>
-					<Grid container
-						direction="column"
-						alignItems={loading ? 'center' : 'stretch'}
-						spacing={1}
-					>
-						<Grid item>
-							{loading ? (
-								<CircularProgress />
-							) : (
-								<FullWidthButton
-									variant="contained"
-									color="primary"
-									type="submit"
-									disabled={!formik.isValid}
-								>
-									Create
-								</FullWidthButton>
-							)}
-						</Grid>
-					</Grid>
-				</CardActions>
-			</form>
-		</Card>
+					</CardActions>
+				</form>
+			</Card>
+		</Grid>
 	);
 };
 
