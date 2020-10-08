@@ -118,21 +118,21 @@ module.exports.delete = async (req, res, next) => {
 module.exports.getLeaderboard = async (req, res, next) => {
 	try {
 		// find distinct users
-		const userIds = await Favour.distinct("fromId");
+		const userIds = await Favour.distinct('fromUser');
 
 		// populate data with distinct users and their number of favours
-		data = [];
+		let data = [];
 
 		for (let i = 0; i < userIds.length; i++) {
 			const favoursCount = await Favour.countDocuments({
-				fromId: userIds[i]
+				fromUser: userIds[i]
 			});
 
 			const user = await User.findOne({
 				_id: new mongoose.Types.ObjectId(userIds[i])
 			});
 
-			dataObj = {};
+			let dataObj = {};
 			dataObj.userId = userIds[i];
 			dataObj.firstName = user.firstName;
 			dataObj.lastName = user.lastName;
