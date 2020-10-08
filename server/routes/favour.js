@@ -4,9 +4,8 @@ const router = express.Router();
 const verifyAuth = require('../middleware/verify-auth');
 const favourController = require('../controllers/favour');
 const favourValidator = require('../validators/favour');
-// const uploaders = require('../utils/uploaders');
+const uploaders = require('../utils/uploaders');
 
-// TODO: upload handling
 
 router.get('/get-leaderboard', favourController.getLeaderboard);
 
@@ -42,6 +41,13 @@ router.delete(
 	verifyAuth,
 	favourValidator.delete,
 	favourController.delete
+);
+
+router.post(
+	'/upload-image',
+	verifyAuth,
+	uploaders.favourImageUploader,
+	favourController.uploadImage
 );
 
 module.exports = router;

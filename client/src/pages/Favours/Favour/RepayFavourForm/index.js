@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Chip, Grid, makeStyles } from '@material-ui/core';
+import { 
+	Chip,
+	Grid,
+	CardActionArea,
+	CardMedia,
+	makeStyles
+} from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
 import CardHeader from '../../../../components/CardHeader';
 import FullWidthButton from '../../../../components/FullWidthButton';
+import ImageUploader from '../../ImageUploader';
 import * as favourController from '../../../../controllers/favour';
+const { REACT_APP_REST_URL: REST_URL } = process.env;
 
 const useStyles = makeStyles({
 	repayButton: {
@@ -14,6 +22,7 @@ const useStyles = makeStyles({
 		marginLeft: 'auto',
 		marginRight: 'auto',
 		marginTop: 12,
+		marginBottom: 16,
 		borderRadius: 6,
 		display: 'flex',
 		width: 'fit-content'
@@ -23,18 +32,25 @@ const useStyles = makeStyles({
 function RepayFavourForm({ favour, setFavour }) {
 	const classes = useStyles();
 	const dispatch = useDispatch();
+	const [imageUrl, setImageUrl] = useState('');
+
+	const handleShowImage = () => {
+		// TODO
+	};
+
+	const handleSetImage = (url) => {
+		setImageUrl(url);
+	};
 
 	const handleSubmit = async (e) => {
-		// TODO: use formik
 		e.preventDefault();
 
 		const data = {
 			favourId: favour.favourId,
-			repaidImage: ''
+			repaidImage: imageUrl
 		};
 
 		const updatedFavour = await dispatch(favourController.repay(data));
-
 		// rerender with updated favour
 		setFavour(updatedFavour);
 	};
@@ -51,6 +67,15 @@ function RepayFavourForm({ favour, setFavour }) {
 						clickable
 						icon={<DoneIcon />}
 					/>
+					<CardActionArea onClick={handleShowImage}>
+						<CardMedia
+							component="img"
+							image={`${REST_URL}/${favour.proof.repaidImage}`}
+							title="Proof of repayment"
+							alt="Proof of repayment"
+							height="180"
+						/>
+					</CardActionArea>
 				</Grid>
 			) : (
 				<Grid>
@@ -59,11 +84,24 @@ function RepayFavourForm({ favour, setFavour }) {
 						subheader="Upload an image as proof to repay this favour."
 					/>
 					<form onSubmit={handleSubmit}>
+						<Grid 
+							container
+							item
+							direction="column"
+							justify="center"
+							alignItems="center"
+						>
+							<ImageUploader
+								imageUrl={imageUrl}
+								handleSetImage={handleSetImage}
+							/>
+						</Grid>
 						<FullWidthButton
 							className={classes.repayButton}
 							variant="contained"
 							color="primary"
 							type="submit"
+							disabled={imageUrl === ''}
 						>
 							Repay
 						</FullWidthButton>

@@ -90,7 +90,7 @@ export const repay = (data) => {
 					feedback: SNACKBAR
 				})
 			});
-			
+
 			return result;
 		} catch (error) {
 			dispatchError(error, dispatch);
@@ -105,6 +105,20 @@ export const getLeaderboard = () => {
 			const result = await Favour.getLeaderboard();
 
 			return result;
+		} catch (error) {
+			dispatchError(error, dispatch);
+			return false;
+		}
+	};
+};
+
+export const uploadImage = (file) => {
+	return async (dispatch, getState) => {
+		try {
+			const userId = getState().authState.authUser.userId;
+
+			const imageUrl = await Favour.uploadImage({ file, userId });
+			return imageUrl;
 		} catch (error) {
 			dispatchError(error, dispatch);
 			return false;

@@ -1,4 +1,5 @@
 import axios from '../utils/axios';
+import Compressor from 'compressorjs';
 const config = { withCredentials: true };
 
 export default class Favour {
@@ -57,6 +58,31 @@ export default class Favour {
 	static async getLeaderboard() {
 		const result = await axios.get('/favours/get-leaderboard', config);
 
+		return result.data;
+	}
+
+	static async uploadImage({file, userId}) {
+		const resizedFile = await new Promise((resolve, reject) => {
+			return new Compressor(file, {
+				width: 400,
+				success: (result) => {
+					resolve(
+						new File([result], file.name, {
+							type: file.type,
+							lastModified: file.lastModified
+						})
+					);
+				},
+				error: (error) => reject(error)
+			});
+		});
+
+		const data = new FormData();
+		data.append('userId', userId);
+		data.append('file', resizedFile);
+
+		// upload image and return resulting image url
+		const result = await axios.post('/favours/upload-image', data, config);
 		return result.data;
 	}
 }

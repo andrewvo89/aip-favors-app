@@ -19,6 +19,7 @@ import RepayFavourForm from './RepayFavourForm';
 import Avatar from '../../../components/Avatar';
 import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
+const { REACT_APP_REST_URL: REST_URL } = process.env;
 
 const useStyles = makeStyles({
 	backButton: {
@@ -74,10 +75,6 @@ const Favour = () => {
 				act: favourData.act.toLowerCase()
 			};
 
-			favourData.proof.actImage = (favourData.proof.actImage !== '')
-				? favourData.proof.actImage
-				: 'https://i.imgur.com/YXScr0c.jpeg';
-
 			setFavour(favourData);
 		};
 
@@ -101,7 +98,7 @@ const Favour = () => {
 	};
 
 	const handleShowImage = () => {
-		// TODO
+		// TODO: show full image
 	};
 
 	return (
@@ -124,7 +121,7 @@ const Favour = () => {
 					<CardActionArea onClick={handleShowImage}>
 						<CardMedia
 							component="img"
-							image={favour.proof.actImage}
+							image={`${REST_URL}/${favour.proof.actImage}`}
 							title="Proof of act"
 							alt="Proof of act"
 							height="180"

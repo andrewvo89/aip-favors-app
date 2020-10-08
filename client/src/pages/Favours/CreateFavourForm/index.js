@@ -10,6 +10,7 @@ import {
 	makeStyles
 } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { Autocomplete } from '@material-ui/lab';
 import { actList } from '../../../utils/actList';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,11 +18,11 @@ import { Link, useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 import * as favourController from '../../../controllers/favour';
 import * as userController from '../../../controllers/user';
-import UserSearchSelect from './UserSearchSelect';
-import { Autocomplete } from '@material-ui/lab';
 import FullWidthButton from '../../../components/FullWidthButton';
 import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
+import UserSearchSelect from './UserSearchSelect';
+import ImageUploader from '../ImageUploader';
 
 const useStyles = makeStyles({
 	backButton: {
@@ -38,6 +39,7 @@ const CreateFavourForm = () => {
 
 	const [loading, setLoading] = useState(false);
 	const [userList, setUserList] = useState([]);
+	const [imageUrl, setImageUrl] = useState('');
 
 	// fetch list of users on page load
 	useEffect(() => {
@@ -85,10 +87,7 @@ const CreateFavourForm = () => {
 			.string()
 			.label('Act')
 			.required()
-			.oneOf(actList, 'Invalid act selection.'),
-		proof: yup.object().shape({
-			actImage: yup.string().label('proof.actImage')
-		})
+			.oneOf(actList, 'Invalid act selection.')
 	});
 
 	const submitHandler = async (values) => {
@@ -100,7 +99,7 @@ const CreateFavourForm = () => {
 			fromUser: values.fromUser.userId,
 			forUser: values.forUser.userId
 		};
-
+		// TODO: add user permissions (user creating favour must be included in it)
 		const favour = await dispatch(favourController.create(values));
 		if (favour) {
 			// route to the new favour's page
@@ -113,6 +112,11 @@ const CreateFavourForm = () => {
 		return () => {
 			setLoading(false);
 		};
+	};
+
+	const handleSetImage = (url) => {
+		setImageUrl(url);
+		formik.setFieldValue('proof', { actImage: url });
 	};
 
 	const formik = useFormik({
@@ -183,6 +187,18 @@ const CreateFavourForm = () => {
 											}}
 										/>
 									)}
+								/>
+							</Grid>
+							<Grid 
+								container
+								item
+								direction="column"
+								justify="center"
+								alignItems="center"
+							>
+								<ImageUploader
+									imageUrl={imageUrl}
+									handleSetImage={handleSetImage}
 								/>
 							</Grid>
 						</Grid>

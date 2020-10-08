@@ -2,6 +2,9 @@ const { validationResult } = require('express-validator');
 const { DIALOG } = require('../utils/constants');
 const { getError } = require('../utils/error');
 const Favour = require('../models/favour');
+const sharp = require('sharp');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 // const mongoose = require('mongoose');
 // const User = require('../models/user');
 // const _ = require('lodash');
@@ -56,15 +59,13 @@ module.exports.create = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
 
-		// TODO: upload handling - actImage
-
-		const { fromUser, forUser, act, actImage } = req.body;
+		const { fromUser, forUser, act, proof } = req.body;
 		const favour = new Favour({
 			fromUser: fromUser,
 			forUser: forUser,
 			act: act,
 			proof: {
-				actImage: actImage
+				actImage: proof.actImage
 			}
 		});
 
@@ -177,6 +178,20 @@ module.exports.getLeaderboard = async (req, res, next) => {
 		// data = data.slice(0, 15);
 
 		res.status(200).json(rankings);
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports.uploadImage = async (req, res, next) => {
+	try {
+		const imagePath = path.join(req.file.destination, `${uuidv4()}_400.jpg`);
+
+		// save image to jpeg file
+		await sharp(req.file.path).jpeg().toFile(imagePath);
+
+		// return image url
+		res.status(200).json(imagePath);
 	} catch (error) {
 		next(error);
 	}

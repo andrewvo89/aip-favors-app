@@ -31,3 +31,33 @@ module.exports.profilePictureUploader = multer({
 		}
 	}
 }).single('file');
+
+module.exports.favourImageUploader = multer({
+	storage: multer.diskStorage({
+		destination: (req, file, callback) => {
+			const destination = path.join(
+				'storage',
+				'favours',
+				req.body.userId,
+				'proof'
+			);
+			// fs.rmdirSync(destination, { recursive: true });
+			fs.mkdirSync(destination, { recursive: true });
+			callback(null, destination);
+		},
+		filename: (req, file, callback) => {
+			callback(null, file.originalname);
+		}
+	}),
+	fileFilter: (req, file, callback) => {
+		if (
+			file.mimetype === 'image/png' ||
+			file.mimetype === 'image/jpg' ||
+			file.mimetype === 'image/jpeg'
+		) {
+			callback(null, true);
+		} else {
+			callback(null, false);
+		}
+	}
+}).single('file');
