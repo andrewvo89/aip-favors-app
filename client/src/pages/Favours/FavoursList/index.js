@@ -119,6 +119,12 @@ const FavourList = () => {
 		return filteredList;
 	};
 
+	const handleChangeFilter = (e, newFilter) => {
+		if (newFilter !== null) {
+			setFilter(newFilter);
+		}
+	};
+
 	return (
 		<Card width="450px">
 			<CardHeader title="Favours" subheader="All your favours" />
@@ -140,7 +146,7 @@ const FavourList = () => {
 								className={classes.buttonGroup}
 								component={ToggleButtonGroup}
 								value={filter}
-								onChange={(e, newValue) => setFilter(newValue)}
+								onChange={handleChangeFilter}
 								variant="text"
 								exclusive
 								fullWidth
