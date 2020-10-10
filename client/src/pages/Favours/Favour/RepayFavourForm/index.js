@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { 
 	Chip,
 	Grid,
@@ -10,13 +10,13 @@ import {
 import DoneIcon from '@material-ui/icons/Done';
 import CardHeader from '../../../../components/CardHeader';
 import FullWidthButton from '../../../../components/FullWidthButton';
+import ImageDialog from '../../../../components/ImageDialog';
 import ImageUploader from '../../ImageUploader';
 import * as favourController from '../../../../controllers/favour';
-import ImageDialog from '../../../../components/ImageDialog';
 
 const useStyles = makeStyles({
 	repayButton: {
-		marginTop: 24
+		marginTop: 16
 	},
 	repaidChip: {
 		marginLeft: 'auto',
@@ -32,6 +32,7 @@ const useStyles = makeStyles({
 function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 	const classes = useStyles();
 	const dispatch = useDispatch();
+	const userId = useSelector((state) => state.authState.authUser.userId);
 	const [imageUrl, setImageUrl] = useState('');
 	const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -58,6 +59,14 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 	
 	const handleDialogClose = () => {
 		setDialogOpen(false);
+	};
+
+	const proofRequired = (checkUrl = true) => {
+		if (checkUrl) {
+			return favour.forUser.userId === userId && imageUrl === '';
+		} else {
+			return favour.forUser.userId === userId;
+		}
 	};
 
 	return (
@@ -106,6 +115,7 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 							<ImageUploader
 								imageUrl={imageUrl}
 								handleSetImage={handleSetImage}
+								disabled={!proofRequired(false)}
 							/>
 						</Grid>
 						<FullWidthButton
@@ -113,7 +123,7 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 							variant="contained"
 							color="primary"
 							type="submit"
-							disabled={imageUrl === ''}
+							disabled={proofRequired()}
 						>
 							Repay
 						</FullWidthButton>

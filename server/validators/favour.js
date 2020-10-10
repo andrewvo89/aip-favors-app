@@ -1,8 +1,5 @@
 const { body, param } = require('express-validator');
 
-// TODO: image path validation?
-// TODO: auth check: ensure user has permission
-
 module.exports.getById = [
 	param('favourId').not().isEmpty().withMessage('favourId is invalid')
 ];

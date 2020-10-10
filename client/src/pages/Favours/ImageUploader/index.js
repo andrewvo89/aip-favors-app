@@ -19,7 +19,7 @@ const useStyles = makeStyles({
 	}
 });
 
-function ImageUploader({ imageUrl, handleSetImage }) {
+function ImageUploader({ imageUrl, handleSetImage, disabled }) {
 	const classes = useStyles();
 	const fileInputRef = useRef();
 	const dispatch = useDispatch();
@@ -66,6 +66,7 @@ function ImageUploader({ imageUrl, handleSetImage }) {
 				hidden
 				ref={fileInputRef}
 				onChange={handleFileSelected}
+				disabled={disabled}
 			/>
 			<label htmlFor="act-image-file">
 				<Button 
@@ -73,6 +74,7 @@ function ImageUploader({ imageUrl, handleSetImage }) {
 					variant="contained" 
 					color="primary" 
 					component="span"
+					disabled={disabled}
 				>
 					<ImageIcon className={classes.imageIcon} />
 					Upload Proof

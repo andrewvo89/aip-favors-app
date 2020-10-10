@@ -99,7 +99,7 @@ const CreateFavourForm = () => {
 			fromUser: values.fromUser.userId,
 			forUser: values.forUser.userId
 		};
-		// TODO: add user permissions (user creating favour must be included in it)
+		
 		const favour = await dispatch(favourController.create(values));
 		if (favour) {
 			// route to the new favour's page
@@ -117,6 +117,39 @@ const CreateFavourForm = () => {
 	const handleSetImage = (url) => {
 		setImageUrl(url);
 		formik.setFieldValue('proof', { actImage: url });
+	};
+
+	const proofRequired = (checkUrl = true) => {
+		const fromUser = formik.values.fromUser;
+		const forUser = formik.values.forUser;
+
+		if (fromUser == null || forUser == null) {
+			return !checkUrl ? false : true;
+		}
+
+		// from and for cannot be the same user
+		if (fromUser.userId === forUser.userId) {
+			return !checkUrl ? false : true;
+		}
+		
+		if (checkUrl) {
+			return fromUser.userId === authUser.userId && imageUrl === '';
+		} else {
+			return fromUser.userId === authUser.userId;
+		}
+	};
+
+	const filteredList = (otherSelectedUser) => {
+		if (otherSelectedUser == null || Object.keys(otherSelectedUser).length === 0) {
+			return userList;
+		}
+
+		// show only authUser in list if not selected in other list
+		if (otherSelectedUser.userId !== authUser.userId) {
+			return [authUser];
+		} else {
+			return userList;
+		}
 	};
 
 	const formik = useFormik({
@@ -151,7 +184,7 @@ const CreateFavourForm = () => {
 								<UserSearchSelect
 									id="from-name-input"
 									label="From"
-									userList={userList}
+									userList={filteredList(formik.values.forUser)}
 									onChange={(newValue) => formik.setFieldValue('fromUser', newValue)}
 									error={!!formik.touched.from && !!formik.errors.from}
 									autoFocus={true}
@@ -162,7 +195,7 @@ const CreateFavourForm = () => {
 								<UserSearchSelect
 									id="for-name-input"
 									label="For"
-									userList={userList}
+									userList={filteredList(formik.values.fromUser)}
 									onChange={(newValue) => formik.setFieldValue('forUser', newValue)}
 									error={!!formik.touched.for && !!formik.errors.for}
 								/>
@@ -199,6 +232,7 @@ const CreateFavourForm = () => {
 								<ImageUploader
 									imageUrl={imageUrl}
 									handleSetImage={handleSetImage}
+									disabled={!proofRequired(false)}
 								/>
 							</Grid>
 						</Grid>
@@ -217,7 +251,7 @@ const CreateFavourForm = () => {
 										variant="contained"
 										color="primary"
 										type="submit"
-										disabled={!formik.isValid}
+										disabled={!formik.isValid || proofRequired()}
 									>
 										Create
 									</FullWidthButton>
