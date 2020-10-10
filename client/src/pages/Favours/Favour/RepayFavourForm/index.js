@@ -12,7 +12,7 @@ import CardHeader from '../../../../components/CardHeader';
 import FullWidthButton from '../../../../components/FullWidthButton';
 import ImageUploader from '../../ImageUploader';
 import * as favourController from '../../../../controllers/favour';
-const { REACT_APP_REST_URL: REST_URL } = process.env;
+import ImageDialog from '../../../../components/ImageDialog';
 
 const useStyles = makeStyles({
 	repayButton: {
@@ -29,14 +29,11 @@ const useStyles = makeStyles({
 	}
 });
 
-function RepayFavourForm({ favour, setFavour }) {
+function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const [imageUrl, setImageUrl] = useState('');
-
-	const handleShowImage = () => {
-		// TODO
-	};
+	const [dialogOpen, setDialogOpen] = useState(false);
 
 	const handleSetImage = (url) => {
 		setImageUrl(url);
@@ -50,9 +47,17 @@ function RepayFavourForm({ favour, setFavour }) {
 			repaidImage: imageUrl
 		};
 
-		const updatedFavour = await dispatch(favourController.repay(data));
+		const favourData = await dispatch(favourController.repay(data));
 		// rerender with updated favour
-		setFavour(updatedFavour);
+		setFavour(updatedFavour(favourData));
+	};
+
+	const handleDialogOpen = () => {
+		setDialogOpen(true);
+	};
+	
+	const handleDialogClose = () => {
+		setDialogOpen(false);
 	};
 
 	return (
@@ -67,15 +72,22 @@ function RepayFavourForm({ favour, setFavour }) {
 						clickable
 						icon={<DoneIcon />}
 					/>
-					<CardActionArea onClick={handleShowImage}>
+					<CardActionArea onClick={handleDialogOpen}>
 						<CardMedia
 							component="img"
-							image={`${REST_URL}/${favour.proof.repaidImage}`}
 							title="Proof of repayment"
 							alt="Proof of repayment"
 							height="180"
+							image={favour.proof.repaidImage}
+							onError={(e) => e.target.src = '/ImageFallback.png'}
 						/>
 					</CardActionArea>
+					<ImageDialog 
+						image={favour.proof.repaidImage}
+						alt="Proof of favour repayment"
+						dialogOpen={dialogOpen}
+						handleDialogClose={handleDialogClose}
+					/>
 				</Grid>
 			) : (
 				<Grid>

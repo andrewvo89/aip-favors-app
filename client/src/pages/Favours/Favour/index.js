@@ -19,6 +19,7 @@ import RepayFavourForm from './RepayFavourForm';
 import Avatar from '../../../components/Avatar';
 import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
+import ImageDialog from '../../../components/ImageDialog';
 const { REACT_APP_REST_URL: REST_URL } = process.env;
 
 const useStyles = makeStyles({
@@ -30,12 +31,49 @@ const useStyles = makeStyles({
 		marginTop: 12
 	},
 	avatarGroup: {
+		marginTop: 8,
 		marginBottom: 0
 	},
 	act: {
 		fontWeight: 500
 	}
 });
+
+const formattedDate = (date) => {
+	const dateOptions = {
+		weekday: 'long',
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+	};
+
+	return new Date(date).toLocaleString('default', dateOptions);
+};
+
+const updatedFavour = (favourData) => {
+	const updatedActImage = favourData.proof.actImage === ''
+		? '/ImageFallback.png'
+		: `${REST_URL}/${favourData.proof.actImage}`;
+
+	const updatedRepaidImage = favourData.proof.repaidImage === ''
+		? '/ImageFallback.png'
+		: `${REST_URL}/${favourData.proof.repaidImage}`;
+
+	favourData = {
+		...favourData,
+		act: favourData.act.toLowerCase(),
+		proof: {
+			actImage: updatedActImage,
+			repaidImage: updatedRepaidImage
+		},
+		createdAt: formattedDate(favourData.createdAt),
+		updatedAt: formattedDate(favourData.updatedAt)
+	};
+
+	return favourData;
+};
 
 const Favour = () => {
 	const classes = useStyles();
@@ -44,6 +82,7 @@ const Favour = () => {
 	const authUserId = useSelector((state) => state.authState.authUser.userId);
 	const { favourId } = useParams();
 
+	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [favour, setFavour] = useState({
 		fromUser: { firstName: '', lastName: '' },
@@ -51,43 +90,19 @@ const Favour = () => {
 		proof: { actImage: '', repaidImage: '' }
 	});
 
-	const formattedDate = (date) => {
-		const dateOptions = {
-			weekday: 'long',
-			day: 'numeric',
-			month: 'long',
-			year: 'numeric',
-			hour: 'numeric',
-			minute: 'numeric',
-		};
-
-		return new Date(date).toLocaleString('default', dateOptions);
-	};
-
 	useEffect(() => {
 		setLoading(true);
 
-		const updateFavour = (favourData) => {
-			favourData = {
-				...favourData,
-				createdAt: formattedDate(favourData.createdAt),
-				updatedAt: formattedDate(favourData.updatedAt),
-				act: favourData.act.toLowerCase()
-			};
-
-			setFavour(favourData);
-		};
-
 		const fetchFavour = async () => {
-			const favour = await dispatch(favourController.getFavour(favourId));
-			updateFavour(favour);
+			const favourData = await dispatch(favourController.getFavour(favourId));
+			setFavour(updatedFavour(favourData));
 		};
 
 		// get favour from db if not in route state (added after favour creation)
 		if (location.state == null) {
 			fetchFavour();
 		} else {
-			updateFavour(location.state);
+			setFavour(updatedFavour(location.state));
 		}
 
 		setLoading(false);
@@ -97,8 +112,12 @@ const Favour = () => {
 		return user.userId === authUserId ? 'You' : user.firstName;
 	};
 
-	const handleShowImage = () => {
-		// TODO: show full image
+	const handleDialogOpen = () => {
+		setDialogOpen(true);
+	};
+	
+	const handleDialogClose = () => {
+		setDialogOpen(false);
 	};
 
 	return (
@@ -118,18 +137,24 @@ const Favour = () => {
 				<CircularProgress />
 			) : (
 				<Card width="450px">
-					<CardActionArea onClick={handleShowImage}>
-						<CardMedia
-							component="img"
-							image={`${REST_URL}/${favour.proof.actImage}`}
-							title="Proof of act"
-							alt="Proof of act"
-							height="180"
-						/>
-					</CardActionArea>
-
 					<CardHeader title="Favour" subheader={favour.createdAt} />
 					<CardContent>
+						<CardActionArea onClick={handleDialogOpen}>
+							<CardMedia
+								component="img"
+								title="Proof of act"
+								alt="Proof of act"
+								height="180"
+								image={favour.proof.actImage}
+								onError={(e) => e.target.src = '/ImageFallback.png'}
+							/>
+						</CardActionArea>
+						<ImageDialog 
+							image={favour.proof.actImage}
+							alt="Proof of favour act"
+							dialogOpen={dialogOpen}
+							handleDialogClose={handleDialogClose}
+						/>
 						<Grid
 							className={classes.avatarGroup}
 							container
@@ -156,7 +181,11 @@ const Favour = () => {
 
 						<Divider variant="middle" className={classes.divider} />
 
-						<RepayFavourForm favour={favour} setFavour={setFavour} />
+						<RepayFavourForm 
+							favour={favour} 
+							setFavour={setFavour} 
+							updatedFavour={updatedFavour} 
+						/>
 					</CardContent>
 				</Card>
 			)}
