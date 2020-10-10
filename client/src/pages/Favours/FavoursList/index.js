@@ -17,7 +17,7 @@ import {
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
 import DoneIcon from '@material-ui/icons/Done';
-import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
+import { Pagination, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import Avatar from '../../../components/Avatar';
 import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
@@ -53,6 +53,9 @@ const useStyles = makeStyles({
 			marginLeft: 4,
 			marginRight: 4
 		}
+	},
+	pagination: {
+		marginTop: 16
 	}
 });
 
@@ -63,6 +66,11 @@ const FavourList = () => {
 	const [loading, setLoading] = useState(false);
 	const [favoursList, setFavoursList] = useState([]);
 	const [filter, setFilter] = useState('all');
+
+	// for pagination
+	const initialPage = 1;
+	const MAX_PER_PAGE = 10;
+	const [page, setPage] = useState(initialPage);
 
 	// fetch user's favours on page load
 	useEffect(() => {
@@ -119,11 +127,17 @@ const FavourList = () => {
 		return filteredList;
 	};
 
-	const handleChangeFilter = (e, newFilter) => {
+	const handleChangeFilter = (_e, newFilter) => {
 		if (newFilter !== null) {
 			setFilter(newFilter);
 		}
 	};
+
+	// for pagination
+	const end = page * MAX_PER_PAGE - 1;
+	const start = end - MAX_PER_PAGE + 1;
+	const paginatedFavours = filteredFavours().slice(start, end);
+	const count = Math.ceil(filteredFavours().length / MAX_PER_PAGE);
 
 	return (
 		<Card width="450px">
@@ -158,7 +172,7 @@ const FavourList = () => {
 							</ButtonGroup>
 						</Grid>
 						<List>
-							{filteredFavours().map((favour) => {
+							{paginatedFavours.map((favour) => {
 								return (
 									<ListItem
 										key={favour.favourId}
@@ -235,11 +249,23 @@ const FavourList = () => {
 									</ListItem>
 								);
 							})}
-							{(filteredFavours().length === 0) && (
-								<Typography variant="subtitle1" align="center">
-									There&apos;s nothing here.
-								</Typography>
-							)}
+							<Grid container item justify="center">
+								{(filteredFavours().length === 0) ? (
+									<Typography variant="subtitle1" align="center">
+										There&apos;s nothing here.
+									</Typography>
+								) : (
+									<Pagination
+										className={classes.pagination}
+										color="primary"
+										count={count}
+										page={page}
+										onChange={(_e, value) => setPage(value)}
+										showFirstButton={true}
+										showLastButton={true}
+									/>
+								)}
+							</Grid>
 						</List>
 					</Fragment>
 				)}
