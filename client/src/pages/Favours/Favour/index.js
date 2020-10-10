@@ -13,7 +13,7 @@ import {
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { Link, useParams, useHistory, useLocation } from 'react-router-dom';
 import * as favourController from '../../../controllers/favour';
 import RepayFavourForm from './RepayFavourForm';
 import Avatar from '../../../components/Avatar';
@@ -78,6 +78,7 @@ const updatedFavour = (favourData) => {
 const Favour = () => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
+	const history = useHistory();
 	const location = useLocation();
 	const authUserId = useSelector((state) => state.authState.authUser.userId);
 	const { favourId } = useParams();
@@ -95,7 +96,13 @@ const Favour = () => {
 
 		const fetchFavour = async () => {
 			const favourData = await dispatch(favourController.getFavour(favourId));
-			setFavour(updatedFavour(favourData));
+			
+			if (favourData) {
+				setFavour(updatedFavour(favourData));
+			} else {
+				// redirect to home page if unauthorised or favour not found
+				history.push('/');
+			}
 		};
 
 		// get favour from db if not in route state (added after favour creation)
@@ -106,7 +113,7 @@ const Favour = () => {
 		}
 
 		setLoading(false);
-	}, [dispatch, favourId, location]);
+	}, [dispatch, favourId, history, location]);
 
 	const getName = (user) => {
 		return user.userId === authUserId ? 'You' : user.firstName;

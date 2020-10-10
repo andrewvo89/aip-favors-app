@@ -21,8 +21,6 @@ module.exports.getById = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
 
-		// TODO: auth/permission handling (user is involved in this favour)
-
 		const { favourId } = req.params;
 		const favourDoc = await Favour
 			.findById(favourId)
@@ -30,6 +28,14 @@ module.exports.getById = async (req, res, next) => {
 
 		if (!favourDoc) {
 			throw getError(404, 'Favour not found', DIALOG);
+		}
+		
+		// ensure requesting user is involved in the favour
+		const userId = res.locals.userId;
+		const fromId = favourDoc.fromUser._id.toString();
+		const forId = favourDoc.forUser._id.toString();
+		if (userId !== fromId && userId !== forId) {
+			throw getError(403, 'You are not authorised to view this favour.', DIALOG);
 		}
 
 		res.status(200).send(favourDoc);
@@ -85,8 +91,6 @@ module.exports.create = async (req, res, next) => {
 module.exports.repay = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
-
-		// TODO: upload handling - repaidImage
 		
 		const { favourId, repaidImage } = req.body;
 		const favour = await Favour.findById(favourId);
@@ -109,8 +113,6 @@ module.exports.repay = async (req, res, next) => {
 module.exports.delete = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
-
-		// TODO: image file deletion handling (if we're doing this)
 
 		const { favourId } = req.body;
 		await Favour.findByIdAndDelete(favourId);
