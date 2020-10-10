@@ -8,10 +8,10 @@ const UserSearchSelect = (props) => {
 		id,
 		label,
 		userList,
-		value,
 		onChange,
 		error,
-		autoFocus = false
+		autoFocus = false,
+		defaultValue
 	} = props;
 	const [open, setOpen] = useState(false);
 	const loading = open && userList.length === 0;
@@ -24,13 +24,12 @@ const UserSearchSelect = (props) => {
 			onClose={() => setOpen(false)}
 			loading={loading}
 			getOptionSelected={(option, value) => option.userId === value.userId}
-			getOptionLabel={(option) => `${option.fullName}`}
+			getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
 			options={userList}
-			value={value}
 			onChange={(e, newVal) => onChange(newVal)}
 			autoHighlight
 			autoSelect
-			disableClearable // TODO: fix this
+			defaultValue={defaultValue}
 			renderInput={(params) => (
 				<TextField
 					{...params}
@@ -39,12 +38,9 @@ const UserSearchSelect = (props) => {
 					autoFocus={autoFocus}
 					InputProps={{
 						...params.InputProps,
-						// startAdornment: <Avatar size={0.66} user={value} />,
 						endAdornment: (
 							<React.Fragment>
-								{loading ? (
-									<CircularProgress color="inherit" size={20} />
-								) : null}
+								{loading ? <CircularProgress color="inherit" size={20} /> : null}
 								{params.InputProps.endAdornment}
 							</React.Fragment>
 						)
@@ -58,7 +54,7 @@ const UserSearchSelect = (props) => {
 							<Avatar size={0.66} user={user} />
 						</Grid>
 						<Grid item xs>
-							{`${user.fullName}`}
+							{`${user.firstName} ${user.lastName}`}
 						</Grid>
 					</Grid>
 				);

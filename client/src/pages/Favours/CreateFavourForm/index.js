@@ -1,86 +1,87 @@
-import React, { Fragment, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	CircularProgress,
 	TextField,
+	Button,
 	CardActions,
 	Grid,
-	CardContent
+	CardContent,
+	Typography,
+	makeStyles
 } from '@material-ui/core';
-import { SNACKBAR } from '../../../utils/constants';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { Autocomplete } from '@material-ui/lab';
 import { actList } from '../../../utils/actList';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import * as yup from 'yup';
-import * as messsageActions from '../../../controllers/message';
 import * as favourController from '../../../controllers/favour';
 import * as userController from '../../../controllers/user';
-import UserSearchSelect from './UserSearchSelect';
-import { Autocomplete } from '@material-ui/lab';
 import FullWidthButton from '../../../components/FullWidthButton';
+import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
+import UserSearchSelect from './UserSearchSelect';
+import ImageUploader from '../ImageUploader';
+
+const useStyles = makeStyles({
+	backButton: {
+		paddingLeft: 0,
+		marginBottom: 8
+	}
+});
 
 const CreateFavourForm = () => {
+	const classes = useStyles();
 	const dispatch = useDispatch();
 	const history = useHistory();
-	const { authUser } = useSelector((state) => state.authState);
+	const authUser = useSelector((state) => state.authState.authUser);
 
 	const [loading, setLoading] = useState(false);
 	const [userList, setUserList] = useState([]);
+	const [imageUrl, setImageUrl] = useState('');
 
-	const stableDispatch = useCallback(dispatch, []);
+	// fetch list of users on page load
 	useEffect(() => {
 		const fetchUsers = async () => {
-			const users = (await stableDispatch(userController.getUsers())).map(
-				(user) => ({
-					...user,
-					fullName: `${user.firstName} ${user.lastName}`
-				})
-			);
+			const users = await dispatch(userController.getUsers());
+
 			setUserList(users);
 		};
 
 		fetchUsers();
-	}, [stableDispatch]);
+	}, [dispatch]);
 
 	const initialValues = {
-		from: {
-			userId: authUser.userId,
-			fullName: `${authUser.firstName} ${authUser.lastName}`,
-			profilePicture: ''
-		},
-		for: {
-			userId: '',
-			fullName: '',
-			profilePicture: ''
-		},
-		act: ''
+		fromUser: authUser,
+		forUser: {},
+		act: '',
+		proof: {
+			actImage: ''
+		}
 	};
 
 	const initialErrors = {
-		from: {
-			_id: true,
-			fullName: true,
-			profilePicture: true
-		},
-		for: {
-			_id: true,
-			fullName: true,
-			profilePicture: true
-		},
-		act: true
+		fromUser: true,
+		forUser: true,
+		act: true,
+		proof: {
+			actImage: true
+		}
 	};
 
 	const validationSchema = yup.object().shape({
-		from: yup.object().shape({
-			_id: yup.string().label('from._id').required().length(24),
-			fullName: yup.string().label('from.name').required().max(101),
-			profilePicture: yup.string().label('from.profilePicture')
+		fromUser: yup.object().shape({
+			userId: yup.string().label('fromUser.userId').required().length(24),
+			firstName: yup.string().label('fromUser.firstName').required().max(50),
+			lastName: yup.string().label('fromUser.lastName').required().max(50),
+			profilePicture: yup.string().label('fromUser.profilePicture')
 		}),
-		for: yup.object().shape({
-			_id: yup.string().label('for._id').required().length(24),
-			fullName: yup.string().label('for.name').required().max(101),
-			profilePicture: yup.string().label('for.profilePicture')
+		forUser: yup.object().shape({
+			userId: yup.string().label('fromUser.userId').required().length(24),
+			firstName: yup.string().label('fromUser.firstName').required().max(50),
+			lastName: yup.string().label('fromUser.lastName').required().max(50),
+			profilePicture: yup.string().label('fromUser.profilePicture')
 		}),
 		act: yup
 			.string()
@@ -92,20 +93,18 @@ const CreateFavourForm = () => {
 	const submitHandler = async (values) => {
 		setLoading(true);
 
-		const result = await dispatch(favourController.create(values));
-		if (result) {
-			dispatch(
-				messsageActions.setMessage({
-					title: 'Favour Created!',
-					text: 'The new favour as been created successfully.',
-					feedback: SNACKBAR
-				})
-			);
-
-			// route to new favour view
-			const favour = await result.data;
+		// document population only requires userId
+		values = {
+			...values,
+			fromUser: values.fromUser.userId,
+			forUser: values.forUser.userId
+		};
+		
+		const favour = await dispatch(favourController.create(values));
+		if (favour) {
+			// route to the new favour's page
 			history.push({
-				pathname: `/favours/view/${favour._id}`,
+				pathname: `/favours/view/${favour.favourId}`,
 				state: favour
 			});
 		}
@@ -115,93 +114,154 @@ const CreateFavourForm = () => {
 		};
 	};
 
+	const handleSetImage = (url) => {
+		setImageUrl(url);
+		formik.setFieldValue('proof', { actImage: url });
+	};
+
+	const proofRequired = (checkUrl = true) => {
+		const fromUser = formik.values.fromUser;
+		const forUser = formik.values.forUser;
+
+		if (fromUser == null || forUser == null) {
+			return !checkUrl ? false : true;
+		}
+
+		// from and for cannot be the same user
+		if (fromUser.userId === forUser.userId) {
+			return !checkUrl ? false : true;
+		}
+		
+		if (checkUrl) {
+			return fromUser.userId === authUser.userId && imageUrl === '';
+		} else {
+			return fromUser.userId === authUser.userId;
+		}
+	};
+
+	const filteredList = (otherSelectedUser) => {
+		if (otherSelectedUser == null || Object.keys(otherSelectedUser).length === 0) {
+			return userList;
+		}
+
+		// show only authUser in list if not selected in other list
+		if (otherSelectedUser.userId !== authUser.userId) {
+			return [authUser];
+		} else {
+			return userList;
+		}
+	};
+
 	const formik = useFormik({
 		initialValues: initialValues,
 		initialStatus: initialErrors,
+		initialErrors: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
 
-	if (!userList) {
-		return <CircularProgress />;
-	}
-
 	return (
-		<Fragment>
-			<form onSubmit={formik.handleSubmit}>
-				<CardHeader
-					title="Create a Favour"
-					subheader="Provided a favour to someone or vice versa? Note it here."
-				/>
-				<CardContent>
-					<Grid container direction="column" spacing={1} alignItems="stretch">
-						<Grid item>
-							<UserSearchSelect
-								id="from-name-input"
-								label="From"
-								userList={userList}
-								value={formik.values.from}
-								onChange={(newValue) => formik.setFieldValue('from', newValue)}
-								error={!!formik.touched.from && !!formik.errors.from}
-								autoFocus={true}
-							/>
-						</Grid>
-						<Grid item>
-							<UserSearchSelect
-								id="for-name-input"
-								label="For"
-								userList={userList}
-								value={formik.values.for}
-								onChange={(newValue) => formik.setFieldValue('for', newValue)}
-								error={!!formik.touched.for && !!formik.errors.for}
-							/>
-						</Grid>
-						<Grid item>
-							<Autocomplete
-								id="act-input"
-								options={actList}
-								value={formik.values.act}
-								onChange={(e, newValue) =>
-									formik.setFieldValue('act', newValue)
-								}
-								getOptionLabel={(option) => option}
-								autoHighlight
-								autoSelect
-								renderInput={(params) => (
-									<TextField
-										{...params}
-										label="Act"
-										error={!!formik.touched.act && !!formik.errors.act}
-										InputProps={{
-											...params.InputProps
-										}}
-									/>
-								)}
-							/>
-						</Grid>
-					</Grid>
-				</CardContent>
-
-				<CardActions>
-					{loading ? (
-						<CircularProgress />
-					) : (
-						<Grid container direction="column" spacing={1}>
+		<Grid>
+			<Button
+				className={classes.backButton}
+				color="primary"
+				component={Link} to="/favours/view/all"
+			>
+				<ArrowBackIcon />
+				<Typography>
+					Favours list
+				</Typography>
+			</Button>
+			<Card>
+				<form onSubmit={formik.handleSubmit}>
+					<CardHeader
+						title="Create a Favour"
+						subheader="Provided a favour to someone or vice versa? Note it here."
+					/>
+					<CardContent>
+						<Grid container direction="column" spacing={1} alignItems="stretch">
 							<Grid item>
-								<FullWidthButton
-									variant="contained"
-									color="primary"
-									type="submit"
-									disabled={!formik.isValid}
-								>
-									Create
-								</FullWidthButton>
+								<UserSearchSelect
+									id="from-name-input"
+									label="From"
+									userList={filteredList(formik.values.forUser)}
+									onChange={(newValue) => formik.setFieldValue('fromUser', newValue)}
+									error={!!formik.touched.from && !!formik.errors.from}
+									autoFocus={true}
+									defaultValue={initialValues.fromUser}
+								/>
+							</Grid>
+							<Grid item>
+								<UserSearchSelect
+									id="for-name-input"
+									label="For"
+									userList={filteredList(formik.values.fromUser)}
+									onChange={(newValue) => formik.setFieldValue('forUser', newValue)}
+									error={!!formik.touched.for && !!formik.errors.for}
+								/>
+							</Grid>
+							<Grid item>
+								<Autocomplete
+									id="act-input"
+									options={actList}
+									onChange={(e, newValue) =>
+										formik.setFieldValue('act', newValue)
+									}
+									getOptionLabel={(option) => option}
+									autoHighlight
+									autoSelect
+									renderInput={(params) => (
+										<TextField
+											{...params}
+											label="Act"
+											error={!!formik.touched.act && !!formik.errors.act}
+											InputProps={{
+												...params.InputProps
+											}}
+										/>
+									)}
+								/>
+							</Grid>
+							<Grid 
+								container
+								item
+								direction="column"
+								justify="center"
+								alignItems="center"
+							>
+								<ImageUploader
+									imageUrl={imageUrl}
+									handleSetImage={handleSetImage}
+									disabled={!proofRequired(false)}
+								/>
 							</Grid>
 						</Grid>
-					)}
-				</CardActions>
-			</form>
-		</Fragment>
+					</CardContent>
+					<CardActions>
+						<Grid container
+							direction="column"
+							alignItems={loading ? 'center' : 'stretch'}
+							spacing={1}
+						>
+							<Grid item>
+								{loading ? (
+									<CircularProgress />
+								) : (
+									<FullWidthButton
+										variant="contained"
+										color="primary"
+										type="submit"
+										disabled={!formik.isValid || proofRequired()}
+									>
+										Create
+									</FullWidthButton>
+								)}
+							</Grid>
+						</Grid>
+					</CardActions>
+				</form>
+			</Card>
+		</Grid>
 	);
 };
 

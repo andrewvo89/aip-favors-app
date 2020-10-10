@@ -24,3 +24,18 @@ module.exports.getProfilePicture = (req, res, next) => {
 		next(error);
 	}
 };
+
+module.exports.getProofImage = (req, res, next) => {
+	try {
+		const imagePath = path.join(rootPath, req.originalUrl);
+
+		if (!fs.existsSync(imagePath)) {
+			throw getError(404, 'File does not exist', DIALOG);
+		}
+
+		const file = fs.createReadStream(imagePath);
+		file.pipe(res);
+	} catch (error) {
+		next(error);
+	}
+};

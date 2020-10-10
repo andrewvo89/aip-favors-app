@@ -9,4 +9,10 @@ router.get(
 	storageController.getProfilePicture
 );
 
+router.get(
+	'/favours/:userId/proof/:filename',
+	verifyAuth,
+	storageController.getProofImage
+);
+
 module.exports = router;
