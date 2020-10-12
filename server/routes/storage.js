@@ -10,6 +10,12 @@ router.get(
 );
 
 router.get(
+	'/requests/:requestId/proof/:filename',
+	verifyAuth,
+	storageController.getRequestProofImage
+);
+
+router.get(
 	'/favours/:userId/proof/:filename',
 	verifyAuth,
 	storageController.getProofImage

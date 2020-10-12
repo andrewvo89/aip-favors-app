@@ -19,13 +19,6 @@ router.patch(
 	userController.updatePassword
 );
 
-// router.patch(
-// 	'/update-settings',
-// 	verifyAuth,
-// 	userValidator.updateSettings,
-// 	userController.updateSettings
-// );
-
 router.patch(
 	'/upload-picture',
 	verifyAuth,

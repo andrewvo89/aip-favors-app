@@ -46,9 +46,13 @@ const requestSchema = new Schema(
 				]
 			}
 		],
-		closed: {
+		completed: {
 			type: Boolean,
 			default: false
+		},
+		completedBy: {
+			type: Schema.Types.ObjectId,
+			ref: 'User'
 		},
 		proof: {
 			type: String,

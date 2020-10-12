@@ -25,16 +25,25 @@ import * as requestController from '../../../../controllers/request';
 import AddRewardDialog from './AddRewardDialog';
 import { Delete as DeleteIcon } from '@material-ui/icons';
 import ConfirmDialog from '../../../../components/ConfirmDialog';
+import CompleteTaskDialog from './CompleteTaskDialog';
+const { REACT_APP_REST_URL: REST_URL } = process.env;
 
 const Request = (props) => {
 	const { authUser } = useSelector((state) => state.authState);
 	const dispatch = useDispatch();
 	const { request } = props;
-	const { act, rewards, createdAt, createdBy } = request;
+	const {
+		act,
+		rewards,
+		createdAt,
+		createdBy,
+		completed,
+		completedBy
+	} = request;
 	const [selectedReward, setSelectedReward] = useState();
 	const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
 	const [addRewardDialogOpen, setAddRewardDialogOpen] = useState(false);
-	// const [completeTaskDialogOpen, setCompleteTaskDialogOpen] = useState(false);
+	const [completeTaskDialogOpen, setCompleteTaskDialogOpen] = useState(false);
 
 	const addRewardClickHandler = () => {
 		if (authUser) {
@@ -71,6 +80,8 @@ const Request = (props) => {
 
 	const completeTaskClickHandler = () => {
 		if (authUser) {
+			setCompleteTaskDialogOpen(true);
+			// fileInputRef.current.click();
 		} else {
 			dispatch(authController.showLoginDialog());
 		}
@@ -119,6 +130,11 @@ const Request = (props) => {
 				request={request}
 			/>
 			{confirmDeleteDialogComponent}
+			<CompleteTaskDialog
+				open={completeTaskDialogOpen}
+				setOpen={setCompleteTaskDialogOpen}
+				request={request}
+			/>
 			<Card>
 				<Grid container direction="column" spacing={2}>
 					<Grid item>
@@ -141,7 +157,7 @@ const Request = (props) => {
 						<List
 							subheader={
 								<ListSubheader>
-									<Typography variant="h6">Rewards on offer</Typography>
+									<Typography variant="h6">Rewards</Typography>
 								</ListSubheader>
 							}
 						>
@@ -158,7 +174,9 @@ const Request = (props) => {
 									<List dense={true}>
 										{reward.favourTypes.map((favourType, favourTypeIndex) => {
 											const disabled =
-												!authUser || reward.fromUser.userId !== authUser.userId;
+												!authUser ||
+												reward.fromUser.userId !== authUser.userId ||
+												completed;
 											return (
 												<ListItem key={favourType.favourType} button>
 													<Typography>{favourType.favourType}</Typography>
@@ -183,21 +201,23 @@ const Request = (props) => {
 																	}
 																/>
 															</Grid>
-															<Grid item>
-																<IconButton
-																	edge="end"
-																	onClick={() => {
-																		setConfirmDeleteDialogOpen(true);
-																		setSelectedReward({
-																			rewardIndex: rewardIndex,
-																			favourTypeIndex: favourTypeIndex
-																		});
-																	}}
-																	disabled={disabled}
-																>
-																	<DeleteIcon />
-																</IconButton>
-															</Grid>
+															{!completed && (
+																<Grid item>
+																	<IconButton
+																		edge="end"
+																		onClick={() => {
+																			setConfirmDeleteDialogOpen(true);
+																			setSelectedReward({
+																				rewardIndex: rewardIndex,
+																				favourTypeIndex: favourTypeIndex
+																			});
+																		}}
+																		disabled={disabled}
+																	>
+																		<DeleteIcon />
+																	</IconButton>
+																</Grid>
+															)}
 														</Grid>
 													</ListItemSecondaryAction>
 												</ListItem>
@@ -208,24 +228,54 @@ const Request = (props) => {
 							))}
 						</List>
 					</Grid>
+					{completed && (
+						<Grid item container direction="row" justify="center">
+							<Grid item></Grid>
+						</Grid>
+					)}
 				</Grid>
-
 				<CardActions>
-					<Grid container direction="row" justify="flex-end">
-						<Grid item>
-							<Button color="primary" onClick={addRewardClickHandler}>
-								Add a reward
-							</Button>
-						</Grid>
-						<Grid item>
-							<Button
-								color="primary"
-								onClick={completeTaskClickHandler}
-								disabled={completeButtonDisabled}
-							>
-								Complete the task
-							</Button>
-						</Grid>
+					<Grid
+						container
+						direction="row"
+						justify={completed ? 'space-between' : 'flex-end'}
+						alignItems="center"
+					>
+						{completed ? (
+							<Fragment>
+								<Grid item>
+									<Button>{`Completed by ${completedBy.firstName} ${completedBy.lastName}`}</Button>
+								</Grid>
+								<Grid item>
+									<Button
+										color="primary"
+										as="a"
+										href={`${REST_URL}/${request.proof.split('\\').join('/')}`}
+										target="_blank"
+										rel="noreferrer"
+									>
+										Show proof
+									</Button>
+								</Grid>
+							</Fragment>
+						) : (
+							<Fragment>
+								<Grid item>
+									<Button color="primary" onClick={addRewardClickHandler}>
+										Add a reward
+									</Button>
+								</Grid>
+								<Grid item>
+									<Button
+										color="primary"
+										onClick={completeTaskClickHandler}
+										disabled={completeButtonDisabled}
+									>
+										Complete the task
+									</Button>
+								</Grid>
+							</Fragment>
+						)}
 					</Grid>
 				</CardActions>
 			</Card>

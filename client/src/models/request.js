@@ -1,3 +1,4 @@
+import Compressor from 'compressorjs';
 import axios from '../utils/axios';
 const config = { withCredentials: true };
 export default class Request {
@@ -7,7 +8,8 @@ export default class Request {
 		createdAt,
 		act,
 		rewards,
-		closed,
+		completed,
+		completedBy,
 		proof
 	}) {
 		this.requestId = requestId;
@@ -15,7 +17,8 @@ export default class Request {
 		this.createdAt = createdAt;
 		this.act = act;
 		this.rewards = rewards;
-		this.closed = closed;
+		this.completed = completed;
+		this.completedBy = completedBy;
 		this.proof = proof;
 	}
 
@@ -64,6 +67,30 @@ export default class Request {
 			favourTypeIndex: favourTypeIndex
 		};
 		await axios.patch('/request/udpate-reward-quantity', data, config);
+	}
+
+	async complete(file) {
+		const reizedFile = await new Promise((resolve, reject) => {
+			return new Compressor(file, {
+				width: 400,
+				success: (result) => {
+					resolve(
+						new File([result], file.name, {
+							type: file.type,
+							lastModified: file.lastModified
+						})
+					);
+				},
+				error: (error) => reject(error)
+			});
+		});
+		const data = new FormData();
+		console.log(this.requestId);
+		data.append('requestId', this.requestId);
+		data.append('file', reizedFile);
+		const result = await axios.patch('/request/complete', data, config);
+		console.log(result);
+		return result;
 	}
 
 	static async create(values) {

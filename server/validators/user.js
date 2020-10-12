@@ -51,7 +51,7 @@ module.exports.updatePassword = [
 
 module.exports.updateSettings = [
 	body('userId').not().isEmpty().withMessage('User is invalid'),
-	body('settings').custom(async (value, { req }) => {
+	body('settings').custom(async (value, { _req }) => {
 		if (
 			typeof value.darkMode !== BOOLEAN ||
 			typeof value.expandFavoursGroup !== BOOLEAN ||

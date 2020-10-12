@@ -7,7 +7,6 @@ const rootPath = require('../utils/root-path');
 module.exports.getProfilePicture = (req, res, next) => {
 	try {
 		const imagePath = path.join(rootPath, req.originalUrl);
-		console.log(imagePath);
 		if (res.locals.userId !== req.params.userId) {
 			throw getError(
 				404,
@@ -15,6 +14,19 @@ module.exports.getProfilePicture = (req, res, next) => {
 				DIALOG
 			);
 		}
+		if (!fs.existsSync(imagePath)) {
+			throw getError(404, 'Access denied, file does not exist', DIALOG);
+		}
+		const file = fs.createReadStream(imagePath);
+		file.pipe(res);
+	} catch (error) {
+		next(error);
+	}
+};
+
+module.exports.getRequestProofImage = (req, res, next) => {
+	try {
+		const imagePath = path.join(rootPath, req.originalUrl);
 		if (!fs.existsSync(imagePath)) {
 			throw getError(404, 'Access denied, file does not exist', DIALOG);
 		}

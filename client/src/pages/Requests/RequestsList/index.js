@@ -1,23 +1,34 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { Pagination } from '@material-ui/lab';
+import { Pagination, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import RequestCard from './RequestCard';
 import Link from '../../../components/Link';
 import { useDispatch, useSelector } from 'react-redux';
-import { CircularProgress, Grid, Typography } from '@material-ui/core';
+import {
+	Button,
+	ButtonGroup,
+	CircularProgress,
+	Grid,
+	Typography
+} from '@material-ui/core';
 import * as requestController from '../../../controllers/request';
 import * as authController from '../../../controllers/auth';
 import openSocket from 'socket.io-client';
 import RequestSearch from './RequestSearch';
 import { useHistory } from 'react-router-dom';
 const { REACT_APP_REST_URL: REST_URL } = process.env;
+const ACTIVE = 'active';
+const COMPLETED = 'completed';
 const socket = openSocket(REST_URL);
 
 const RequestsList = () => {
+	const tabs = [ACTIVE, COMPLETED];
+	const [activeTab, setActiveTab] = useState(tabs[0]);
 	const { authUser } = useSelector((state) => state.authState);
 	const [searchParams, setSearchParams] = useState();
 	const [searchResults, setSearchResults] = useState();
 	const [socketData, setSocketData] = useState();
 	const [requests, setRequests] = useState();
+	const [filteredRequests, setFilteredRequests] = useState();
 	const [requestRewards, setRequestRewards] = useState();
 	const history = useHistory();
 	const dispatch = useDispatch();
@@ -27,9 +38,7 @@ const RequestsList = () => {
 
 	useEffect(() => {
 		const fetchRequests = async () => {
-			const initialRequests = await dispatch(
-				requestController.getRequests({ closed: false })
-			);
+			const initialRequests = await dispatch(requestController.getRequests());
 			//Subscribe to the socket.io for request updates
 			socket.on('requests', (data) => setSocketData(data));
 			setRequests(initialRequests);
@@ -68,19 +77,39 @@ const RequestsList = () => {
 	}, [requests]);
 	//Update search results
 	useEffect(() => {
-		if (searchParams) {
-			const searchResults = requestController.getSearchResults(
-				searchParams,
-				requests
-			);
-			setSearchResults(searchResults);
-			setPage(1);
-		} else {
-			setSearchResults(null);
+		if (requests) {
+			if (searchParams) {
+				if (searchParams && requests) {
+					const newSearchResults = requestController.getSearchResults(
+						searchParams,
+						requests
+					);
+					setSearchResults(newSearchResults);
+					setPage(1);
+				} else {
+					setSearchResults(requests);
+				}
+			} else {
+				setSearchResults(requests);
+			}
 		}
-	}, [searchParams, requests]);
+	}, [requests, searchParams]);
+	//Update requests based on filter
+	useEffect(() => {
+		if (searchResults && activeTab) {
+			const newFilteredRequests = searchResults.filter((request) => {
+				if (activeTab === ACTIVE) {
+					return request.completed === false;
+				} else if (activeTab === COMPLETED) {
+					return request.completed === true;
+				}
+				return false;
+			});
+			setFilteredRequests(newFilteredRequests);
+		}
+	}, [searchResults, activeTab]);
 
-	if (!requests || !requestRewards) {
+	if (!filteredRequests || !requestRewards) {
 		return <CircularProgress />;
 	}
 
@@ -92,16 +121,12 @@ const RequestsList = () => {
 		}
 	};
 
-	let dataSource = requests;
-	if (searchResults) {
-		dataSource = searchResults;
-	}
-
 	const end = page * MAX_PER_PAGE - 1;
 	const start = end - MAX_PER_PAGE + 1;
-	const paginatedRequests = dataSource.slice(start, end);
-	const count = Math.ceil(dataSource.length / MAX_PER_PAGE);
+	const paginatedRequests = filteredRequests.slice(start, end);
+	const count = Math.ceil(filteredRequests.length / MAX_PER_PAGE);
 	const noRequests = requests.length === 0;
+	const noTabRequests = filteredRequests.length === 0;
 
 	return (
 		<Grid container direction="column" spacing={2} alignItems="stretch">
@@ -111,6 +136,22 @@ const RequestsList = () => {
 					requestRewards={requestRewards}
 					disabled={noRequests}
 				/>
+			</Grid>
+			<Grid item>
+				<ButtonGroup
+					component={ToggleButtonGroup}
+					value={activeTab}
+					onChange={(_event, newValue) => setActiveTab(newValue)}
+					variant="text"
+					exclusive
+					fullWidth
+				>
+					{tabs.map((tab) => (
+						<Button key={tab} component={ToggleButton} value={tab}>
+							{tab}
+						</Button>
+					))}
+				</ButtonGroup>
 			</Grid>
 			<Grid item container direction="column" spacing={2}>
 				{paginatedRequests.map((request) => {
@@ -122,7 +163,7 @@ const RequestsList = () => {
 				})}
 			</Grid>
 			<Grid item container justify="center">
-				{noRequests ? (
+				{noTabRequests && activeTab === ACTIVE && (
 					<Fragment>
 						<Typography>
 							No public requests.
@@ -132,7 +173,8 @@ const RequestsList = () => {
 							</Link>
 						</Typography>
 					</Fragment>
-				) : (
+				)}
+				{!noTabRequests && (
 					<Pagination
 						color="primary"
 						count={count}

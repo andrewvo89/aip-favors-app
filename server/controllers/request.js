@@ -6,6 +6,9 @@ const mongoose = require('mongoose');
 const socket = require('../utils/socket');
 const notificationController = require('./notification');
 const User = require('../models/user');
+const sharp = require('sharp');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 module.exports.create = async (req, res, next) => {
 	try {
@@ -28,11 +31,21 @@ module.exports.create = async (req, res, next) => {
 					]
 				}
 			],
-			closed: false,
+			complete: false,
 			proof: ''
 		});
-		await request.execPopulate('createdBy');
-		await request.execPopulate('rewards.fromUser');
+		await request.execPopulate(
+			'completedBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'createdBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'rewards.fromUser',
+			'firstName lastName profilePicture'
+		);
 		await request.save();
 		socket.get().emit('requests', {
 			action: CREATE,
@@ -88,8 +101,18 @@ module.exports.addReward = async (req, res, next) => {
 			});
 		}
 		await request.save();
-		await request.execPopulate('createdBy');
-		await request.execPopulate('rewards.fromUser');
+		await request.execPopulate(
+			'completedBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'createdBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'rewards.fromUser',
+			'firstName lastName profilePicture'
+		);
 		socket.get().emit('requests', {
 			action: UPDATE,
 			request: getRequestForClient(request)
@@ -130,12 +153,22 @@ module.exports.deleteReward = async (req, res, next) => {
 			request.rewards.splice(rewardIndex, 1);
 		}
 		if (request.rewards.length === 0) {
-			//If no rewards are left, set closed flag to true to remove request from client list
-			request.closed = true;
+			//If no rewards are left, set completed flag to true to remove request from client list
+			request.complete = true;
 		}
 		await request.save();
-		await request.execPopulate('createdBy');
-		await request.execPopulate('rewards.fromUser');
+		await request.execPopulate(
+			'completedBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'createdBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'rewards.fromUser',
+			'firstName lastName profilePicture'
+		);
 		socket.get().emit('requests', {
 			action: UPDATE,
 			request: getRequestForClient(request)
@@ -165,8 +198,18 @@ module.exports.udpateRewardQuantity = async (req, res, next) => {
 			favourTypeIndex
 		].quantity = quantity;
 		await request.save();
-		await request.execPopulate('createdBy');
-		await request.execPopulate('rewards.fromUser');
+		await request.execPopulate(
+			'completedBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'createdBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'rewards.fromUser',
+			'firstName lastName profilePicture'
+		);
 		socket.get().emit('requests', {
 			action: UPDATE,
 			request: getRequestForClient(request)
@@ -181,8 +224,9 @@ module.exports.getRequests = async (req, res, next) => {
 	try {
 		const { filter } = req.body;
 		const requestDocs = await Request.find(filter)
-			.populate('createdBy')
-			.populate('rewards.fromUser')
+			.populate('completedBy', 'firstName lastName profilePicture')
+			.populate('createdBy', 'firstName lastName profilePicture')
+			.populate('rewards.fromUser', 'firstName lastName profilePicture')
 			.sort({ createdAt: 'desc' });
 		const requests = requestDocs.map((request) => {
 			return getRequestForClient(request);
@@ -193,7 +237,50 @@ module.exports.getRequests = async (req, res, next) => {
 	}
 };
 
+module.exports.complete = async (req, res, next) => {
+	try {
+		const imagePath = path.join(req.file.destination, `${uuidv4()}_400.jpg`);
+		await sharp(req.file.path).jpeg().toFile(imagePath);
+		const request = await Request.findOne({
+			_id: new mongoose.Types.ObjectId(req.body.requestId)
+		});
+		request.proof = imagePath;
+		request.completed = true;
+		request.completedBy = res.locals.userId;
+		await request.save();
+		await request.execPopulate(
+			'completedBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'createdBy',
+			'firstName lastName profilePicture'
+		);
+		await request.execPopulate(
+			'rewards.fromUser',
+			'firstName lastName profilePicture'
+		);
+		socket.get().emit('requests', {
+			action: UPDATE,
+			request: getRequestForClient(request)
+		});
+		res.status(201).send();
+	} catch (error) {
+		next(error);
+	}
+};
+
 const getRequestForClient = (request) => {
+	let completedBy = null;
+	//Only get populated data for requests that have been requested
+	if (request.completedBy) {
+		completedBy = {
+			userId: request.completedBy._id,
+			firstName: request.completedBy.firstName,
+			lastName: request.completedBy.lastName,
+			profilePicture: request.completedBy.profilePicture
+		};
+	}
 	return {
 		requestId: request._id,
 		createdBy: {
@@ -213,7 +300,8 @@ const getRequestForClient = (request) => {
 			},
 			favourTypes: reward.favourTypes
 		})),
-		closed: request.closed,
+		completed: request.completed,
+		completedBy: completedBy,
 		proof: request.proof
 	};
 };

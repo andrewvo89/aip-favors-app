@@ -127,7 +127,7 @@ export const handleSocketUpdate = (socketData, requests) => {
 		default:
 			break;
 	}
-	return newRequests.filter((request) => request.closed === false);
+	return newRequests;
 };
 
 export const getSearchResults = (searchParams, requests) => {
@@ -149,4 +149,20 @@ export const getSearchResults = (searchParams, requests) => {
 		);
 		return textMatch && rewardMatch;
 	});
+};
+
+export const complete = (request, file) => {
+	return async (dispatch, _getState) => {
+		try {
+			console.log(request);
+			await request.complete(file);
+		} catch (error) {
+			console.log(error);
+			const errorMessage = getErrorMessage(error);
+			dispatch({
+				type: SET_ERROR,
+				error: errorMessage
+			});
+		}
+	};
 };
