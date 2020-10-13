@@ -10,12 +10,53 @@ const sharp = require('sharp');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
+// Catches any errors detected through express-validator middlware
+const catchValidationErrors = (req) => {
+	const validationErrors = validationResult(req);
+	if (!validationErrors.isEmpty()) {
+		throw getError(422, validationErrors.errors[0].msg, DIALOG);
+	}
+};
+
+const getRequestForClient = (request) => {
+	let completedBy = null;
+	//Only get populated data for requests that have been requested
+	if (request.completedBy) {
+		completedBy = {
+			userId: request.completedBy._id,
+			firstName: request.completedBy.firstName,
+			lastName: request.completedBy.lastName,
+			profilePicture: request.completedBy.profilePicture
+		};
+	}
+	return {
+		requestId: request._id,
+		createdBy: {
+			userId: request.createdBy._id,
+			firstName: request.createdBy.firstName,
+			lastName: request.createdBy.lastName,
+			profilePicture: request.createdBy.profilePicture
+		},
+		createdAt: request.createdAt,
+		act: request.act,
+		rewards: request.rewards.map((reward) => ({
+			fromUser: {
+				userId: reward.fromUser._id,
+				firstName: reward.fromUser.firstName,
+				lastName: reward.fromUser.lastName,
+				profilePicture: reward.fromUser.profilePicture
+			},
+			favourTypes: reward.favourTypes
+		})),
+		completed: request.completed,
+		completedBy: completedBy,
+		proof: request.proof
+	};
+};
+
 module.exports.create = async (req, res, next) => {
 	try {
-		const validationErrors = validationResult(req);
-		if (!validationErrors.isEmpty()) {
-			throw getError(422, validationErrors.errors[0].msg, DIALOG);
-		}
+		catchValidationErrors(req);
 		const { act, favourType, quantity } = req.body;
 		const { userId } = res.locals;
 		const request = new Request({
@@ -72,10 +113,7 @@ module.exports.create = async (req, res, next) => {
 
 module.exports.addReward = async (req, res, next) => {
 	try {
-		const validationErrors = validationResult(req);
-		if (!validationErrors.isEmpty()) {
-			throw getError(422, validationErrors.errors[0].msg, DIALOG);
-		}
+		catchValidationErrors(req);
 		const { requestId, favourType, quantity } = req.body;
 		const { userId } = res.locals;
 		const request = await Request.findById(
@@ -150,10 +188,7 @@ module.exports.addReward = async (req, res, next) => {
 
 module.exports.deleteReward = async (req, res, next) => {
 	try {
-		const validationErrors = validationResult(req);
-		if (!validationErrors.isEmpty()) {
-			throw getError(422, validationErrors.errors[0].msg, DIALOG);
-		}
+		catchValidationErrors(req);
 		const { requestId, rewardIndex, favourTypeIndex } = req.body;
 		const { userId } = res.locals;
 		const request = await Request.findById(
@@ -232,10 +267,7 @@ module.exports.deleteReward = async (req, res, next) => {
 
 module.exports.udpateRewardQuantity = async (req, res, next) => {
 	try {
-		const validationErrors = validationResult(req);
-		if (!validationErrors.isEmpty()) {
-			throw getError(422, validationErrors.errors[0].msg, DIALOG);
-		}
+		catchValidationErrors(req);
 		const { requestId, quantity, rewardIndex, favourTypeIndex } = req.body;
 		const { userId } = res.locals;
 		const request = await Request.findById(
@@ -364,40 +396,4 @@ module.exports.complete = async (req, res, next) => {
 	} catch (error) {
 		next(error);
 	}
-};
-
-const getRequestForClient = (request) => {
-	let completedBy = null;
-	//Only get populated data for requests that have been requested
-	if (request.completedBy) {
-		completedBy = {
-			userId: request.completedBy._id,
-			firstName: request.completedBy.firstName,
-			lastName: request.completedBy.lastName,
-			profilePicture: request.completedBy.profilePicture
-		};
-	}
-	return {
-		requestId: request._id,
-		createdBy: {
-			userId: request.createdBy._id,
-			firstName: request.createdBy.firstName,
-			lastName: request.createdBy.lastName,
-			profilePicture: request.createdBy.profilePicture
-		},
-		createdAt: request.createdAt,
-		act: request.act,
-		rewards: request.rewards.map((reward) => ({
-			fromUser: {
-				userId: reward.fromUser._id,
-				firstName: reward.fromUser.firstName,
-				lastName: reward.fromUser.lastName,
-				profilePicture: reward.fromUser.profilePicture
-			},
-			favourTypes: reward.favourTypes
-		})),
-		completed: request.completed,
-		completedBy: completedBy,
-		proof: request.proof
-	};
 };
