@@ -85,11 +85,9 @@ export default class Request {
 			});
 		});
 		const data = new FormData();
-		console.log(this.requestId);
 		data.append('requestId', this.requestId);
 		data.append('file', reizedFile);
 		const result = await axios.patch('/request/complete', data, config);
-		console.log(result);
 		return result;
 	}
 

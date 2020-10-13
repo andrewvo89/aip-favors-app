@@ -7,10 +7,10 @@ const socket = require('../utils/socket');
 
 module.exports.getAll = async (req, res, next) => {
 	try {
-		const notificationDocs = await Notification.find({
-			createdBy: { $eq: res.locals.userId }
+		const docs = await Notification.find({
+			recipient: { $eq: res.locals.userId }
 		}).sort({ createdAt: 'desc' });
-		const notifications = notificationDocs.map((notification) => {
+		const notifications = docs.map((notification) => {
 			return getNotificationForClient(notification);
 		});
 		res.status(200).json({ notifications: notifications });

@@ -7,6 +7,7 @@ import {
 	Button,
 	ButtonGroup,
 	CircularProgress,
+	Container,
 	Grid,
 	Typography
 } from '@material-ui/core';
@@ -129,63 +130,65 @@ const RequestsList = () => {
 	const noTabRequests = filteredRequests.length === 0;
 
 	return (
-		<Grid container direction="column" spacing={2} alignItems="stretch">
-			<Grid item>
-				<RequestSearch
-					setSearchParams={setSearchParams}
-					requestRewards={requestRewards}
-					disabled={noRequests}
-				/>
-			</Grid>
-			<Grid item>
-				<ButtonGroup
-					component={ToggleButtonGroup}
-					value={activeTab}
-					onChange={(_event, newValue) => setActiveTab(newValue)}
-					variant="text"
-					exclusive
-					fullWidth
-				>
-					{tabs.map((tab) => (
-						<Button key={tab} component={ToggleButton} value={tab}>
-							{tab}
-						</Button>
-					))}
-				</ButtonGroup>
-			</Grid>
-			<Grid item container direction="column" spacing={2}>
-				{paginatedRequests.map((request) => {
-					return (
-						<Grid key={request.requestId} item>
-							<RequestCard request={request} />
-						</Grid>
-					);
-				})}
-			</Grid>
-			<Grid item container justify="center">
-				{noTabRequests && activeTab === ACTIVE && (
-					<Fragment>
-						<Typography>
-							No public requests.
-							<Link onClick={linkClickHandler}>
-								{' '}
-								Click here to create a new public request.
-							</Link>
-						</Typography>
-					</Fragment>
-				)}
-				{!noTabRequests && (
-					<Pagination
-						color="primary"
-						count={count}
-						page={page}
-						onChange={(_event, value) => setPage(value)}
-						showFirstButton={true}
-						showLastButton={true}
+		<Container maxWidth="sm" disableGutters>
+			<Grid container direction="column" spacing={2} alignItems="stretch">
+				<Grid item>
+					<RequestSearch
+						setSearchParams={setSearchParams}
+						requestRewards={requestRewards}
+						disabled={noRequests}
 					/>
-				)}
+				</Grid>
+				<Grid item>
+					<ButtonGroup
+						component={ToggleButtonGroup}
+						value={activeTab}
+						onChange={(_event, newValue) => setActiveTab(newValue)}
+						variant="text"
+						exclusive
+						fullWidth
+					>
+						{tabs.map((tab) => (
+							<Button key={tab} component={ToggleButton} value={tab}>
+								{tab}
+							</Button>
+						))}
+					</ButtonGroup>
+				</Grid>
+				<Grid item container direction="column" spacing={2}>
+					{paginatedRequests.map((request) => {
+						return (
+							<Grid key={request.requestId} item>
+								<RequestCard request={request} />
+							</Grid>
+						);
+					})}
+				</Grid>
+				<Grid item container justify="center">
+					{noTabRequests && activeTab === ACTIVE && (
+						<Fragment>
+							<Typography>
+								No public requests.
+								<Link onClick={linkClickHandler}>
+									{' '}
+									Click here to create a new public request.
+								</Link>
+							</Typography>
+						</Fragment>
+					)}
+					{!noTabRequests && (
+						<Pagination
+							color="primary"
+							count={count}
+							page={page}
+							onChange={(_event, value) => setPage(value)}
+							showFirstButton={true}
+							showLastButton={true}
+						/>
+					)}
+				</Grid>
 			</Grid>
-		</Grid>
+		</Container>
 	);
 };
 

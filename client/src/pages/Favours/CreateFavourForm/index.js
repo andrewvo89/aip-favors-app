@@ -99,7 +99,7 @@ const CreateFavourForm = () => {
 			fromUser: values.fromUser.userId,
 			forUser: values.forUser.userId
 		};
-		
+
 		const favour = await dispatch(favourController.create(values));
 		if (favour) {
 			// route to the new favour's page
@@ -131,7 +131,7 @@ const CreateFavourForm = () => {
 		if (fromUser.userId === forUser.userId) {
 			return !checkUrl ? false : true;
 		}
-		
+
 		if (checkUrl) {
 			return fromUser.userId === authUser.userId && imageUrl === '';
 		} else {
@@ -140,7 +140,10 @@ const CreateFavourForm = () => {
 	};
 
 	const filteredList = (otherSelectedUser) => {
-		if (otherSelectedUser == null || Object.keys(otherSelectedUser).length === 0) {
+		if (
+			otherSelectedUser == null ||
+			Object.keys(otherSelectedUser).length === 0
+		) {
 			return userList;
 		}
 
@@ -165,12 +168,11 @@ const CreateFavourForm = () => {
 			<Button
 				className={classes.backButton}
 				color="primary"
-				component={Link} to="/favours/view/all"
+				component={Link}
+				to="/favours/view/all"
 			>
 				<ArrowBackIcon />
-				<Typography>
-					Favours list
-				</Typography>
+				<Typography>Favours list</Typography>
 			</Button>
 			<Card>
 				<form onSubmit={formik.handleSubmit}>
@@ -185,7 +187,9 @@ const CreateFavourForm = () => {
 									id="from-name-input"
 									label="From"
 									userList={filteredList(formik.values.forUser)}
-									onChange={(newValue) => formik.setFieldValue('fromUser', newValue)}
+									onChange={(newValue) =>
+										formik.setFieldValue('fromUser', newValue)
+									}
 									error={!!formik.touched.from && !!formik.errors.from}
 									autoFocus={true}
 									defaultValue={initialValues.fromUser}
@@ -196,7 +200,9 @@ const CreateFavourForm = () => {
 									id="for-name-input"
 									label="For"
 									userList={filteredList(formik.values.fromUser)}
-									onChange={(newValue) => formik.setFieldValue('forUser', newValue)}
+									onChange={(newValue) =>
+										formik.setFieldValue('forUser', newValue)
+									}
 									error={!!formik.touched.for && !!formik.errors.for}
 								/>
 							</Grid>
@@ -222,7 +228,7 @@ const CreateFavourForm = () => {
 									)}
 								/>
 							</Grid>
-							<Grid 
+							<Grid
 								container
 								item
 								direction="column"
@@ -238,7 +244,8 @@ const CreateFavourForm = () => {
 						</Grid>
 					</CardContent>
 					<CardActions>
-						<Grid container
+						<Grid
+							container
 							direction="column"
 							alignItems={loading ? 'center' : 'stretch'}
 							spacing={1}

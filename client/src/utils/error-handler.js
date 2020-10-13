@@ -34,7 +34,12 @@ const ErrorHandler = (props) => {
 		switch (feedback) {
 			case DIALOG:
 				errorMessage = (
-					<Dialog open={feedback === DIALOG} onClose={errorClearHandler}>
+					<Dialog
+						fullWidth
+						maxWidth="xs"
+						open={feedback === DIALOG}
+						onClose={errorClearHandler}
+					>
 						<DialogTitle>
 							{status}: {statusText}
 						</DialogTitle>

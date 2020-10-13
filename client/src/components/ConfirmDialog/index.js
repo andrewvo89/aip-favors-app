@@ -1,17 +1,17 @@
 import React from 'react';
 import {
 	Button,
+	Dialog,
 	DialogActions,
 	DialogContent,
 	DialogContentText,
 	DialogTitle
 } from '@material-ui/core';
-import Dialog from '../Dialog';
 
 const ConfirmDialog = (props) => {
 	const { open, cancel, confirm, title, message } = props;
 	return (
-		<Dialog open={open} onClose={cancel}>
+		<Dialog fullWidth maxWidth="xs" open={open} onClose={cancel}>
 			<DialogTitle>{title}</DialogTitle>
 			<DialogContent>
 				<DialogContentText>{message}</DialogContentText>

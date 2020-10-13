@@ -18,6 +18,8 @@ const AuthProvider = (props) => {
 	return (
 		<Fragment>
 			<Dialog
+				fullWidth
+				maxWidth="xs"
 				open={login}
 				onClose={closeHandler}
 				TransitionComponent={Transition}

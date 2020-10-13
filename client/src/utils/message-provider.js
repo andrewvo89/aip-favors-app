@@ -27,7 +27,12 @@ const MessageProvider = (props) => {
 		switch (feedback) {
 			case DIALOG:
 				messageComponent = (
-					<Dialog open={feedback === DIALOG} onClose={messageClearHandler}>
+					<Dialog
+						fullWidth
+						maxWidth="xs"
+						open={feedback === DIALOG}
+						onClose={messageClearHandler}
+					>
 						<DialogTitle>{title}</DialogTitle>
 						<DialogContent>
 							<DialogContentText>{text}</DialogContentText>

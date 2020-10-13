@@ -18,7 +18,7 @@ export const subscribeToNotifications = () => {
 	return async (dispatch, getState) => {
 		try {
 			const { authUser } = getState().authState;
-			const notifications = await Notification.getAll(authUser.userId);
+			const notifications = await Notification.getAll();
 			dispatch({
 				type: SET_NOTIFICACTIONS,
 				notifications: notifications

@@ -45,6 +45,11 @@ const Request = (props) => {
 	const [addRewardDialogOpen, setAddRewardDialogOpen] = useState(false);
 	const [completeTaskDialogOpen, setCompleteTaskDialogOpen] = useState(false);
 
+	const confirmDeleteDialogCloseHandler = () => {
+		setConfirmDeleteDialogOpen(false);
+		setSelectedReward(null);
+	};
+
 	const addRewardClickHandler = () => {
 		if (authUser) {
 			setAddRewardDialogOpen(true);
@@ -54,12 +59,13 @@ const Request = (props) => {
 	};
 
 	const deleteRewardClickHandler = async () => {
+		const selectedDeleteReward = { ...selectedReward };
+		setSelectedReward(null);
 		const result = await dispatch(
-			requestController.deleteReward(request, selectedReward)
+			requestController.deleteReward(request, selectedDeleteReward)
 		);
 		if (result) {
-			setSelectedReward(null);
-			setConfirmDeleteDialogOpen(false);
+			confirmDeleteDialogCloseHandler();
 		}
 	};
 
@@ -81,7 +87,18 @@ const Request = (props) => {
 	const completeTaskClickHandler = () => {
 		if (authUser) {
 			setCompleteTaskDialogOpen(true);
-			// fileInputRef.current.click();
+		} else {
+			dispatch(authController.showLoginDialog());
+		}
+	};
+
+	const proofClickHandler = () => {
+		if (authUser) {
+			window.open(
+				`${REST_URL}/${request.proof.split('\\').join('/')}`,
+				'_blank',
+				'noreferrer'
+			);
 		} else {
 			dispatch(authController.showLoginDialog());
 		}
@@ -114,7 +131,7 @@ const Request = (props) => {
 		confirmDeleteDialogComponent = (
 			<ConfirmDialog
 				open={confirmDeleteDialogOpen}
-				cancel={() => setConfirmDeleteDialogOpen(false)}
+				cancel={confirmDeleteDialogCloseHandler}
 				confirm={deleteRewardClickHandler}
 				title="Delete Reward"
 				message={message}
@@ -244,15 +261,23 @@ const Request = (props) => {
 						{completed ? (
 							<Fragment>
 								<Grid item>
-									<Button>{`Completed by ${completedBy.firstName} ${completedBy.lastName}`}</Button>
+									<Typography
+										style={{ padding: '6px 6px' }}
+										variant="button"
+									>{`Completed by ${completedBy.firstName} ${completedBy.lastName}`}</Typography>
 								</Grid>
 								<Grid item>
 									<Button
+										onClick={proofClickHandler}
 										color="primary"
-										as="a"
-										href={`${REST_URL}/${request.proof.split('\\').join('/')}`}
-										target="_blank"
-										rel="noreferrer"
+										// as={authUser ? 'a' : 'button'}
+										// href={
+										// 	authUser
+										// 		? `${REST_URL}/${request.proof.split('\\').join('/')}`
+										// 		: null
+										// }
+										// target="_blank"
+										// rel="noreferrer"
 									>
 										Show proof
 									</Button>

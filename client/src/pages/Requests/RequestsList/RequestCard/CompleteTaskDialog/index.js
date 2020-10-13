@@ -53,7 +53,6 @@ const CompleteTaskDialog = (props) => {
 
 	const completeTaskClickHandler = async () => {
 		setLoading(true);
-		console.log(request);
 		const result = await dispatch(requestController.complete(request, file));
 		if (result) {
 			dialogCloseHandler();
@@ -99,6 +98,7 @@ const CompleteTaskDialog = (props) => {
 						<Button
 							variant="contained"
 							color="primary"
+							disabled={loading}
 							onClick={() => fileInputRef.current.click()}
 						>
 							<ImageIcon />
@@ -112,7 +112,7 @@ const CompleteTaskDialog = (props) => {
 					type="submit"
 					variant="contained"
 					color="primary"
-					disabled={!file}
+					disabled={!file || loading}
 					onClick={completeTaskClickHandler}
 				>
 					Confirm

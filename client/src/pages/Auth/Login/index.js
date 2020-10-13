@@ -6,7 +6,8 @@ import {
 	TextField,
 	Grid,
 	CardActions,
-	CardContent
+	CardContent,
+	Card
 } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { useFormik } from 'formik';
@@ -14,7 +15,6 @@ import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
 import * as authController from '../../../controllers/auth';
 import FullWidthButton from '../../../components/FullWidthButton';
-import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
 
 export default (props) => {

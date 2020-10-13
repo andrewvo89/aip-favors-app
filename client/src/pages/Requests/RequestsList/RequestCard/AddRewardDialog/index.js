@@ -1,10 +1,10 @@
 import {
 	Button,
+	Dialog,
 	DialogActions,
 	DialogContent,
 	DialogTitle
 } from '@material-ui/core';
-import Dialog from '../../../../../components/Dialog';
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -63,7 +63,7 @@ const AddRewardDialog = (props) => {
 	});
 
 	return (
-		<Dialog open={open} onClose={closeHandler}>
+		<Dialog fullWidth maxWidth="xs" open={open} onClose={closeHandler}>
 			<form onSubmit={formik.handleSubmit}>
 				<DialogTitle>Add a reward</DialogTitle>
 				<DialogContent>

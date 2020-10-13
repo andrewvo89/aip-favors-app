@@ -1,14 +1,12 @@
-import React, { Fragment } from 'react';
+import { Card } from '@material-ui/core';
+import React from 'react';
 import ProfileForm from './ProfileForm';
-import Card from '../../components/Card';
 
 const Account = () => {
 	return (
-		<Fragment>
-			<Card elevation={6}>
-				<ProfileForm />
-			</Card>
-		</Fragment>
+		<Card elevation={6}>
+			<ProfileForm />
+		</Card>
 	);
 };
 

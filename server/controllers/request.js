@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const Request = require('../models/request');
-const { DIALOG, CREATE, UPDATE } = require('../utils/constants');
+const { DIALOG, CREATE, UPDATE, DELETE } = require('../utils/constants');
 const { getError } = require('../utils/error');
 const mongoose = require('mongoose');
 const socket = require('../utils/socket');
@@ -17,12 +17,13 @@ module.exports.create = async (req, res, next) => {
 			throw getError(422, validationErrors.errors[0].msg, DIALOG);
 		}
 		const { act, favourType, quantity } = req.body;
+		const { userId } = res.locals;
 		const request = new Request({
-			createdBy: res.locals.userId,
+			createdBy: new mongoose.Types.ObjectId(userId),
 			act: act,
 			rewards: [
 				{
-					fromUser: res.locals.userId,
+					fromUser: new mongoose.Types.ObjectId(userId),
 					favourTypes: [
 						{
 							favourType: favourType,
@@ -34,10 +35,6 @@ module.exports.create = async (req, res, next) => {
 			complete: false,
 			proof: ''
 		});
-		await request.execPopulate(
-			'completedBy',
-			'firstName lastName profilePicture'
-		);
 		await request.execPopulate(
 			'createdBy',
 			'firstName lastName profilePicture'
@@ -51,6 +48,22 @@ module.exports.create = async (req, res, next) => {
 			action: CREATE,
 			request: getRequestForClient(request)
 		});
+		//Send a notification to all users about the new request
+		const fromUser = await User.findById(new mongoose.Types.ObjectId(userId));
+		const users = await User.find();
+		const promises = [];
+		//Execute all the notifications in parallel to save on time for function to finish
+		for (const user of users) {
+			promises.push(
+				notificationController.create(
+					userId,
+					'/requests/view/all',
+					user._id,
+					`${fromUser.fullName} added a new public request to "${request.act}"`
+				)
+			);
+		}
+		await Promise.all(promises);
 		res.status(201).send();
 	} catch (error) {
 		next(error);
@@ -101,31 +114,34 @@ module.exports.addReward = async (req, res, next) => {
 			});
 		}
 		await request.save();
-		await request.execPopulate(
-			'completedBy',
-			'firstName lastName profilePicture'
-		);
-		await request.execPopulate(
-			'createdBy',
-			'firstName lastName profilePicture'
-		);
-		await request.execPopulate(
-			'rewards.fromUser',
-			'firstName lastName profilePicture'
-		);
+		await request.execPopulate('createdBy');
+		await request.execPopulate('rewards.fromUser');
 		socket.get().emit('requests', {
 			action: UPDATE,
 			request: getRequestForClient(request)
 		});
-		//TEST START
+		//Send a notification to all users about the new reward
 		const fromUser = await User.findById(new mongoose.Types.ObjectId(userId));
-		await notificationController.create(
-			userId,
-			'/requests/view/all',
-			userId,
-			`${fromUser.fullName} added ${quantity}x ${favourType} as a reward for the request to "${request.act}"`
+		const users = request.rewards.map((reward) => reward.fromUser);
+		const createdByUserExists = users.find(
+			(user) => user._id.toString() === request.createdBy._id.toString()
 		);
-		//TEST END
+		if (!createdByUserExists) {
+			users.push(request.createdBy);
+		}
+		const promises = [];
+		//Execute all the notifications in parallel to save on time for function to finish
+		for (const user of users) {
+			promises.push(
+				notificationController.create(
+					userId,
+					'/requests/view/all',
+					user._id,
+					`${fromUser.fullName} added ${quantity}x ${favourType} as a reward for the request to "${request.act}"`
+				)
+			);
+		}
+		await Promise.all(promises);
 		res.status(201).send();
 	} catch (error) {
 		next(error);
@@ -139,6 +155,7 @@ module.exports.deleteReward = async (req, res, next) => {
 			throw getError(422, validationErrors.errors[0].msg, DIALOG);
 		}
 		const { requestId, rewardIndex, favourTypeIndex } = req.body;
+		const { userId } = res.locals;
 		const request = await Request.findById(
 			new mongoose.Types.ObjectId(requestId)
 		);
@@ -147,32 +164,66 @@ module.exports.deleteReward = async (req, res, next) => {
 			//If your userId does not match the userId of the reward being deleted (prevent deleting other people's rewards)
 			throw getError(403, 'Unauthorized to delete reward', DIALOG);
 		}
-		request.rewards[rewardIndex].favourTypes.splice(favourTypeIndex, 1);
+		const deletedReward = request.rewards[rewardIndex].favourTypes.splice(
+			favourTypeIndex,
+			1
+		)[0];
 		if (request.rewards[rewardIndex].favourTypes.length === 0) {
 			//If user has no more rewards, remove the user from rewards array
 			request.rewards.splice(rewardIndex, 1);
 		}
 		if (request.rewards.length === 0) {
-			//If no rewards are left, set completed flag to true to remove request from client list
-			request.complete = true;
+			//If no rewards are left, set completed flag to true to delete request
+			await request.deleteOne();
+			socket.get().emit('requests', {
+				action: DELETE,
+				request: request._id
+			});
+		} else {
+			await request.save();
+			await request.execPopulate(
+				'completedBy',
+				'firstName lastName profilePicture'
+			);
+			await request.execPopulate(
+				'createdBy',
+				'firstName lastName profilePicture'
+			);
+			await request.execPopulate(
+				'rewards.fromUser',
+				'firstName lastName profilePicture'
+			);
+			socket.get().emit('requests', {
+				action: UPDATE,
+				request: getRequestForClient(request)
+			});
 		}
-		await request.save();
-		await request.execPopulate(
-			'completedBy',
-			'firstName lastName profilePicture'
+		//Send a notification to all users about the new request
+		const fromUser = await User.findById(new mongoose.Types.ObjectId(userId));
+		const users = request.rewards.map((reward) => reward.fromUser);
+		const createdByUserExists = users.find(
+			(user) => user._id.toString() === request.createdBy._id.toString()
 		);
-		await request.execPopulate(
-			'createdBy',
-			'firstName lastName profilePicture'
-		);
-		await request.execPopulate(
-			'rewards.fromUser',
-			'firstName lastName profilePicture'
-		);
-		socket.get().emit('requests', {
-			action: UPDATE,
-			request: getRequestForClient(request)
-		});
+		if (!createdByUserExists) {
+			users.push(request.createdBy);
+		}
+		const promises = [];
+		//Execute all the notifications in parallel to save on time for function to finish
+		for (const user of users) {
+			let title = `${fromUser.fullName} removed ${deletedReward.quantity}x ${deletedReward.favourType} for the request to "${request.act}"`;
+			if (request.rewards.length === 0) {
+				title = `${fromUser.fullName} removed the request to "${request.act}"`;
+			}
+			promises.push(
+				notificationController.create(
+					userId,
+					'/requests/view/all',
+					user._id,
+					title
+				)
+			);
+		}
+		await Promise.all(promises);
 		res.status(201).send();
 	} catch (error) {
 		next(error);
@@ -186,22 +237,22 @@ module.exports.udpateRewardQuantity = async (req, res, next) => {
 			throw getError(422, validationErrors.errors[0].msg, DIALOG);
 		}
 		const { requestId, quantity, rewardIndex, favourTypeIndex } = req.body;
+		const { userId } = res.locals;
 		const request = await Request.findById(
 			new mongoose.Types.ObjectId(requestId)
 		);
 		const fromUserId = request.rewards[rewardIndex].fromUser.toString();
-		if (fromUserId !== res.locals.userId) {
+		if (fromUserId !== userId) {
 			//If your userId does not match the userId of the reward being udpated (prevent deleting other people's rewards)
 			throw getError(403, 'Unauthorized to update reward quantity', DIALOG);
 		}
+		const favourType =
+			request.rewards[rewardIndex].favourTypes[favourTypeIndex];
+		const prevQuantity = favourType.quantity;
 		request.rewards[rewardIndex].favourTypes[
 			favourTypeIndex
 		].quantity = quantity;
 		await request.save();
-		await request.execPopulate(
-			'completedBy',
-			'firstName lastName profilePicture'
-		);
 		await request.execPopulate(
 			'createdBy',
 			'firstName lastName profilePicture'
@@ -214,6 +265,29 @@ module.exports.udpateRewardQuantity = async (req, res, next) => {
 			action: UPDATE,
 			request: getRequestForClient(request)
 		});
+		//Send a notification to all users about the udpated request
+		const fromUser = await User.findById(new mongoose.Types.ObjectId(userId));
+		const users = request.rewards.map((reward) => reward.fromUser);
+		const createdByUserExists = users.find(
+			(user) => user._id.toString() === request.createdBy._id.toString()
+		);
+		if (!createdByUserExists) {
+			users.push(request.createdBy);
+		}
+		const promises = [];
+		//Execute all the notifications in parallel to save on time for function to finish
+		for (const user of users) {
+			const action = prevQuantity < quantity ? 'added' : 'removed';
+			promises.push(
+				notificationController.create(
+					userId,
+					'/requests/view/all',
+					user._id,
+					`${fromUser.fullName} ${action} a ${favourType.favourType} for the request to "${request.act}"`
+				)
+			);
+		}
+		await Promise.all(promises);
 		res.status(201).send();
 	} catch (error) {
 		next(error);
@@ -239,6 +313,7 @@ module.exports.getRequests = async (req, res, next) => {
 
 module.exports.complete = async (req, res, next) => {
 	try {
+		const { userId } = res.locals;
 		const imagePath = path.join(req.file.destination, `${uuidv4()}_400.jpg`);
 		await sharp(req.file.path).jpeg().toFile(imagePath);
 		const request = await Request.findOne({
@@ -246,7 +321,7 @@ module.exports.complete = async (req, res, next) => {
 		});
 		request.proof = imagePath;
 		request.completed = true;
-		request.completedBy = res.locals.userId;
+		request.completedBy = userId;
 		await request.save();
 		await request.execPopulate(
 			'completedBy',
@@ -264,6 +339,27 @@ module.exports.complete = async (req, res, next) => {
 			action: UPDATE,
 			request: getRequestForClient(request)
 		});
+		//Send a notification to all users about the request being completed
+		const fromUser = await User.findById(new mongoose.Types.ObjectId(userId));
+		const users = request.rewards.map((reward) => reward.fromUser);
+		const createdByUserExists = users.find(
+			(user) => user._id.toString() === request.createdBy._id.toString()
+		);
+		if (!createdByUserExists) {
+			users.push(request.createdBy);
+		}
+		const promises = [];
+		//Execute all the notifications in parallel to save on time for function to finish
+		for (const user of users) {
+			promises.push(
+				notificationController.create(
+					userId,
+					'/requests/view/all',
+					user._id,
+					`${fromUser.fullName} has completed the request to "${request.act}"`
+				)
+			);
+		}
 		res.status(201).send();
 	} catch (error) {
 		next(error);

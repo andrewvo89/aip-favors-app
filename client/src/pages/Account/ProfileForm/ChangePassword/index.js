@@ -83,7 +83,12 @@ const ChangePassword = (props) => {
 	});
 
 	return (
-		<Dialog open={props.showPasswordDialog} onClose={dialogCloseHandler}>
+		<Dialog
+			fullWidth
+			maxWidth="xs"
+			open={props.showPasswordDialog}
+			onClose={dialogCloseHandler}
+		>
 			<form onSubmit={formik.handleSubmit}>
 				<DialogTitle>Update Password</DialogTitle>
 				<DialogContent>

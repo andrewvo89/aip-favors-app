@@ -1,5 +1,6 @@
 import {
 	Checkbox,
+	Dialog,
 	DialogContent,
 	DialogTitle,
 	List,
@@ -8,7 +9,6 @@ import {
 	ListItemText
 } from '@material-ui/core';
 import React from 'react';
-import Dialog from '../../../../../components/Dialog';
 
 const RewardsFilterDialog = (props) => {
 	const {
@@ -40,7 +40,7 @@ const RewardsFilterDialog = (props) => {
 	};
 
 	return (
-		<Dialog open={open} onClose={() => close()}>
+		<Dialog fullWidth maxWidth="xs" open={open} onClose={() => close()}>
 			<DialogTitle>
 				<List>
 					<ListItem button onClick={selectAllCheckHandler}>

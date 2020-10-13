@@ -2,6 +2,7 @@ import Message from '../models/message';
 import Request from '../models/request';
 import {
 	CREATE,
+	DELETE,
 	DIALOG,
 	SET_ERROR,
 	SET_MESSAGE,
@@ -114,18 +115,18 @@ export const udpateRewardQuantity = (
 export const handleSocketUpdate = (socketData, requests) => {
 	let newRequests = [...requests];
 	const newRequest = new Request({ ...socketData.request });
-	switch (socketData.action) {
-		case CREATE:
-			newRequests.unshift(newRequest);
-			break;
-		case UPDATE:
-			var index = requests.findIndex(
-				(request) => request.requestId === newRequest.requestId
-			);
-			newRequests.splice(index, 1, newRequest);
-			break;
-		default:
-			break;
+	if (socketData.action === CREATE) {
+		newRequests.unshift(newRequest);
+	} else if (socketData.action === UPDATE) {
+		const index = requests.findIndex(
+			(request) => request.requestId === newRequest.requestId
+		);
+		newRequests.splice(index, 1, newRequest);
+	} else if (socketData.action === DELETE) {
+		const index = requests.findIndex(
+			(request) => request.requestId === newRequest.requestId
+		);
+		newRequests.splice(index, 1);
 	}
 	return newRequests;
 };
@@ -154,10 +155,8 @@ export const getSearchResults = (searchParams, requests) => {
 export const complete = (request, file) => {
 	return async (dispatch, _getState) => {
 		try {
-			console.log(request);
 			await request.complete(file);
 		} catch (error) {
-			console.log(error);
 			const errorMessage = getErrorMessage(error);
 			dispatch({
 				type: SET_ERROR,
