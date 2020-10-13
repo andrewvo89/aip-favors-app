@@ -1,10 +1,14 @@
 import React, { useCallback, useEffect, useState, Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import { Badge, IconButton } from '@material-ui/core';
-import { Notifications as NotificationsIcon } from '@material-ui/icons';
+import {
+	Notifications as NotificationsIcon,
+	NotificationsOff as NotificationsOffIcon
+} from '@material-ui/icons';
 import NotificationsPopover from './NotificationsPopover';
 
 const NotificationsIconButton = (props) => {
+	const { notificationsOff } = props;
 	const { notifications } = useSelector((state) => state.notificationState);
 	const [anchorEl, setAnchorEl] = useState(null);
 
@@ -18,7 +22,11 @@ const NotificationsIconButton = (props) => {
 		}
 	}, [notifications, closePopoverHandler]);
 
-	return (
+	return notificationsOff ? (
+		<IconButton edge="start" color="inherit">
+			<NotificationsOffIcon />
+		</IconButton>
+	) : (
 		<Fragment>
 			<IconButton
 				edge="start"

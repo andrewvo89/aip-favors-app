@@ -24,7 +24,6 @@ export const subscribeToNotifications = () => {
 				notifications: notifications
 			});
 			//Subscribe to the socket.io for notification updates
-			dispatch(unsubscribeToNotifications(authUser.userId));
 			socket.on(`notifications-${authUser.userId}`, (data) => {
 				let newNotifications = [...getState().notificationState.notifications];
 				const actions = [];
@@ -64,13 +63,18 @@ export const subscribeToNotifications = () => {
 	};
 };
 
-export const unsubscribeToNotifications = (userId) => {
-	return async (dispatch, _getState) => {
+export const unsubscribeToNotifications = () => {
+	return async (dispatch, getState) => {
+		const { authUser } = getState().authState;
 		try {
-			const socketEvent = `notifications-${userId}`;
+			const socketEvent = `notifications-${authUser.userId}`;
 			if (socket.hasListeners(socketEvent)) {
 				socket.off(socketEvent);
 			}
+			dispatch({
+				type: SET_NOTIFICACTIONS,
+				notifications: []
+			});
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
 			dispatch({

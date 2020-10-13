@@ -35,6 +35,10 @@ const userSchema = new Schema(
 				type: Boolean,
 				default: false
 			},
+			notifications: {
+				type: Boolean,
+				default: true
+			},
 			expandFavoursGroup: {
 				type: Boolean,
 				default: true

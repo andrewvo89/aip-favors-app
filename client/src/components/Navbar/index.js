@@ -81,7 +81,9 @@ const Navbar = withTheme((props) => {
 						{authUser && (
 							<Fragment>
 								<Grid item>
-									<NotificationsIconButton />
+									<NotificationsIconButton
+										notificationsOff={!authUser.settings.notifications}
+									/>
 								</Grid>
 								<Grid item>
 									<NavbarAvatar authUser={authUser} />

@@ -16,6 +16,7 @@ const App = withRouter((props) => {
 	const dispatch = useDispatch();
 	const [authLoading, setAuthLoading] = useState(true);
 	const { authUser } = useSelector((state) => state.authState);
+	const notifications = authUser?.settings?.notifications;
 	//Check authentication as first action upon loading
 	useEffect(() => {
 		const verifyAuth = async () => {
@@ -27,17 +28,15 @@ const App = withRouter((props) => {
 
 	//Get notifications when user is logged in
 	useEffect(() => {
-		if (authUser) {
+		if (notifications) {
 			dispatch(notificationController.subscribeToNotifications());
 		}
 		return () => {
-			if (authUser) {
-				dispatch(
-					notificationController.unsubscribeToNotifications(authUser.userId)
-				);
+			if (notifications) {
+				dispatch(notificationController.unsubscribeToNotifications());
 			}
 		};
-	}, [authUser, dispatch]);
+	}, [notifications, dispatch]);
 
 	let children = <CircularProgress />;
 
