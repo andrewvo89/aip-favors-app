@@ -1,21 +1,26 @@
-import { Divider, IconButton, Popover, Tooltip } from '@material-ui/core';
+import { Divider, Grid, IconButton, Popover, Tooltip } from '@material-ui/core';
 import React, { Fragment } from 'react';
 import NotificationItem from './NotificationItem';
-import {
-	StyledToolbar,
-	StyledList,
-	StyledTitle,
-	StyledClearAllIcon
-} from './styled-components';
+import { StyledList, StyledTitle } from './styled-components';
 import * as notificationController from '../../../../controllers/notification';
+import * as userController from '../../../../controllers/user';
 import { useDispatch } from 'react-redux';
+import {
+	ClearAll as ClearAllIcon,
+	NotificationsOff as NotificationsOffIcon
+} from '@material-ui/icons';
 
 const NotificationsPopover = (props) => {
 	const dispatch = useDispatch();
-	const { anchorEl, setAnchorEl, notifications } = props;
+	const { authUser, anchorEl, setAnchorEl, notifications } = props;
 
 	const notificationsClearHandler = async () => {
 		await dispatch(notificationController.clearNotifications());
+	};
+
+	const notificationSilenceHandler = async () => {
+		const settings = { ...authUser.settings, notifications: false };
+		await dispatch(userController.update({ settings: settings }));
 	};
 
 	const closePopoverHandler = () => {
@@ -36,14 +41,27 @@ const NotificationsPopover = (props) => {
 				horizontal: 'center'
 			}}
 		>
-			<StyledToolbar>
-				<StyledTitle variant="h6">Notifications</StyledTitle>
-				<Tooltip title="Clear all" placement="bottom">
-					<IconButton onClick={notificationsClearHandler}>
-						<StyledClearAllIcon />
-					</IconButton>
-				</Tooltip>
-			</StyledToolbar>
+			<Grid container direction="row" justify="space-between" wrap="nowrap">
+				<Grid item>
+					<StyledTitle variant="h6">Notifications</StyledTitle>
+				</Grid>
+				<Grid item container direction="row" justify="flex-end" wrap="nowrap">
+					<Grid item>
+						<Tooltip title="Silence notifications" placement="bottom">
+							<IconButton onClick={notificationSilenceHandler}>
+								<NotificationsOffIcon />
+							</IconButton>
+						</Tooltip>
+					</Grid>
+					<Grid item>
+						<Tooltip title="Clear all" placement="bottom">
+							<IconButton onClick={notificationsClearHandler}>
+								<ClearAllIcon />
+							</IconButton>
+						</Tooltip>
+					</Grid>
+				</Grid>
+			</Grid>
 			<StyledList>
 				{notifications.map((notification, index, array) => {
 					const firstElement = index === 0;

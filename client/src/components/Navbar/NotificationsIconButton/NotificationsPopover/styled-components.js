@@ -6,12 +6,6 @@ export const StyledIconButton = styled(IconButton)`
 	margin-right: 20px;
 `;
 
-export const StyledToolbar = styled.div`
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-`;
-
 export const StyledTitle = styled(Typography)`
 	padding: 12px;
 `;
