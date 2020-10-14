@@ -69,7 +69,7 @@ export default (props) => {
 
 	const formik = useFormik({
 		initialValues: initialValues,
-		initialStatus: initialErrors,
+		initialErrors: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});

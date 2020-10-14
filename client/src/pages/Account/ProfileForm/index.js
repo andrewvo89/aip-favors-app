@@ -95,7 +95,6 @@ const ProfileForm = () => {
 							</Grid>
 						</Grid>
 					}
-					subheader="23 favours completed"
 				/>
 				<CardContent>
 					<Grid container direction="column" spacing={1}>
