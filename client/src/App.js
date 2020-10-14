@@ -11,6 +11,7 @@ import Account from './pages/Account';
 import Settings from './pages/Settings';
 import Favours from './pages/Favours';
 import Leaderboard from './pages/Leaderboard';
+import { Grid } from '@material-ui/core';
 
 const App = withRouter((props) => {
 	const dispatch = useDispatch();
@@ -33,7 +34,11 @@ const App = withRouter((props) => {
 		}
 	}, [notifications, dispatch]);
 
-	let children = <CircularProgress />;
+	let children = (
+		<Grid container justify="center">
+			<CircularProgress />
+		</Grid>
+	);
 
 	if (!authLoading) {
 		children = (

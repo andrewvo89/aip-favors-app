@@ -42,10 +42,10 @@ export const verifyAuth = () => {
 			]);
 		} catch (error) {
 			const errorMessage = new ErrorMessage({
-				status: error.response.status,
-				statusText: error.response.statusText,
-				message: error.response.data.message,
-				feedback: error.response.data.feedback
+				status: error.response?.status,
+				statusText: error.response?.statusText,
+				message: error.response?.data.message,
+				feedback: error.response?.data.feedback
 			});
 			dispatch([
 				{
@@ -88,10 +88,10 @@ export const signup = (values) => {
 			return true;
 		} catch (error) {
 			const errorMessage = new ErrorMessage({
-				status: error.response.status,
-				statusText: error.response.statusText,
-				message: error.response.data.message,
-				feedback: error.response.data.feedback
+				status: error.response?.status,
+				statusText: error.response?.statusText,
+				message: error.response?.data.message,
+				feedback: error.response?.data.feedback
 			});
 			dispatch({
 				type: SET_ERROR,
@@ -124,10 +124,10 @@ export const login = (values) => {
 			return true;
 		} catch (error) {
 			const errorMessage = new ErrorMessage({
-				status: error.response.status,
-				statusText: error.response.statusText,
-				message: error.response.data.message,
-				feedback: error.response.data.feedback
+				status: error.response?.status,
+				statusText: error.response?.statusText,
+				message: error.response?.data.message,
+				feedback: error.response?.data.feedback
 			});
 			dispatch({
 				type: SET_ERROR,
@@ -150,10 +150,10 @@ export const logout = () => {
 				errorMessage = get503Error();
 			} else {
 				errorMessage = new ErrorMessage({
-					status: error.response.status,
-					statusText: error.response.statusText,
-					message: error.response.data.message,
-					feedback: error.response.data.feedback
+					status: error.response?.status,
+					statusText: error.response?.statusText,
+					message: error.response?.data.message,
+					feedback: error.response?.data.feedback
 				});
 			}
 			dispatch({

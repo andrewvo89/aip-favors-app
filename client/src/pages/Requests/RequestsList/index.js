@@ -111,7 +111,11 @@ const RequestsList = () => {
 	}, [searchResults, activeTab]);
 
 	if (!filteredRequests || !requestRewards) {
-		return <CircularProgress />;
+		return (
+			<Grid container justify="center">
+				<CircularProgress />
+			</Grid>
+		);
 	}
 
 	const linkClickHandler = () => {
