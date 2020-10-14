@@ -8,7 +8,8 @@ import {
 	Button,
 	Grid,
 	makeStyles,
-	CardActionArea
+	CardActionArea,
+	Card
 } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
@@ -17,7 +18,6 @@ import { Link, useParams, useHistory, useLocation } from 'react-router-dom';
 import * as favourController from '../../../controllers/favour';
 import RepayFavourForm from './RepayFavourForm';
 import Avatar from '../../../components/Avatar';
-import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
 import ImageDialog from '../../../components/ImageDialog';
 const { REACT_APP_REST_URL: REST_URL } = process.env;
@@ -46,20 +46,22 @@ const formattedDate = (date) => {
 		month: 'long',
 		year: 'numeric',
 		hour: 'numeric',
-		minute: 'numeric',
+		minute: 'numeric'
 	};
 
 	return new Date(date).toLocaleString('default', dateOptions);
 };
 
 const updatedFavour = (favourData) => {
-	const updatedActImage = favourData.proof.actImage === ''
-		? '/ImageFallback.png'
-		: `${REST_URL}/${favourData.proof.actImage}`;
+	const updatedActImage =
+		favourData.proof.actImage === ''
+			? '/ImageFallback.png'
+			: `${REST_URL}/${favourData.proof.actImage}`;
 
-	const updatedRepaidImage = favourData.proof.repaidImage === ''
-		? '/ImageFallback.png'
-		: `${REST_URL}/${favourData.proof.repaidImage}`;
+	const updatedRepaidImage =
+		favourData.proof.repaidImage === ''
+			? '/ImageFallback.png'
+			: `${REST_URL}/${favourData.proof.repaidImage}`;
 
 	favourData = {
 		...favourData,
@@ -96,7 +98,7 @@ const Favour = () => {
 
 		const fetchFavour = async () => {
 			const favourData = await dispatch(favourController.getFavour(favourId));
-			
+
 			if (favourData) {
 				setFavour(updatedFavour(favourData));
 			} else {
@@ -122,7 +124,7 @@ const Favour = () => {
 	const handleDialogOpen = () => {
 		setDialogOpen(true);
 	};
-	
+
 	const handleDialogClose = () => {
 		setDialogOpen(false);
 	};
@@ -132,18 +134,17 @@ const Favour = () => {
 			<Button
 				className={classes.backButton}
 				color="primary"
-				component={Link} to="/favours/view/all"
+				component={Link}
+				to="/favours/view/all"
 			>
 				<ArrowBackIcon />
-				<Typography>
-					Favours list
-				</Typography>
+				<Typography>Favours list</Typography>
 			</Button>
 
 			{loading ? (
 				<CircularProgress />
 			) : (
-				<Card width="450px">
+				<Card>
 					<CardHeader title="Favour" subheader={favour.createdAt} />
 					<CardContent>
 						<CardActionArea onClick={handleDialogOpen}>
@@ -153,10 +154,10 @@ const Favour = () => {
 								alt="Proof of act"
 								height="180"
 								image={favour.proof.actImage}
-								onError={(e) => e.target.src = '/ImageFallback.png'}
+								onError={(e) => (e.target.src = '/ImageFallback.png')}
 							/>
 						</CardActionArea>
-						<ImageDialog 
+						<ImageDialog
 							image={favour.proof.actImage}
 							alt="Proof of favour act"
 							dialogOpen={dialogOpen}
@@ -188,10 +189,10 @@ const Favour = () => {
 
 						<Divider variant="middle" className={classes.divider} />
 
-						<RepayFavourForm 
-							favour={favour} 
-							setFavour={setFavour} 
-							updatedFavour={updatedFavour} 
+						<RepayFavourForm
+							favour={favour}
+							setFavour={setFavour}
+							updatedFavour={updatedFavour}
 						/>
 					</CardContent>
 				</Card>

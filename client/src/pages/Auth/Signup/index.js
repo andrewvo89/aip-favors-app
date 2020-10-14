@@ -7,14 +7,14 @@ import {
 	TextField,
 	CardActions,
 	CardContent,
-	Card
+	Card,
+	Button
 } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
 import * as authController from '../../../controllers/auth';
-import FullWidthButton from '../../../components/FullWidthButton';
 import CardHeader from '../../../components/CardHeader';
 
 export default (props) => {
@@ -196,23 +196,25 @@ export default (props) => {
 						) : (
 							<Fragment>
 								<Grid item>
-									<FullWidthButton
+									<Button
+										fullWidth
 										variant="contained"
 										color="primary"
 										type="submit"
 										disabled={!formik.isValid}
 									>
 										Signup
-									</FullWidthButton>
+									</Button>
 								</Grid>
 								<Grid item>
-									<FullWidthButton
+									<Button
+										fullWidth
 										variant="outlined"
 										color="primary"
 										onClick={backClickHandler}
 									>
 										Back
-									</FullWidthButton>
+									</Button>
 								</Grid>
 							</Fragment>
 						)}

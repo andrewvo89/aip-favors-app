@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
+import {
 	Chip,
 	Grid,
 	CardActionArea,
 	CardMedia,
-	makeStyles
+	makeStyles,
+	Button
 } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
 import CardHeader from '../../../../components/CardHeader';
-import FullWidthButton from '../../../../components/FullWidthButton';
 import ImageDialog from '../../../../components/ImageDialog';
 import ImageUploader from '../../ImageUploader';
 import * as favourController from '../../../../controllers/favour';
@@ -56,7 +56,7 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 	const handleDialogOpen = () => {
 		setDialogOpen(true);
 	};
-	
+
 	const handleDialogClose = () => {
 		setDialogOpen(false);
 	};
@@ -88,10 +88,10 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 							alt="Proof of repayment"
 							height="180"
 							image={favour.proof.repaidImage}
-							onError={(e) => e.target.src = '/ImageFallback.png'}
+							onError={(e) => (e.target.src = '/ImageFallback.png')}
 						/>
 					</CardActionArea>
-					<ImageDialog 
+					<ImageDialog
 						image={favour.proof.repaidImage}
 						alt="Proof of favour repayment"
 						dialogOpen={dialogOpen}
@@ -105,7 +105,7 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 						subheader="Upload an image as proof to repay this favour."
 					/>
 					<form onSubmit={handleSubmit}>
-						<Grid 
+						<Grid
 							container
 							item
 							direction="column"
@@ -118,7 +118,8 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 								disabled={!proofRequired(false)}
 							/>
 						</Grid>
-						<FullWidthButton
+						<Button
+							fullWidth
 							className={classes.repayButton}
 							variant="contained"
 							color="primary"
@@ -126,7 +127,7 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 							disabled={proofRequired()}
 						>
 							Repay
-						</FullWidthButton>
+						</Button>
 					</form>
 				</Grid>
 			)}

@@ -3,11 +3,11 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import CreateFavourForm from './CreateFavourForm';
 import FavoursList from './FavoursList';
 import Favour from './Favour';
-import PageContainer from '../../components/PageContainer';
+import { Container } from '@material-ui/core';
 
 const Favours = () => {
 	return (
-		<PageContainer>
+		<Container maxWidth="xs" disableGutters>
 			<Switch>
 				<Route path="/favours/create" component={CreateFavourForm} />
 				<Route path="/favours/view/all" component={FavoursList} />
@@ -19,7 +19,7 @@ const Favours = () => {
 				/>
 				<Redirect from="/favours" to="/favours/view/all" />
 			</Switch>
-		</PageContainer>
+		</Container>
 	);
 };
 

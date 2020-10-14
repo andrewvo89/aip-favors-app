@@ -6,7 +6,7 @@ import {
 	ListItemIcon,
 	Collapse
 } from '@material-ui/core';
-import { StyledListContainer } from './styled-components';
+import { StyledContainer, StyledListItem } from './styled-components';
 import {
 	ExpandLess,
 	ExpandMore,
@@ -34,9 +34,9 @@ const SideDrawerItems = (props) => {
 	};
 
 	return (
-		<StyledListContainer>
+		<StyledContainer disableGutters maxWidth="md">
 			<List>
-				<ListItem
+				<StyledListItem
 					button
 					onClick={itemClickHandler}
 					component={Link}
@@ -46,7 +46,7 @@ const SideDrawerItems = (props) => {
 						<IconList />
 					</ListItemIcon>
 					<ListItemText primary="View Leaderboard" />
-				</ListItem>
+				</StyledListItem>
 				<ListItem
 					button
 					onClick={() =>
@@ -60,7 +60,7 @@ const SideDrawerItems = (props) => {
 					{<IconExpandFavourGroup />}
 				</ListItem>
 				<Collapse in={expandFavoursGroup} timeout="auto">
-					<ListItem
+					<StyledListItem
 						button
 						onClick={itemClickHandler}
 						component={Link}
@@ -70,8 +70,8 @@ const SideDrawerItems = (props) => {
 							<IconAdd />
 						</ListItemIcon>
 						<ListItemText primary="Create Favour" />
-					</ListItem>
-					<ListItem
+					</StyledListItem>
+					<StyledListItem
 						button
 						onClick={itemClickHandler}
 						component={Link}
@@ -81,9 +81,9 @@ const SideDrawerItems = (props) => {
 							<IconList />
 						</ListItemIcon>
 						<ListItemText primary="View Favours" />
-					</ListItem>
+					</StyledListItem>
 				</Collapse>
-				<ListItem
+				<StyledListItem
 					button
 					onClick={() =>
 						expandClickHandler({
@@ -94,9 +94,9 @@ const SideDrawerItems = (props) => {
 				>
 					<ListItemText primary="Public Requests" />
 					{<IconExpandSecondGroup />}
-				</ListItem>
+				</StyledListItem>
 				<Collapse in={expandRequestsGroup} timeout="auto" unmountOnExit>
-					<ListItem
+					<StyledListItem
 						button
 						onClick={itemClickHandler}
 						component={Link}
@@ -106,8 +106,8 @@ const SideDrawerItems = (props) => {
 							<IconAdd />
 						</ListItemIcon>
 						<ListItemText primary="Create Request" />
-					</ListItem>
-					<ListItem
+					</StyledListItem>
+					<StyledListItem
 						button
 						onClick={itemClickHandler}
 						component={Link}
@@ -117,10 +117,10 @@ const SideDrawerItems = (props) => {
 							<IconList />
 						</ListItemIcon>
 						<ListItemText primary="View Requests" />
-					</ListItem>
+					</StyledListItem>
 				</Collapse>
 			</List>
-		</StyledListContainer>
+		</StyledContainer>
 	);
 };
 

@@ -21,6 +21,8 @@ const Avatar = (props) => {
 	let avatarUrl;
 	if (user.profilePicture) {
 		avatarUrl = `${REST_URL}/${user.profilePicture.split('\\').join('/')}`;
+	} else {
+		avatarUrl = `https://avatars.dicebear.com/api/avataaars/${user.firstName.toLowerCase()}.svg`;
 	}
 
 	return (

@@ -4,7 +4,8 @@ import {
 	CircularProgress,
 	TextField,
 	CardActions,
-	CardContent
+	CardContent,
+	Button
 } from '@material-ui/core';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -14,7 +15,6 @@ import * as messsageActions from '../../../controllers/message';
 import ChangePassword from './ChangePassword';
 import { SNACKBAR } from '../../../utils/constants';
 import AccountAvatar from '../AccountAvatar';
-import FullWidthButton from '../../../components/FullWidthButton';
 import CardHeader from '../../../components/CardHeader';
 import Link from '../../../components/Link';
 
@@ -149,14 +149,15 @@ const ProfileForm = () => {
 								</Link>
 							</Grid>
 							<Grid item>
-								<FullWidthButton
+								<Button
+									fullWidth
 									variant="contained"
 									color="primary"
 									type="submit"
 									disabled={!formik.isValid}
 								>
 									Update
-								</FullWidthButton>
+								</Button>
 							</Grid>
 						</Grid>
 					)}

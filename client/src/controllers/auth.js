@@ -14,6 +14,9 @@ import User from '../models/user';
 import ErrorMessage from '../models/error-message';
 import Message from '../models/message';
 import { get503Error } from '../utils/error-handler';
+import openSocket from 'socket.io-client';
+const { REACT_APP_REST_URL: REST_URL } = process.env;
+const socket = openSocket(REST_URL);
 
 export const verifyAuth = () => {
 	return async (dispatch, _getState) => {
@@ -139,6 +142,7 @@ export const logout = () => {
 	return async (dispatch, getState) => {
 		try {
 			const { authUser } = getState().authState;
+			socket.removeAllListeners();
 			await authUser.logout();
 		} catch (error) {
 			let errorMessage;

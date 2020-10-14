@@ -76,6 +76,7 @@ export const unsubscribeToNotifications = () => {
 				notifications: []
 			});
 		} catch (error) {
+			console.log(error);
 			const errorMessage = getErrorMessage(error);
 			dispatch({
 				type: SET_ERROR,

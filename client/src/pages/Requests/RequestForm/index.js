@@ -1,4 +1,5 @@
 import {
+	Button,
 	Card,
 	CardActions,
 	CardContent,
@@ -12,7 +13,6 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
 import * as requestController from '../../../controllers/request';
-import FullWidthButton from '../../../components/FullWidthButton';
 import CardHeader from '../../../components/CardHeader';
 import { useHistory } from 'react-router-dom';
 
@@ -113,14 +113,15 @@ const RequestForm = (props) => {
 						</Grid>
 					</CardContent>
 					<CardActions>
-						<FullWidthButton
+						<Button
 							type="submit"
 							variant="contained"
 							color="primary"
+							fullWidth
 							disabled={!formik.isValid || loading}
 						>
 							Submit
-						</FullWidthButton>
+						</Button>
 					</CardActions>
 				</form>
 			</Card>

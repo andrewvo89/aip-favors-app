@@ -4,34 +4,32 @@ import {
 	IconButton,
 	Button,
 	Grid,
-	Toolbar,
-	Typography
+	withTheme,
+	useMediaQuery
 } from '@material-ui/core';
-import { Menu as MenuIcon } from '@material-ui/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import NavbarAvatar from './NavbarAvatar';
 import { useHistory } from 'react-router-dom';
 import * as authController from '../../controllers/auth';
 import NotificationsIconButton from './NotificationsIconButton';
-import { withTheme } from '@material-ui/core/styles';
+import {
+	StyledAppTitle,
+	StyledMenuIcon,
+	StyledToolbar
+} from './styled-components';
 
 const Navbar = withTheme((props) => {
+	const mobile = useMediaQuery('(max-width:760px)');
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const { authUser, touched } = useSelector((state) => state.authState);
-
 	const loginClickHandler = () => {
 		dispatch(authController.showLoginDialog());
 	};
 
 	return (
 		<AppBar position="sticky">
-			<Toolbar
-				style={{
-					padding: `${props.theme.spacing(1)}px ${props.theme.spacing(10)}px`,
-					minHeight: `${props.theme.spacing(10)}px`
-				}}
-			>
+			<StyledToolbar>
 				<Grid
 					container
 					direction="row"
@@ -45,29 +43,24 @@ const Navbar = withTheme((props) => {
 						direction="row"
 						alignItems="center"
 						justify="flex-start"
-						spacing={2}
+						spacing={mobile ? 1 : 2}
 					>
 						{authUser && (
-							<Grid item>
-								<IconButton
-									edge="start"
-									color="inherit"
-									onClick={() => props.setDrawerOpen(true)}
-								>
-									<MenuIcon
-										style={{ fontSize: `${props.theme.spacing(5)}px` }}
-									/>
-								</IconButton>
-							</Grid>
+							<IconButton
+								edge="start"
+								color="inherit"
+								onClick={() => props.setDrawerOpen(true)}
+							>
+								<StyledMenuIcon />
+							</IconButton>
 						)}
 						<Grid item>
-							<Typography
-								style={{ cursor: 'pointer' }}
-								variant="h5"
+							<StyledAppTitle
+								variant={mobile ? 'h6' : 'h5'}
 								onClick={() => history.push('/')}
 							>
 								Favours App
-							</Typography>
+							</StyledAppTitle>
 						</Grid>
 					</Grid>
 					<Grid
@@ -76,7 +69,7 @@ const Navbar = withTheme((props) => {
 						direction="row"
 						alignItems="center"
 						justify="flex-end"
-						spacing={2}
+						spacing={mobile ? 1 : 2}
 					>
 						{authUser && (
 							<Fragment>
@@ -99,7 +92,7 @@ const Navbar = withTheme((props) => {
 						)}
 					</Grid>
 				</Grid>
-			</Toolbar>
+			</StyledToolbar>
 		</AppBar>
 	);
 });

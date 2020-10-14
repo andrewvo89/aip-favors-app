@@ -20,6 +20,18 @@ const ThemeProvider = (props) => {
 			type: type,
 			primary: type === LIGHT ? colors.primary : colors.primaryDarkMode,
 			secondary: type === LIGHT ? colors.secondary : colors.secondaryDarkMode
+		},
+		overrides: {
+			MuiPaper: {
+				rounded: {
+					borderRadius: '8px'
+				}
+			},
+			MuiButton: {
+				root: {
+					borderRadius: '32px'
+				}
+			}
 		}
 	});
 

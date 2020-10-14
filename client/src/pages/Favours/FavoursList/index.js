@@ -12,17 +12,16 @@ import {
 	ButtonGroup,
 	Chip,
 	Typography,
-	makeStyles
+	makeStyles,
+	Card
 } from '@material-ui/core';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
 import DoneIcon from '@material-ui/icons/Done';
 import { Pagination, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import Avatar from '../../../components/Avatar';
-import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
 import * as favourController from '../../../controllers/favour';
-import FullWidthButton from '../../../components/FullWidthButton';
 
 const useStyles = makeStyles({
 	buttonGroup: {
@@ -91,7 +90,7 @@ const FavourList = () => {
 			day: 'numeric',
 			month: 'short',
 			hour: 'numeric',
-			minute: 'numeric',
+			minute: 'numeric'
 		};
 
 		return new Date(date).toLocaleString('default', dateOptions);
@@ -114,11 +113,11 @@ const FavourList = () => {
 				case 'all':
 					return true;
 				case 'from':
-					return (fromId === authUserId) ? true : false;
+					return fromId === authUserId ? true : false;
 				case 'for':
-					return (forId === authUserId) ? true : false;
+					return forId === authUserId ? true : false;
 				case 'repaid':
-					return (favour.repaid) ? true : false;
+					return favour.repaid ? true : false;
 				default:
 					return true;
 			}
@@ -140,17 +139,18 @@ const FavourList = () => {
 	const count = Math.ceil(filteredFavours().length / MAX_PER_PAGE);
 
 	return (
-		<Card width="450px">
+		<Card>
 			<CardHeader title="Favours" subheader="All your favours" />
 			<CardContent>
-				<FullWidthButton 
-					variant="contained" 
+				<Button
+					fullWidth
+					variant="contained"
 					color="primary"
 					component={Link}
 					to="/favours/create"
 				>
 					New Favour
-				</FullWidthButton>
+				</Button>
 				{loading ? (
 					<CircularProgress />
 				) : (
@@ -165,10 +165,18 @@ const FavourList = () => {
 								exclusive
 								fullWidth
 							>
-								<Button component={ToggleButton} value='all'>All</Button>
-								<Button component={ToggleButton} value='from'>From you</Button>
-								<Button component={ToggleButton} value='for'>For you</Button>
-								<Button component={ToggleButton} value='repaid'>Repaid</Button>
+								<Button component={ToggleButton} value="all">
+									All
+								</Button>
+								<Button component={ToggleButton} value="from">
+									From you
+								</Button>
+								<Button component={ToggleButton} value="for">
+									For you
+								</Button>
+								<Button component={ToggleButton} value="repaid">
+									Repaid
+								</Button>
 							</ButtonGroup>
 						</Grid>
 						<List>
@@ -183,11 +191,13 @@ const FavourList = () => {
 										disableGutters
 									>
 										<ListItemAvatar>
-											<Avatar user={
-												favour.fromUser.userId === authUserId
-													? favour.forUser
-													: favour.fromUser
-											} />
+											<Avatar
+												user={
+													favour.fromUser.userId === authUserId
+														? favour.forUser
+														: favour.fromUser
+												}
+											/>
 										</ListItemAvatar>
 										<Grid container>
 											<Grid
@@ -228,9 +238,7 @@ const FavourList = () => {
 											</Grid>
 											<Grid container className={classes.subInfo}>
 												<AccessTimeIcon fontSize="small" />
-												<span>
-													{formattedDate(favour.createdAt)}
-												</span>
+												<span>{formattedDate(favour.createdAt)}</span>
 												{favour.repaid && (
 													<Grid container item xs justify="flex-end">
 														<Chip
@@ -250,7 +258,7 @@ const FavourList = () => {
 								);
 							})}
 							<Grid container item justify="center">
-								{(filteredFavours().length === 0) ? (
+								{filteredFavours().length === 0 ? (
 									<Typography variant="subtitle1" align="center">
 										There&apos;s nothing here.
 									</Typography>

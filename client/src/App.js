@@ -31,11 +31,6 @@ const App = withRouter((props) => {
 		if (notifications) {
 			dispatch(notificationController.subscribeToNotifications());
 		}
-		return () => {
-			if (notifications) {
-				dispatch(notificationController.unsubscribeToNotifications());
-			}
-		};
 	}, [notifications, dispatch]);
 
 	let children = <CircularProgress />;
@@ -77,7 +72,7 @@ const App = withRouter((props) => {
 		}
 	}
 
-	return <AppContainer>{children}</AppContainer>;
+	return <AppContainer authUser={authUser}>{children}</AppContainer>;
 });
 
 export default App;

@@ -7,7 +7,8 @@ import {
 	Grid,
 	CardContent,
 	Typography,
-	makeStyles
+	makeStyles,
+	Card
 } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { Autocomplete } from '@material-ui/lab';
@@ -18,8 +19,6 @@ import { Link, useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 import * as favourController from '../../../controllers/favour';
 import * as userController from '../../../controllers/user';
-import FullWidthButton from '../../../components/FullWidthButton';
-import Card from '../../../components/Card';
 import CardHeader from '../../../components/CardHeader';
 import UserSearchSelect from './UserSearchSelect';
 import ImageUploader from '../ImageUploader';
@@ -164,110 +163,121 @@ const CreateFavourForm = () => {
 	});
 
 	return (
-		<Grid>
-			<Button
-				className={classes.backButton}
-				color="primary"
-				component={Link}
-				to="/favours/view/all"
-			>
-				<ArrowBackIcon />
-				<Typography>Favours list</Typography>
-			</Button>
-			<Card>
-				<form onSubmit={formik.handleSubmit}>
-					<CardHeader
-						title="Create a Favour"
-						subheader="Provided a favour to someone or vice versa? Note it here."
-					/>
-					<CardContent>
-						<Grid container direction="column" spacing={1} alignItems="stretch">
-							<Grid item>
-								<UserSearchSelect
-									id="from-name-input"
-									label="From"
-									userList={filteredList(formik.values.forUser)}
-									onChange={(newValue) =>
-										formik.setFieldValue('fromUser', newValue)
-									}
-									error={!!formik.touched.from && !!formik.errors.from}
-									autoFocus={true}
-									defaultValue={initialValues.fromUser}
-								/>
-							</Grid>
-							<Grid item>
-								<UserSearchSelect
-									id="for-name-input"
-									label="For"
-									userList={filteredList(formik.values.fromUser)}
-									onChange={(newValue) =>
-										formik.setFieldValue('forUser', newValue)
-									}
-									error={!!formik.touched.for && !!formik.errors.for}
-								/>
-							</Grid>
-							<Grid item>
-								<Autocomplete
-									id="act-input"
-									options={actList}
-									onChange={(e, newValue) =>
-										formik.setFieldValue('act', newValue)
-									}
-									getOptionLabel={(option) => option}
-									autoHighlight
-									autoSelect
-									renderInput={(params) => (
-										<TextField
-											{...params}
-											label="Act"
-											error={!!formik.touched.act && !!formik.errors.act}
-											InputProps={{
-												...params.InputProps
-											}}
-										/>
-									)}
-								/>
-							</Grid>
+		<Grid container direction="column" spacing={1}>
+			<Grid item>
+				<Button
+					className={classes.backButton}
+					color="primary"
+					component={Link}
+					to="/favours/view/all"
+				>
+					<ArrowBackIcon />
+					<Typography>Favours list</Typography>
+				</Button>
+			</Grid>
+			<Grid item>
+				{' '}
+				<Card>
+					<form onSubmit={formik.handleSubmit}>
+						<CardHeader
+							title="Create a Favour"
+							subheader="Provided a favour to someone or vice versa? Note it here."
+						/>
+						<CardContent>
 							<Grid
 								container
-								item
 								direction="column"
-								justify="center"
-								alignItems="center"
+								spacing={1}
+								alignItems="stretch"
 							>
-								<ImageUploader
-									imageUrl={imageUrl}
-									handleSetImage={handleSetImage}
-									disabled={!proofRequired(false)}
-								/>
+								<Grid item>
+									<UserSearchSelect
+										id="from-name-input"
+										label="From"
+										userList={filteredList(formik.values.forUser)}
+										onChange={(newValue) =>
+											formik.setFieldValue('fromUser', newValue)
+										}
+										error={!!formik.touched.from && !!formik.errors.from}
+										autoFocus={true}
+										defaultValue={initialValues.fromUser}
+									/>
+								</Grid>
+								<Grid item>
+									<UserSearchSelect
+										id="for-name-input"
+										label="For"
+										userList={filteredList(formik.values.fromUser)}
+										onChange={(newValue) =>
+											formik.setFieldValue('forUser', newValue)
+										}
+										error={!!formik.touched.for && !!formik.errors.for}
+									/>
+								</Grid>
+								<Grid item>
+									<Autocomplete
+										id="act-input"
+										options={actList}
+										onChange={(e, newValue) =>
+											formik.setFieldValue('act', newValue)
+										}
+										getOptionLabel={(option) => option}
+										autoHighlight
+										autoSelect
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												label="Act"
+												error={!!formik.touched.act && !!formik.errors.act}
+												InputProps={{
+													...params.InputProps
+												}}
+											/>
+										)}
+									/>
+								</Grid>
+								<Grid
+									container
+									item
+									direction="column"
+									justify="center"
+									alignItems="center"
+								>
+									<ImageUploader
+										imageUrl={imageUrl}
+										handleSetImage={handleSetImage}
+										disabled={!proofRequired(false)}
+									/>
+								</Grid>
 							</Grid>
-						</Grid>
-					</CardContent>
-					<CardActions>
-						<Grid
-							container
-							direction="column"
-							alignItems={loading ? 'center' : 'stretch'}
-							spacing={1}
-						>
-							<Grid item>
-								{loading ? (
-									<CircularProgress />
-								) : (
-									<FullWidthButton
-										variant="contained"
-										color="primary"
-										type="submit"
-										disabled={!formik.isValid || proofRequired()}
-									>
-										Create
-									</FullWidthButton>
-								)}
+						</CardContent>
+						<CardActions>
+							<Grid
+								container
+								direction="column"
+								alignItems={loading ? 'center' : 'stretch'}
+								spacing={1}
+							>
+								<Grid item>
+									{loading ? (
+										<CircularProgress />
+									) : (
+										<Button
+											fullWidth
+											variant="contained"
+											color="primary"
+											type="submit"
+											disabled={!formik.isValid || proofRequired()}
+										>
+											Create
+										</Button>
+									)}
+								</Grid>
 							</Grid>
-						</Grid>
-					</CardActions>
-				</form>
-			</Card>
+						</CardActions>
+					</form>
+				</Card>
+			</Grid>
 		</Grid>
 	);
 };

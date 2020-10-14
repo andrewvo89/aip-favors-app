@@ -92,14 +92,15 @@ const ErrorHandler = (props) => {
 };
 
 export const getErrorMessage = (error) => {
+	console.log('here');
 	if (error.message === NETWORK_ERROR) {
 		return get503Error();
 	} else {
 		return new ErrorMessage({
-			status: error.response.status,
-			statusText: error.response.statusText,
-			message: error.response.data.message,
-			feedback: error.response.data.feedback
+			status: error.response?.status,
+			statusText: error.response?.statusText,
+			message: error.response?.data.message,
+			feedback: error.response?.data.feedback
 		});
 	}
 };
