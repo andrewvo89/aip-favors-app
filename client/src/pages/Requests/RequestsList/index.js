@@ -118,7 +118,7 @@ const RequestsList = () => {
 		);
 	}
 
-	const linkClickHandler = () => {
+	const newRequestClickHandler = () => {
 		if (authUser) {
 			history.push('/requests/create');
 		} else {
@@ -142,6 +142,16 @@ const RequestsList = () => {
 						requestRewards={requestRewards}
 						disabled={noRequests}
 					/>
+				</Grid>
+				<Grid item>
+					<Button
+						fullWidth
+						variant="contained"
+						color="primary"
+						onClick={newRequestClickHandler}
+					>
+						Add new request
+					</Button>
 				</Grid>
 				<Grid item>
 					<ButtonGroup
@@ -173,7 +183,7 @@ const RequestsList = () => {
 						<Fragment>
 							<Typography>
 								No public requests.
-								<Link onClick={linkClickHandler}>
+								<Link onClick={newRequestClickHandler}>
 									{' '}
 									Click here to create a new public request.
 								</Link>

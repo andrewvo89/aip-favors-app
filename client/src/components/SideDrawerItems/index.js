@@ -8,22 +8,27 @@ import {
 } from '@material-ui/core';
 import { StyledContainer, StyledListItem } from './styled-components';
 import {
-	ExpandLess,
-	ExpandMore,
+	ExpandLess as ExpandLessIcon,
+	ExpandMore as ExpandMoreIcon,
 	Add as IconAdd,
-	List as IconList
+	FormatListNumbered as FormatListNumberedIcon,
+	LocalCafe as LocalCafeIcon,
+	TransferWithinAStation as TransferWithinAStationIcon
 } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import * as userController from '../../controllers/user';
-
 const SideDrawerItems = (props) => {
 	const dispatch = useDispatch();
 	const { authUser } = useSelector((state) => state.authState);
 	const { expandFavoursGroup, expandRequestsGroup } = authUser.settings;
 
-	const IconExpandFavourGroup = expandFavoursGroup ? ExpandLess : ExpandMore;
-	const IconExpandSecondGroup = expandRequestsGroup ? ExpandLess : ExpandMore;
+	const IconExpandFavourGroup = expandFavoursGroup
+		? ExpandLessIcon
+		: ExpandMoreIcon;
+	const IconExpandRequestGroup = expandRequestsGroup
+		? ExpandLessIcon
+		: ExpandMoreIcon;
 
 	const expandClickHandler = async (settings) => {
 		await dispatch(userController.update({ settings: settings }));
@@ -43,7 +48,7 @@ const SideDrawerItems = (props) => {
 					to="/leaderboard"
 				>
 					<ListItemIcon>
-						<IconList />
+						<FormatListNumberedIcon />
 					</ListItemIcon>
 					<ListItemText primary="View Leaderboard" />
 				</StyledListItem>
@@ -78,7 +83,7 @@ const SideDrawerItems = (props) => {
 						to="/favours/view/all"
 					>
 						<ListItemIcon>
-							<IconList />
+							<LocalCafeIcon />
 						</ListItemIcon>
 						<ListItemText primary="View Favours" />
 					</StyledListItem>
@@ -92,8 +97,8 @@ const SideDrawerItems = (props) => {
 						})
 					}
 				>
-					<ListItemText primary="Public Requests" />
-					{<IconExpandSecondGroup />}
+					<ListItemText primary="Requests" />
+					{<IconExpandRequestGroup />}
 				</StyledListItem>
 				<Collapse in={expandRequestsGroup} timeout="auto" unmountOnExit>
 					<StyledListItem
@@ -114,7 +119,7 @@ const SideDrawerItems = (props) => {
 						to="/requests/view/all"
 					>
 						<ListItemIcon>
-							<IconList />
+							<TransferWithinAStationIcon />
 						</ListItemIcon>
 						<ListItemText primary="View Requests" />
 					</StyledListItem>
