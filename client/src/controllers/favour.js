@@ -5,7 +5,8 @@ import {
 	NETWORK_ERROR,
 	SET_ERROR,
 	SET_MESSAGE,
-	SNACKBAR
+	SNACKBAR,
+	FAVOUR_TYPES
 } from '../utils/constants';
 import { get503Error } from '../utils/error-handler';
 
@@ -122,6 +123,33 @@ export const uploadImage = (file) => {
 		} catch (error) {
 			dispatchError(error, dispatch);
 			return false;
+		}
+	};
+};
+
+export const getFavorsTypes = () => {
+	return async (dispatch, getState) => {
+		try {
+			const result = await axios.put('/favours/getfavourtype', null, config);
+			console.log(result);
+			dispatch({
+				type: FAVOUR_TYPES,
+				favours: result.favortypesname
+			});
+			return result;
+		} catch (error) {
+			dispatch({
+				type: SET_ERROR,
+				error:
+					error.message === NETWORK_ERROR
+						? get503Error()
+						: new ErrorMessage(
+								error.response.status,
+								error.response.statusText,
+								error.response.data.message,
+								error.response.data.feedback
+						  )
+			});
 		}
 	};
 };

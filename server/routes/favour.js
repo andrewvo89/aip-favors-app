@@ -5,15 +5,12 @@ const verifyAuth = require('../middleware/verify-auth');
 const favourController = require('../controllers/favour');
 const favourValidator = require('../validators/favour');
 const uploaders = require('../utils/uploaders');
-
+const favourTypeController = require('../controllers/favour');
+// const uploaders = require('../utils/uploaders');
 
 router.get('/get-leaderboard', favourController.getLeaderboard);
 
-router.get(
-	'/view/all',
-	verifyAuth,
-	favourController.getAll
-);
+router.get('/view/all', verifyAuth, favourController.getAll);
 
 router.get(
 	'/view/:favourId',
@@ -49,5 +46,6 @@ router.post(
 	uploaders.favourImageUploader,
 	favourController.uploadImage
 );
+router.put('/getfavourtype', favourTypeController.getfavourtype);
 
 module.exports = router;

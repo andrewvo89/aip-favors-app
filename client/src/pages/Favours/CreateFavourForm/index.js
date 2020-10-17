@@ -51,6 +51,8 @@ const CreateFavourForm = () => {
 		fetchUsers();
 	}, [dispatch]);
 
+		fetchUsers();
+	}, [stableDispatch]);
 	const initialValues = {
 		fromUser: authUser,
 		forUser: {},

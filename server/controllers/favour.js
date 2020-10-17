@@ -7,10 +7,12 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
 const User = require('../models/user');
+const FavourTypes = require('../models/favourstypes');
 const _ = require('lodash');
 
 // Catches any errors detected through express-validator middlware
-const catchValidationErrors = req => {
+
+const catchValidationErrors = (req) => {
 	const validationErrors = validationResult(req);
 	if (!validationErrors.isEmpty()) {
 		throw getError(422, validationErrors.errors[0].msg, DIALOG);
@@ -22,20 +24,25 @@ module.exports.getById = async (req, res, next) => {
 		catchValidationErrors(req);
 
 		const { favourId } = req.params;
-		const favourDoc = await Favour
-			.findById(favourId)
-			.populate('fromUser forUser', '_id firstName lastName profilePicture');
+		const favourDoc = await Favour.findById(favourId).populate(
+			'fromUser forUser',
+			'_id firstName lastName profilePicture'
+		);
 
 		if (!favourDoc) {
 			throw getError(404, 'Favour not found', DIALOG);
 		}
-		
+
 		// ensure requesting user is involved in the favour
 		const userId = res.locals.userId;
 		const fromId = favourDoc.fromUser._id.toString();
 		const forId = favourDoc.forUser._id.toString();
 		if (userId !== fromId && userId !== forId) {
-			throw getError(403, 'You are not authorised to view this favour.', DIALOG);
+			throw getError(
+				403,
+				'You are not authorised to view this favour.',
+				DIALOG
+			);
 		}
 
 		res.status(200).send(favourDoc);
@@ -49,8 +56,8 @@ module.exports.getAll = async (req, res, next) => {
 		catchValidationErrors(req);
 
 		const userId = res.locals.userId;
-		const favourDocs = await Favour
-			.find().or([{ fromUser: userId }, { forUser: userId }])
+		const favourDocs = await Favour.find()
+			.or([{ fromUser: userId }, { forUser: userId }])
 			.populate('fromUser forUser', '_id firstName lastName profilePicture')
 			.sort({ repaid: 1, createdAt: 'desc' })
 			.exec();
@@ -91,7 +98,7 @@ module.exports.create = async (req, res, next) => {
 module.exports.repay = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
-		
+
 		const { favourId, repaidImage } = req.body;
 		const favour = await Favour.findById(favourId);
 
@@ -148,7 +155,7 @@ module.exports.getLeaderboard = async (req, res, next) => {
 			dataObj.favourCount = favoursCount;
 			data.push(dataObj);
 		}
-		
+
 		// order by favour count descending and limit to top 15 for leaderboard output
 		data = _.orderBy(data, ['favourCount'], ['desc']);
 		data = data.slice(0, 15);
@@ -196,6 +203,17 @@ module.exports.uploadImage = async (req, res, next) => {
 
 		// return image url
 		res.status(200).json(imagePath);
+	} catch (error) {
+		next(error);
+	}
+};
+module.exports.getfavourtype = async (req, res, next) => {
+	try {
+		const result = await FavourTypes.find();
+		const favortypesname = result.map((item) => {
+			return item.favorname;
+		});
+		res.status(201).send({ favortypesname });
 	} catch (error) {
 		next(error);
 	}
