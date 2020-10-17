@@ -12,17 +12,18 @@ import {
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as requestController from '../../../controllers/request';
 import CardHeader from '../../../components/CardHeader';
 import { useHistory } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import FavourType from '../../../models/favour-type';
 
 const RequestForm = (props) => {
-	const dummyFavourTypes = ['Coffee', 'Chocolate', 'Mint', 'Pizza', 'Cupcake'];
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const [loading, setLoading] = useState(false);
+	const { favourTypes } = useSelector((state) => state.favourTypeState);
 
 	const initialValues = {
 		act: '',
@@ -40,10 +41,16 @@ const RequestForm = (props) => {
 		act: yup.string().label('act').required().max(100),
 		quantity: yup.number().label('quanity').required().min(1).max(10),
 		favourType: yup
-			.string()
-			.label('favourType')
+			.object()
+			.label('Favour')
 			.required()
-			.oneOf(dummyFavourTypes)
+			.test('isValidFavourType', 'Favour Type is not valid', (value) => {
+				const isValidInstance = value instanceof FavourType;
+				const isValidElement = !!favourTypes.find(
+					(favourType) => favourType.favourTypeId === value.favourTypeId
+				);
+				return isValidInstance && isValidElement;
+			})
 	});
 
 	const submitHandler = async (values) => {
@@ -116,9 +123,12 @@ const RequestForm = (props) => {
 												fullWidth={true}
 												disabled={loading}
 											>
-												{dummyFavourTypes.map((favours) => (
-													<MenuItem key={favours} value={favours}>
-														{favours}
+												{favourTypes.map((favourType) => (
+													<MenuItem
+														key={favourType.favourTypeId}
+														value={favourType}
+													>
+														{favourType.name}
 													</MenuItem>
 												))}
 											</TextField>

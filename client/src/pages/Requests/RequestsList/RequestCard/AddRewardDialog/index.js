@@ -8,19 +8,20 @@ import {
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Grid, MenuItem, TextField } from '@material-ui/core';
 import * as requestController from '../../../../../controllers/request';
+import FavourType from '../../../../../models/favour-type';
 
 const AddRewardDialog = (props) => {
-	const dummyFavourTypes = ['Coffee', 'Chocolate', 'Mint', 'Pizza', 'Cupcake'];
+	const { favourTypes } = useSelector((state) => state.favourTypeState);
 	const dispatch = useDispatch();
 	const { open, setOpen } = props;
 	const [loading, setLoading] = useState(false);
 
 	const initialValues = {
 		quantity: 1,
-		favourType: ''
+		favourType: favourTypes[0]
 	};
 
 	const initialErrors = {
@@ -31,16 +32,22 @@ const AddRewardDialog = (props) => {
 	const validationSchema = yup.object().shape({
 		quantity: yup.number().label('quanity').required().min(1).max(10),
 		favourType: yup
-			.string()
-			.label('favourType')
+			.object()
+			.label('Reward')
 			.required()
-			.oneOf(dummyFavourTypes)
+			.test('isValidFavourType', 'Favour Type is not valid', (value) => {
+				const isValidInstance = value instanceof FavourType;
+				const isValidElement = !!favourTypes.find(
+					(favourType) => favourType.favourTypeId === value.favourTypeId
+				);
+				return isValidInstance && isValidElement;
+			})
 	});
 
 	const closeHandler = () => {
 		if (!loading) {
-			formik.setValues(initialValues, true);
 			setOpen(false);
+			formik.setValues(initialValues, true);
 		}
 	};
 
@@ -91,9 +98,9 @@ const AddRewardDialog = (props) => {
 								fullWidth={true}
 								disabled={loading}
 							>
-								{dummyFavourTypes.map((favours) => (
-									<MenuItem key={favours} value={favours}>
-										{favours}
+								{favourTypes.map((favourType) => (
+									<MenuItem key={favourType.favourTypeId} value={favourType}>
+										{favourType.name}
 									</MenuItem>
 								))}
 							</TextField>

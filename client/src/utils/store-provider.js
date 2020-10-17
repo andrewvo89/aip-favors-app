@@ -7,13 +7,15 @@ import authReducer from '../store/auth';
 import errorReducer from '../store/error';
 import messageReducer from '../store/message';
 import notificationReducer from '../store/notification';
+import favourTypeReducer from '../store/favour-type';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 const rootReducer = combineReducers({
 	authState: authReducer,
 	errorState: errorReducer,
 	messageState: messageReducer,
-	notificationState: notificationReducer
+	notificationState: notificationReducer,
+	favourTypeState: favourTypeReducer
 });
 
 const store = createStore(

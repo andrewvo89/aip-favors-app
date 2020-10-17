@@ -16,6 +16,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const storageRoutes = require('./routes/storage');
 const favourRoutes = require('./routes/favour');
+const favourTypeRoutes = require('./routes/favour-type');
 const requestRoutes = require('./routes/request');
 const notificationRoutes = require('./routes/notification');
 
@@ -33,6 +34,7 @@ app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/storage', storageRoutes);
 app.use('/favours', favourRoutes);
+app.use('/favour-types', favourTypeRoutes);
 app.use('/request', requestRoutes);
 app.use('/notification', notificationRoutes);
 //catch all errors that get passed via next()

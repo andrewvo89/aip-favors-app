@@ -6,6 +6,7 @@ import AppContainer from './components/AppContainer';
 import { useSelector, useDispatch } from 'react-redux';
 import * as authController from './controllers/auth';
 import * as notificationController from './controllers/notification';
+import * as favourTypeController from './controllers/favour-type';
 import Requests from './pages/Requests';
 import Account from './pages/Account';
 import Settings from './pages/Settings';
@@ -27,7 +28,13 @@ const App = withRouter((props) => {
 		verifyAuth();
 	}, [dispatch]);
 
-	//Get notifications when user is logged in
+	useEffect(() => {
+		if (authUser) {
+			dispatch(favourTypeController.getFavourTypes());
+		}
+	}, [authUser, dispatch]);
+
+	//Get notifications when authUser.settings.notifications changes
 	useEffect(() => {
 		if (notifications) {
 			dispatch(notificationController.subscribeToNotifications());

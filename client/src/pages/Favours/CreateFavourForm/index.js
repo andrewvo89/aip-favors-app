@@ -12,7 +12,6 @@ import {
 } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { Autocomplete } from '@material-ui/lab';
-import { actList } from '../../../utils/actList';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
@@ -22,6 +21,7 @@ import * as userController from '../../../controllers/user';
 import CardHeader from '../../../components/CardHeader';
 import UserSearchSelect from './UserSearchSelect';
 import ImageUploader from '../ImageUploader';
+import FavourType from '../../../models/favour-type';
 
 const useStyles = makeStyles({
 	backButton: {
@@ -35,6 +35,7 @@ const CreateFavourForm = () => {
 	const dispatch = useDispatch();
 	const history = useHistory();
 	const authUser = useSelector((state) => state.authState.authUser);
+	const { favourTypes } = useSelector((state) => state.favourTypeState);
 
 	const [loading, setLoading] = useState(false);
 	const [userList, setUserList] = useState([]);
@@ -51,12 +52,10 @@ const CreateFavourForm = () => {
 		fetchUsers();
 	}, [dispatch]);
 
-		fetchUsers();
-	}, [stableDispatch]);
 	const initialValues = {
 		fromUser: authUser,
 		forUser: {},
-		act: '',
+		favour: null,
 		proof: {
 			actImage: ''
 		}
@@ -65,7 +64,7 @@ const CreateFavourForm = () => {
 	const initialErrors = {
 		fromUser: true,
 		forUser: true,
-		act: true,
+		favour: true,
 		proof: {
 			actImage: true
 		}
@@ -84,11 +83,17 @@ const CreateFavourForm = () => {
 			lastName: yup.string().label('fromUser.lastName').required().max(50),
 			profilePicture: yup.string().label('fromUser.profilePicture')
 		}),
-		act: yup
-			.string()
-			.label('Act')
+		favour: yup
+			.object()
+			.label('Favour')
 			.required()
-			.oneOf(actList, 'Invalid act selection.')
+			.test('isValidFavourType', 'Favour Type is not valid', (value) => {
+				const isValidInstance = value instanceof FavourType;
+				const isValidElement = !!favourTypes.find(
+					(favourType) => favourType.favourTypeId === value.favourTypeId
+				);
+				return isValidInstance && isValidElement;
+			})
 	});
 
 	const submitHandler = async (values) => {
@@ -218,19 +223,21 @@ const CreateFavourForm = () => {
 								</Grid>
 								<Grid item>
 									<Autocomplete
-										id="act-input"
-										options={actList}
+										id="favour-input"
+										options={favourTypes}
 										onChange={(e, newValue) =>
-											formik.setFieldValue('act', newValue)
+											formik.setFieldValue('favour', newValue)
 										}
-										getOptionLabel={(option) => option}
+										getOptionLabel={(option) => option.name}
 										autoHighlight
 										autoSelect
 										renderInput={(params) => (
 											<TextField
 												{...params}
-												label="Act"
-												error={!!formik.touched.act && !!formik.errors.act}
+												label="Favour"
+												error={
+													!!formik.touched.favour && !!formik.errors.favour
+												}
 												InputProps={{
 													...params.InputProps
 												}}

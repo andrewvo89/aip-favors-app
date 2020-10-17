@@ -7,7 +7,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
 const User = require('../models/user');
-const FavourTypes = require('../models/favourstypes');
+const FavourTypes = require('../models/favour-type');
 const _ = require('lodash');
 
 // Catches any errors detected through express-validator middlware
