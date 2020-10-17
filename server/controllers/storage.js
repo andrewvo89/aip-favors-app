@@ -7,13 +7,6 @@ const rootPath = require('../utils/root-path');
 module.exports.getProfilePicture = (req, res, next) => {
 	try {
 		const imagePath = path.join(rootPath, req.originalUrl);
-		if (res.locals.userId !== req.params.userId) {
-			throw getError(
-				404,
-				'Access denied, login credentials are invalid',
-				DIALOG
-			);
-		}
 		if (!fs.existsSync(imagePath)) {
 			throw getError(404, 'Access denied, file does not exist', DIALOG);
 		}
