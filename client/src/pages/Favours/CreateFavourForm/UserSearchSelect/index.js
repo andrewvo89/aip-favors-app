@@ -8,6 +8,7 @@ const UserSearchSelect = (props) => {
 		id,
 		label,
 		userList,
+		value,
 		onChange,
 		error,
 		autoFocus = false,
@@ -26,6 +27,7 @@ const UserSearchSelect = (props) => {
 			getOptionSelected={(option, value) => option.userId === value.userId}
 			getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
 			options={userList}
+			value={value}
 			onChange={(e, newVal) => onChange(newVal)}
 			autoHighlight
 			autoSelect
@@ -40,7 +42,9 @@ const UserSearchSelect = (props) => {
 						...params.InputProps,
 						endAdornment: (
 							<React.Fragment>
-								{loading ? <CircularProgress color="inherit" size={20} /> : null}
+								{loading ? (
+									<CircularProgress color="inherit" size={20} />
+								) : null}
 								{params.InputProps.endAdornment}
 							</React.Fragment>
 						)

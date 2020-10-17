@@ -7,7 +7,14 @@ module.exports.getById = [
 module.exports.create = [
 	body('fromUser').not().isEmpty().withMessage('fromUser is invalid'),
 	body('forUser').not().isEmpty().withMessage('forUser is invalid'),
-	body('act').trim().not().isEmpty().withMessage('Act is invalid')
+	body('favourType')
+		.trim()
+		.not()
+		.isEmpty()
+		.withMessage('favourType is invalid'),
+	body('quantity')
+		.isInt({ min: 1, max: 10 })
+		.withMessage('Quantity favour type is invalid')
 ];
 
 module.exports.repay = [

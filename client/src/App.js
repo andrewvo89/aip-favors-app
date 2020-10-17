@@ -18,21 +18,17 @@ const App = withRouter((props) => {
 	const dispatch = useDispatch();
 	const [authLoading, setAuthLoading] = useState(true);
 	const { authUser } = useSelector((state) => state.authState);
+	const { favourTypes } = useSelector((state) => state.favourTypeState);
 	const notifications = authUser?.settings?.notifications;
 	//Check authentication as first action upon loading
 	useEffect(() => {
 		const verifyAuth = async () => {
 			await dispatch(authController.verifyAuth());
+			dispatch(favourTypeController.getFavourTypes());
 			setAuthLoading(false);
 		};
 		verifyAuth();
 	}, [dispatch]);
-
-	useEffect(() => {
-		if (authUser) {
-			dispatch(favourTypeController.getFavourTypes());
-		}
-	}, [authUser, dispatch]);
 
 	//Get notifications when authUser.settings.notifications changes
 	useEffect(() => {
@@ -47,7 +43,7 @@ const App = withRouter((props) => {
 		</Grid>
 	);
 
-	if (!authLoading) {
+	if (!authLoading && !!favourTypes) {
 		children = (
 			<Switch>
 				<Route path="/" exact>
@@ -57,7 +53,7 @@ const App = withRouter((props) => {
 			</Switch>
 		);
 
-		if (authUser) {
+		if (authUser && !!favourTypes) {
 			children = (
 				<Switch>
 					<Route path="/" exact>

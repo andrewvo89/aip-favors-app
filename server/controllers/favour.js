@@ -24,10 +24,9 @@ module.exports.getById = async (req, res, next) => {
 		catchValidationErrors(req);
 
 		const { favourId } = req.params;
-		const favourDoc = await Favour.findById(favourId).populate(
-			'fromUser forUser',
-			'_id firstName lastName profilePicture'
-		);
+		const favourDoc = await Favour.findById(favourId)
+			.populate('fromUser forUser', '_id firstName lastName profilePicture')
+			.populate('favourType');
 
 		if (!favourDoc) {
 			throw getError(404, 'Favour not found', DIALOG);
@@ -54,14 +53,13 @@ module.exports.getById = async (req, res, next) => {
 module.exports.getAll = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
-
 		const userId = res.locals.userId;
 		const favourDocs = await Favour.find()
 			.or([{ fromUser: userId }, { forUser: userId }])
 			.populate('fromUser forUser', '_id firstName lastName profilePicture')
+			.populate('favourType')
 			.sort({ repaid: 1, createdAt: 'desc' })
 			.exec();
-
 		res.status(200).send(favourDocs);
 	} catch (error) {
 		next(error);
@@ -71,22 +69,21 @@ module.exports.getAll = async (req, res, next) => {
 module.exports.create = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
-
-		const { fromUser, forUser, act, proof } = req.body;
+		const { fromUser, forUser, proof, favourType, quantity } = req.body;
 		const favour = new Favour({
 			fromUser: fromUser,
 			forUser: forUser,
-			act: act,
 			proof: {
 				actImage: proof.actImage
-			}
+			},
+			favourType: favourType,
+			quantity: quantity
 		});
-
 		const favourDoc = await favour.save();
-
 		// populate favour with user data and add to response
 		await favourDoc
 			.populate('fromUser forUser', '_id firstName lastName profilePicture')
+			.populate('favourType')
 			.execPopulate();
 
 		res.status(201).send(favourDoc);
@@ -109,6 +106,7 @@ module.exports.repay = async (req, res, next) => {
 
 		await favourDoc
 			.populate('fromUser forUser', '_id firstName lastName profilePicture')
+			.populate('favourType')
 			.execPopulate();
 
 		res.status(200).send(favourDoc);
@@ -203,17 +201,6 @@ module.exports.uploadImage = async (req, res, next) => {
 
 		// return image url
 		res.status(200).json(imagePath);
-	} catch (error) {
-		next(error);
-	}
-};
-module.exports.getfavourtype = async (req, res, next) => {
-	try {
-		const result = await FavourTypes.find();
-		const favortypesname = result.map((item) => {
-			return item.favorname;
-		});
-		res.status(201).send({ favortypesname });
 	} catch (error) {
 		next(error);
 	}

@@ -13,10 +13,16 @@ const favourSchema = new Schema(
 			ref: 'User',
 			required: true
 		},
-		act: {
-			type: String,
+		favourType: {
+			type: Schema.Types.ObjectId,
+			ref: 'FavourType',
+			required: true
+		},
+		quantity: {
+			type: Number,
 			required: true,
-			maxlength: 50
+			min: 1,
+			max: 100
 		},
 		repaid: {
 			type: Boolean,

@@ -61,18 +61,18 @@ function ImageUploader({ imageUrl, handleSetImage, disabled }) {
 		<Fragment>
 			<input
 				accept="image/*"
-				id="act-image-file"
+				id="favour-image-file"
 				type="file"
 				hidden
 				ref={fileInputRef}
 				onChange={handleFileSelected}
 				disabled={disabled}
 			/>
-			<label htmlFor="act-image-file">
-				<Button 
+			<label htmlFor="favour-image-file">
+				<Button
 					className={classes.uploadButton}
-					variant="contained" 
-					color="primary" 
+					variant="contained"
+					color="primary"
 					component="span"
 					disabled={disabled}
 				>
@@ -80,9 +80,7 @@ function ImageUploader({ imageUrl, handleSetImage, disabled }) {
 					Upload Proof
 				</Button>
 			</label>
-			{imageUrl && (
-				'Image uploaded.'
-			)}
+			{imageUrl && 'Image uploaded.'}
 		</Fragment>
 	);
 }

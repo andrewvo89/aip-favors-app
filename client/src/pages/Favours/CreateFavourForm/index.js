@@ -8,10 +8,10 @@ import {
 	CardContent,
 	Typography,
 	makeStyles,
-	Card
+	Card,
+	MenuItem
 } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { Autocomplete } from '@material-ui/lab';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
@@ -45,7 +45,6 @@ const CreateFavourForm = () => {
 	useEffect(() => {
 		const fetchUsers = async () => {
 			const users = await dispatch(userController.getUsers());
-
 			setUserList(users);
 		};
 
@@ -55,19 +54,11 @@ const CreateFavourForm = () => {
 	const initialValues = {
 		fromUser: authUser,
 		forUser: {},
-		favour: null,
 		proof: {
 			actImage: ''
-		}
-	};
-
-	const initialErrors = {
-		fromUser: true,
-		forUser: true,
-		favour: true,
-		proof: {
-			actImage: true
-		}
+		},
+		favourType: favourTypes[0],
+		quantity: 1
 	};
 
 	const validationSchema = yup.object().shape({
@@ -83,9 +74,9 @@ const CreateFavourForm = () => {
 			lastName: yup.string().label('fromUser.lastName').required().max(50),
 			profilePicture: yup.string().label('fromUser.profilePicture')
 		}),
-		favour: yup
+		favourType: yup
 			.object()
-			.label('Favour')
+			.label('Favour Type')
 			.required()
 			.test('isValidFavourType', 'Favour Type is not valid', (value) => {
 				const isValidInstance = value instanceof FavourType;
@@ -103,7 +94,8 @@ const CreateFavourForm = () => {
 		values = {
 			...values,
 			fromUser: values.fromUser.userId,
-			forUser: values.forUser.userId
+			forUser: values.forUser.userId,
+			favourType: values.favourType.favourTypeId
 		};
 
 		const favour = await dispatch(favourController.create(values));
@@ -163,11 +155,16 @@ const CreateFavourForm = () => {
 
 	const formik = useFormik({
 		initialValues: initialValues,
-		initialStatus: initialErrors,
-		initialErrors: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
+
+	const { validateForm } = formik;
+
+	useEffect(() => {
+		//formik.validateOnMount() does not work
+		validateForm();
+	}, [validateForm]);
 
 	return (
 		<Grid container direction="column" spacing={1}>
@@ -221,29 +218,39 @@ const CreateFavourForm = () => {
 										error={!!formik.touched.for && !!formik.errors.for}
 									/>
 								</Grid>
-								<Grid item>
-									<Autocomplete
-										id="favour-input"
-										options={favourTypes}
-										onChange={(e, newValue) =>
-											formik.setFieldValue('favour', newValue)
-										}
-										getOptionLabel={(option) => option.name}
-										autoHighlight
-										autoSelect
-										renderInput={(params) => (
-											<TextField
-												{...params}
-												label="Favour"
-												error={
-													!!formik.touched.favour && !!formik.errors.favour
-												}
-												InputProps={{
-													...params.InputProps
-												}}
-											/>
-										)}
-									/>
+								<Grid item container direction="row" spacing={1}>
+									<Grid item xs={4}>
+										<TextField
+											label="Quantity"
+											type="number"
+											inputProps={{
+												min: 1,
+												max: 100
+											}}
+											fullWidth={true}
+											value={formik.values.quantity}
+											onChange={formik.handleChange('quantity')}
+										/>
+									</Grid>
+									<Grid item xs={8}>
+										<TextField
+											label="Favour Type"
+											select={true}
+											value={formik.values.favourType}
+											onChange={formik.handleChange('favourType')}
+											fullWidth={true}
+											disabled={loading}
+										>
+											{favourTypes.map((favourType) => (
+												<MenuItem
+													key={favourType.favourTypeId}
+													value={favourType}
+												>
+													{favourType.name}
+												</MenuItem>
+											))}
+										</TextField>
+									</Grid>
 								</Grid>
 								<Grid
 									container

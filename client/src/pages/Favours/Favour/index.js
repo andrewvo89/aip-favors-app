@@ -34,7 +34,7 @@ const useStyles = makeStyles({
 		marginTop: 8,
 		marginBottom: 0
 	},
-	act: {
+	afavourTypect: {
 		fontWeight: 500
 	}
 });
@@ -53,6 +53,7 @@ const formattedDate = (date) => {
 };
 
 const updatedFavour = (favourData) => {
+	console.log(favourData);
 	const updatedActImage =
 		favourData.proof.actImage === ''
 			? '/ImageFallback.png'
@@ -65,7 +66,8 @@ const updatedFavour = (favourData) => {
 
 	favourData = {
 		...favourData,
-		act: favourData.act.toLowerCase(),
+		favourType: favourData.favourType.toLowerCase(),
+		quantity: favourData.quantity,
 		proof: {
 			actImage: updatedActImage,
 			repaidImage: updatedRepaidImage
@@ -150,8 +152,8 @@ const Favour = () => {
 						<CardActionArea onClick={handleDialogOpen}>
 							<CardMedia
 								component="img"
-								title="Proof of act"
-								alt="Proof of act"
+								title="Proof of favour"
+								alt="Proof of favour"
 								height="180"
 								image={favour.proof.actImage}
 								onError={(e) => (e.target.src = '/ImageFallback.png')}
@@ -159,7 +161,7 @@ const Favour = () => {
 						</CardActionArea>
 						<ImageDialog
 							image={favour.proof.actImage}
-							alt="Proof of favour act"
+							alt="Proof of favour favour"
 							dialogOpen={dialogOpen}
 							handleDialogClose={handleDialogClose}
 						/>
@@ -182,9 +184,11 @@ const Favour = () => {
 						</Grid>
 
 						<Typography variant="body1" align="center" gutterBottom>
-							{`${getName(favour.fromUser)} `}
-							<span className={classes.act}>{favour.act}</span>
-							{` for ${getName(favour.forUser)}`}.
+							{`${getName(favour.fromUser)} owe `}
+							<span
+								className={classes.favourType}
+							>{`${favour.quantity}x ${favour.favourType}`}</span>
+							{` to ${getName(favour.forUser)}`}.
 						</Typography>
 
 						<Divider variant="middle" className={classes.divider} />

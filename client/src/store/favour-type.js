@@ -1,7 +1,7 @@
 import { SET_FAVOUR_TYPES } from '../utils/constants';
 
 const initialState = {
-	favourTypes: []
+	favourTypes: null
 };
 
 export default (state = initialState, action) => {

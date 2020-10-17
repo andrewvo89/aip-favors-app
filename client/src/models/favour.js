@@ -13,12 +13,12 @@ export default class Favour {
 			userId: favour.forUser._id,
 			...favour.forUser
 		};
-		this.act = favour.act;
 		this.repaid = favour.repaid;
 		this.proof = favour.proof;
 		this.createdAt = favour.createdAt;
 		this.updatedAt = favour.updatedAt;
-
+		this.favourType = favour.favourType.name;
+		this.quantity = favour.quantity;
 		// remove unnecessary _id property
 		delete this.fromUser._id;
 		delete this.forUser._id;
@@ -26,7 +26,6 @@ export default class Favour {
 
 	static async create(data) {
 		const result = await axios.post('/favours/create', data, config);
-
 		const favour = new Favour(result.data);
 		return favour;
 	}
@@ -34,23 +33,20 @@ export default class Favour {
 	static async getAllFavours() {
 		const result = await axios.get('/favours/view/all', config);
 
-		const favours = result.data.map(
-			(favour) => new Favour(favour)
-		);
+		const favours = result.data.map((favour) => new Favour(favour));
 
 		return favours;
 	}
 
 	static async getFavour(favourId) {
 		const result = await axios.get(`/favours/view/${favourId}`, config);
-
+		console.log(result);
 		const favour = new Favour(result.data);
 		return favour;
 	}
 
 	static async repay(data) {
 		const result = await axios.patch('/favours/repay', data, config);
-
 		const favour = new Favour(result.data);
 		return favour;
 	}
@@ -61,7 +57,7 @@ export default class Favour {
 		return result.data;
 	}
 
-	static async uploadImage({file, userId}) {
+	static async uploadImage({ file, userId }) {
 		const resizedFile = await new Promise((resolve, reject) => {
 			return new Compressor(file, {
 				width: 400,
