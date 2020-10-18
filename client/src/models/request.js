@@ -62,7 +62,7 @@ export default class Request {
 	}
 
 	async complete(file) {
-		const reizedFile = await new Promise((resolve, reject) => {
+		const resizedFile = await new Promise((resolve, reject) => {
 			return new Compressor(file, {
 				width: 400,
 				success: (result) => {
@@ -78,7 +78,7 @@ export default class Request {
 		});
 		const data = new FormData();
 		data.append('requestId', this.requestId);
-		data.append('file', reizedFile);
+		data.append('file', resizedFile);
 		const result = await axios.patch('/request/complete', data, config);
 		return result;
 	}

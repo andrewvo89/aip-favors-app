@@ -43,7 +43,6 @@ module.exports.requestProofUploader = multer({
 				req.body.requestId,
 				'proof'
 			);
-			fs.rmdirSync(destination, { recursive: true });
 			fs.mkdirSync(destination, { recursive: true });
 			callback(null, destination);
 		},
