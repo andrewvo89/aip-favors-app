@@ -16,7 +16,7 @@ import {
 	TextField,
 	Typography
 } from '@material-ui/core';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import Avatar from '../../../../components/Avatar';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,24 +26,35 @@ import AddRewardDialog from './AddRewardDialog';
 import { Delete as DeleteIcon } from '@material-ui/icons';
 import ConfirmDialog from '../../../../components/ConfirmDialog';
 import CompleteTaskDialog from './CompleteTaskDialog';
+import ImageDialog from '../../../../components/ImageDialog';
 const { REACT_APP_REST_URL: REST_URL } = process.env;
 
 const Request = (props) => {
 	const { authUser } = useSelector((state) => state.authState);
 	const dispatch = useDispatch();
-	const { request } = props;
-	const {
-		act,
-		rewards,
-		createdAt,
-		createdBy,
-		completed,
-		completedBy
-	} = request;
+	const { request, tabs, setActiveTab } = props;
+	const { rewards } = request;
 	const [selectedReward, setSelectedReward] = useState();
 	const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
 	const [addRewardDialogOpen, setAddRewardDialogOpen] = useState(false);
 	const [completeTaskDialogOpen, setCompleteTaskDialogOpen] = useState(false);
+	const [rewardUsers, setRewardUsers] = useState([]);
+	const [imageDialogOpen, setimageDialogOpen] = useState(false);
+	//Get reward users everytime rewards changes
+	useEffect(() => {
+		const newRewardUsers = [];
+		rewards.forEach((reward) => {
+			const userExists = newRewardUsers.find(
+				(user) => user.userId === reward.fromUser.userId
+			);
+			if (!userExists) {
+				//Only add unique users to the list
+				newRewardUsers.push(reward.fromUser);
+			}
+		});
+		newRewardUsers.sort((a, b) => (a.firstName > b.firstName ? 1 : -1));
+		setRewardUsers(newRewardUsers);
+	}, [rewards]);
 
 	const confirmDeleteDialogCloseHandler = () => {
 		setConfirmDeleteDialogOpen(false);
@@ -59,28 +70,19 @@ const Request = (props) => {
 	};
 
 	const deleteRewardClickHandler = async () => {
-		const selectedDeleteReward = { ...selectedReward };
+		const reward = { ...selectedReward };
 		setSelectedReward(null);
 		const result = await dispatch(
-			requestController.deleteReward(request, selectedDeleteReward)
+			requestController.deleteReward(request, reward)
 		);
 		if (result) {
 			confirmDeleteDialogCloseHandler();
 		}
 	};
 
-	const quantityChangeHandler = async (
-		quantity,
-		rewardIndex,
-		favourTypeIndex
-	) => {
+	const quantityChangeHandler = async (reward, quantity) => {
 		await dispatch(
-			requestController.udpateRewardQuantity(
-				request,
-				quantity,
-				rewardIndex,
-				favourTypeIndex
-			)
+			requestController.udpateRewardQuantity(request, reward, quantity)
 		);
 	};
 
@@ -94,11 +96,12 @@ const Request = (props) => {
 
 	const proofClickHandler = () => {
 		if (authUser) {
-			window.open(
-				`${REST_URL}/${request.proof.split('\\').join('/')}`,
-				'_blank',
-				'noreferrer'
-			);
+			setimageDialogOpen(true);
+			// window.open(
+			// 	`${REST_URL}/${request.proof.split('\\').join('/')}`,
+			// 	'_blank',
+			// 	'noreferrer'
+			// );
 		} else {
 			dispatch(authController.showLoginDialog());
 		}
@@ -106,23 +109,17 @@ const Request = (props) => {
 
 	let completeButtonDisabled = false;
 	if (authUser) {
-		completeButtonDisabled = authUser.userId === createdBy.userId;
+		completeButtonDisabled = authUser.userId === request.createdBy.userId;
 	}
 
 	let confirmDeleteDialogComponent = null;
 	if (selectedReward) {
-		const selectedFavourType =
-			request.rewards[selectedReward.rewardIndex].favourTypes[
-				selectedReward.favourTypeIndex
-			];
 		let message = `Are you sure you want to remove ${
-			selectedFavourType.quantity
-		}x ${selectedFavourType.favourType}${
-			selectedFavourType.quantity > 1 ? 's' : ''
-		}.`;
-		const lastReward =
-			request.rewards.length === 1 &&
-			request.rewards[0].favourTypes.length === 1;
+			selectedReward.quantity
+		}x ${selectedReward.favourType.name}${
+			selectedReward.quantity > 1 ? 's' : ''
+		}?`;
+		const lastReward = request.rewards.length === 1;
 		if (lastReward) {
 			message = message.concat(
 				' Caution: removing this last reward will remove the entire request.'
@@ -151,20 +148,28 @@ const Request = (props) => {
 				open={completeTaskDialogOpen}
 				setOpen={setCompleteTaskDialogOpen}
 				request={request}
+				tabs={tabs}
+				setActiveTab={setActiveTab}
+			/>
+			<ImageDialog
+				image={`${REST_URL}/${request.proof.split('\\').join('/')}`}
+				alt="Proof image"
+				dialogOpen={imageDialogOpen}
+				handleDialogClose={() => setimageDialogOpen(false)}
 			/>
 			<Card>
 				<Grid container direction="column" spacing={2}>
 					<Grid item>
 						<CardHeader
-							avatar={<Avatar user={createdBy} size={1.5} />}
-							title={`${createdBy.firstName} ${createdBy.lastName}`}
+							avatar={<Avatar user={request.createdBy} size={1.5} />}
+							title={`${request.createdBy.firstName} ${request.createdBy.lastName}`}
 							titleTypographyProps={{
 								variant: 'h5'
 							}}
-							subheader={moment(createdAt).format('llll')}
+							subheader={moment(request.createdAt).format('llll')}
 						/>
 						<CardContent style={{ paddingBottom: 0 }}>
-							<Typography>{act}</Typography>
+							<Typography>{request.task}</Typography>
 						</CardContent>
 					</Grid>
 					<Grid item>
@@ -178,74 +183,79 @@ const Request = (props) => {
 								</ListSubheader>
 							}
 						>
-							{rewards.map((reward, rewardIndex) => (
-								<Fragment key={reward.fromUser.userId}>
-									<ListItem>
-										<ListItemAvatar>
-											<Avatar user={reward.fromUser} />
-										</ListItemAvatar>
-										<ListItemText
-											primary={`${reward.fromUser.firstName} ${reward.fromUser.lastName}`}
-										/>
-									</ListItem>
-									<List dense={true}>
-										{reward.favourTypes.map((favourType, favourTypeIndex) => {
-											const disabled =
-												!authUser ||
-												reward.fromUser.userId !== authUser.userId ||
-												completed;
-											return (
-												<ListItem key={favourType.favourType} button>
-													<Typography>{favourType.favourType}</Typography>
-													<ListItemSecondaryAction>
-														<Grid container direction="row" alignItems="center">
-															<Grid item>
-																<TextField
-																	type="number"
-																	inputProps={{
-																		min: 1,
-																		max: 100,
-																		style: { textAlign: 'right' }
-																	}}
-																	value={favourType.quantity}
-																	disabled={disabled}
-																	onChange={(event) =>
-																		quantityChangeHandler(
-																			event.target.value,
-																			rewardIndex,
-																			favourTypeIndex
-																		)
-																	}
-																/>
-															</Grid>
-															{!completed && (
+							{rewardUsers.map((rewardUser) => {
+								const userRewards = request.rewards.filter(
+									(reward) => reward.fromUser.userId === rewardUser.userId
+								);
+								return (
+									<Fragment key={rewardUser.userId}>
+										<ListItem key={rewardUser.userId}>
+											<ListItemAvatar>
+												<Avatar user={rewardUser} />
+											</ListItemAvatar>
+											<ListItemText
+												primary={`${rewardUser.firstName} ${rewardUser.lastName}`}
+											/>
+										</ListItem>
+										<List dense={true}>
+											{userRewards.map((reward) => {
+												const disabled =
+													!authUser ||
+													reward.fromUser.userId !== authUser.userId ||
+													request.completed;
+												return (
+													<ListItem key={reward.favourType.favourTypeId} button>
+														<Typography>{reward.favourType.name}</Typography>
+														<ListItemSecondaryAction>
+															<Grid
+																container
+																direction="row"
+																alignItems="center"
+															>
 																<Grid item>
-																	<IconButton
-																		edge="end"
-																		onClick={() => {
-																			setConfirmDeleteDialogOpen(true);
-																			setSelectedReward({
-																				rewardIndex: rewardIndex,
-																				favourTypeIndex: favourTypeIndex
-																			});
+																	<TextField
+																		type="number"
+																		inputProps={{
+																			min: 1,
+																			max: 100,
+																			style: { textAlign: 'right' }
 																		}}
+																		value={reward.quantity}
 																		disabled={disabled}
-																	>
-																		<DeleteIcon />
-																	</IconButton>
+																		onChange={(event) =>
+																			quantityChangeHandler(
+																				reward,
+																				event.target.value
+																			)
+																		}
+																	/>
 																</Grid>
-															)}
-														</Grid>
-													</ListItemSecondaryAction>
-												</ListItem>
-											);
-										})}
-									</List>
-								</Fragment>
-							))}
+																{!request.completed && (
+																	<Grid item>
+																		<IconButton
+																			edge="end"
+																			onClick={() => {
+																				setConfirmDeleteDialogOpen(true);
+																				setSelectedReward(reward);
+																			}}
+																			disabled={disabled}
+																		>
+																			<DeleteIcon />
+																		</IconButton>
+																	</Grid>
+																)}
+															</Grid>
+														</ListItemSecondaryAction>
+													</ListItem>
+												);
+											})}
+										</List>
+									</Fragment>
+								);
+							})}
 						</List>
 					</Grid>
-					{completed && (
+					{request.completed && (
 						<Grid item container direction="row" justify="center">
 							<Grid item></Grid>
 						</Grid>
@@ -255,16 +265,16 @@ const Request = (props) => {
 					<Grid
 						container
 						direction="row"
-						justify={completed ? 'space-between' : 'flex-end'}
+						justify={request.completed ? 'space-between' : 'flex-end'}
 						alignItems="center"
 					>
-						{completed ? (
+						{request.completed ? (
 							<Fragment>
 								<Grid item>
 									<Typography
 										style={{ padding: '6px 6px' }}
 										variant="button"
-									>{`Completed by ${completedBy.firstName} ${completedBy.lastName}`}</Typography>
+									>{`Completed by ${request.completedBy.firstName} ${request.completedBy.lastName}`}</Typography>
 								</Grid>
 								<Grid item>
 									<Button

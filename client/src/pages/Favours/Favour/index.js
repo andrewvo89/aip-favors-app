@@ -53,25 +53,22 @@ const formattedDate = (date) => {
 };
 
 const updatedFavour = (favourData) => {
-	console.log(favourData);
 	const updatedActImage =
-		favourData.proof.actImage === ''
+		favourData.proof === ''
 			? '/ImageFallback.png'
-			: `${REST_URL}/${favourData.proof.actImage}`;
+			: `${REST_URL}/${favourData.proof}`;
 
 	const updatedRepaidImage =
-		favourData.proof.repaidImage === ''
+		favourData.repaidProof === ''
 			? '/ImageFallback.png'
-			: `${REST_URL}/${favourData.proof.repaidImage}`;
+			: `${REST_URL}/${favourData.repaidProof}`;
 
 	favourData = {
 		...favourData,
-		favourType: favourData.favourType.toLowerCase(),
+		favourType: favourData.favourType,
 		quantity: favourData.quantity,
-		proof: {
-			actImage: updatedActImage,
-			repaidImage: updatedRepaidImage
-		},
+		proof: updatedActImage,
+		repaidProof: updatedRepaidImage,
 		createdAt: formattedDate(favourData.createdAt),
 		updatedAt: formattedDate(favourData.updatedAt)
 	};
@@ -89,11 +86,7 @@ const Favour = () => {
 
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [favour, setFavour] = useState({
-		fromUser: { firstName: '', lastName: '' },
-		forUser: { firstName: '', lastName: '' },
-		proof: { actImage: '', repaidImage: '' }
-	});
+	const [favour, setFavour] = useState();
 
 	useEffect(() => {
 		setLoading(true);
@@ -131,6 +124,10 @@ const Favour = () => {
 		setDialogOpen(false);
 	};
 
+	if (!favour) {
+		return <CircularProgress />;
+	}
+
 	return (
 		<Grid>
 			<Button
@@ -155,12 +152,12 @@ const Favour = () => {
 								title="Proof of favour"
 								alt="Proof of favour"
 								height="180"
-								image={favour.proof.actImage}
+								image={favour.proof}
 								onError={(e) => (e.target.src = '/ImageFallback.png')}
 							/>
 						</CardActionArea>
 						<ImageDialog
-							image={favour.proof.actImage}
+							image={favour.proof}
 							alt="Proof of favour favour"
 							dialogOpen={dialogOpen}
 							handleDialogClose={handleDialogClose}
@@ -184,11 +181,15 @@ const Favour = () => {
 						</Grid>
 
 						<Typography variant="body1" align="center" gutterBottom>
-							{`${getName(favour.fromUser)} owe `}
-							<span
-								className={classes.favourType}
-							>{`${favour.quantity}x ${favour.favourType}`}</span>
-							{` to ${getName(favour.forUser)}`}.
+							{favour.requestTask
+								? `${getName(favour.fromUser)} completed a request to ${
+										favour.requestTask
+								  } for ${favour.quantity}x ${
+										favour.favourType.name
+								  } reward from ${getName(favour.forUser)} `
+								: `${getName(favour.fromUser)} gave ${getName(
+										favour.forUser
+								  )} ${favour.quantity}x ${favour.favourType.name}`}
 						</Typography>
 
 						<Divider variant="middle" className={classes.divider} />

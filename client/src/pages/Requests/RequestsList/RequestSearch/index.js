@@ -13,12 +13,16 @@ import {
 } from '@material-ui/icons';
 import { StyledSearchIcon } from './styled-components';
 import RewardsFilterDialog from './RewardsFilterDialog';
+import { useSelector } from 'react-redux';
 
 const RequestSearch = (props) => {
-	const { setSearchParams, requestRewards, disabled } = props;
+	const { favourTypes } = useSelector((state) => state.favourTypeState);
+	const { setSearchParams, disabled } = props;
 	const [rewardsDialogOpen, setRewardsDialogOpen] = useState(false);
 	const [searchText, setSearchText] = useState('');
-	const [selectedRewards, setSelectedRewards] = useState(requestRewards);
+	const [selectedRewards, setSelectedRewards] = useState(
+		favourTypes.map((favourType) => favourType.favourTypeId)
+	);
 
 	useEffect(() => {
 		setSearchParams({
@@ -32,7 +36,6 @@ const RequestSearch = (props) => {
 			<RewardsFilterDialog
 				open={rewardsDialogOpen}
 				close={() => setRewardsDialogOpen(false)}
-				requestRewards={requestRewards}
 				selectedRewards={selectedRewards}
 				setSelectedRewards={setSelectedRewards}
 			/>

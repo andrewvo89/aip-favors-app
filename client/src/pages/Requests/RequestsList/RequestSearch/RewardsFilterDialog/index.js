@@ -9,32 +9,30 @@ import {
 	ListItemText
 } from '@material-ui/core';
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 const RewardsFilterDialog = (props) => {
-	const {
-		open,
-		close,
-		requestRewards,
-		selectedRewards,
-		setSelectedRewards
-	} = props;
+	const { favourTypes } = useSelector((state) => state.favourTypeState);
+	const { open, close, selectedRewards, setSelectedRewards } = props;
 
 	const selectAllCheckHandler = () => {
-		const checked = requestRewards.length === selectedRewards.length;
+		const checked = favourTypes.length === selectedRewards.length;
 		let newSelectedRewards = [];
 		if (!checked) {
-			newSelectedRewards = [...requestRewards];
+			newSelectedRewards = favourTypes.map(
+				(favourTypes) => favourTypes.favourTypeId
+			);
 		}
 		setSelectedRewards(newSelectedRewards);
 	};
 
-	const rewardCheckHandler = (reward, checked) => {
+	const rewardCheckHandler = (favourType, checked) => {
 		const newSelectedRewards = [...selectedRewards];
 		if (checked) {
-			const index = newSelectedRewards.indexOf(reward);
+			const index = newSelectedRewards.indexOf(favourType.favourTypeId);
 			newSelectedRewards.splice(index, 1);
 		} else {
-			newSelectedRewards.push(reward);
+			newSelectedRewards.push(favourType.favourTypeId);
 		}
 		setSelectedRewards(newSelectedRewards);
 	};
@@ -49,10 +47,10 @@ const RewardsFilterDialog = (props) => {
 							<Checkbox
 								edge="end"
 								onChange={selectAllCheckHandler}
-								checked={requestRewards.length === selectedRewards.length}
+								checked={favourTypes.length === selectedRewards.length}
 								indeterminate={
 									selectedRewards.length > 0 &&
-									selectedRewards.length < requestRewards.length
+									selectedRewards.length < favourTypes.length
 								}
 							/>
 						</ListItemSecondaryAction>
@@ -61,20 +59,20 @@ const RewardsFilterDialog = (props) => {
 			</DialogTitle>
 			<DialogContent>
 				<List>
-					{requestRewards.map((reward) => {
-						const checked = selectedRewards.includes(reward);
+					{favourTypes.map((favourType) => {
+						const checked = selectedRewards.includes(favourType.favourTypeId);
 						return (
 							<ListItem
-								key={reward}
+								key={favourType.favourTypeId}
 								button
-								onClick={() => rewardCheckHandler(reward, checked)}
+								onClick={() => rewardCheckHandler(favourType, checked)}
 							>
-								<ListItemText primary={reward} />
+								<ListItemText primary={favourType.name} />
 								<ListItemSecondaryAction>
 									<Checkbox
 										edge="end"
 										checked={checked}
-										onChange={() => rewardCheckHandler(reward, checked)}
+										onChange={() => rewardCheckHandler(favourType, checked)}
 									/>
 								</ListItemSecondaryAction>
 							</ListItem>

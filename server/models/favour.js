@@ -24,22 +24,26 @@ const favourSchema = new Schema(
 			min: 1,
 			max: 100
 		},
+		proof: {
+			type: String,
+			default: '',
+			required: false
+		},
 		repaid: {
 			type: Boolean,
 			default: false,
 			required: true
 		},
-		proof: {
-			actImage: {
-				type: String,
-				default: '',
-				required: false
-			},
-			repaidImage: {
-				type: String,
-				default: '',
-				required: false
-			}
+		repaidProof: {
+			type: String,
+			default: '',
+			required: false
+		},
+		requestTask: {
+			type: String,
+			default: '',
+			required: false,
+			maxlength: 50
 		}
 	},
 	{

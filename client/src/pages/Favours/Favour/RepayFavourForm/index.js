@@ -42,12 +42,10 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-
 		const data = {
 			favourId: favour.favourId,
-			repaidImage: imageUrl
+			repaidProof: imageUrl
 		};
-
 		const favourData = await dispatch(favourController.repay(data));
 		// rerender with updated favour
 		setFavour(updatedFavour(favourData));
@@ -87,12 +85,12 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 							title="Proof of repayment"
 							alt="Proof of repayment"
 							height="180"
-							image={favour.proof.repaidImage}
+							image={favour.repaidProof}
 							onError={(e) => (e.target.src = '/ImageFallback.png')}
 						/>
 					</CardActionArea>
 					<ImageDialog
-						image={favour.proof.repaidImage}
+						image={favour.repaidProof}
 						alt="Proof of favour repayment"
 						dialogOpen={dialogOpen}
 						handleDialogClose={handleDialogClose}
@@ -100,24 +98,28 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 				</Grid>
 			) : (
 				<Grid>
-					<CardHeader
-						title="Repay Favour"
-						subheader="Upload an image as proof to repay this favour."
-					/>
+					{proofRequired(false) && (
+						<CardHeader
+							title="Repay Favour"
+							subheader="Upload an image as proof to repay this favour."
+						/>
+					)}
 					<form onSubmit={handleSubmit}>
-						<Grid
-							container
-							item
-							direction="column"
-							justify="center"
-							alignItems="center"
-						>
-							<ImageUploader
-								imageUrl={imageUrl}
-								handleSetImage={handleSetImage}
-								disabled={!proofRequired(false)}
-							/>
-						</Grid>
+						{proofRequired(false) && (
+							<Grid
+								container
+								item
+								direction="column"
+								justify="center"
+								alignItems="center"
+							>
+								<ImageUploader
+									imageUrl={imageUrl}
+									handleSetImage={handleSetImage}
+									disabled={!proofRequired(false)}
+								/>
+							</Grid>
+						)}
 						<Button
 							fullWidth
 							className={classes.repayButton}
@@ -126,7 +128,7 @@ function RepayFavourForm({ favour, setFavour, updatedFavour }) {
 							type="submit"
 							disabled={proofRequired()}
 						>
-							Repay
+							Mark as Repaid
 						</Button>
 					</form>
 				</Grid>

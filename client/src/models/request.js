@@ -6,7 +6,7 @@ export default class Request {
 		requestId,
 		createdBy,
 		createdAt,
-		act,
+		task,
 		rewards,
 		completed,
 		completedBy,
@@ -15,7 +15,7 @@ export default class Request {
 		this.requestId = requestId;
 		this.createdBy = createdBy;
 		this.createdAt = createdAt;
-		this.act = act;
+		this.task = task;
 		this.rewards = rewards;
 		this.completed = completed;
 		this.completedBy = completedBy;
@@ -23,18 +23,10 @@ export default class Request {
 	}
 
 	async save() {
-		if (this.requestId) {
-			//If requestId exists, update existing entry in database
-			// const data = {
-			// 	requestId: this.requestId,
-			// 	rewards: this.rewards,
-			// 	closed: this.closed
-			// };
-			// await axios.patch('/request/update', data, config);
-		} else {
+		if (!this.requestId) {
 			//If no requestId, create a new Request in the database
 			const data = {
-				act: this.act,
+				task: this.task,
 				rewards: this.rewards
 			};
 			await axios.post('/request/create', data, config);
@@ -50,21 +42,21 @@ export default class Request {
 		await axios.patch('/request/add-reward', data, config);
 	}
 
-	async deleteReward(rewardIndex, favourTypeIndex) {
+	async deleteReward(reward) {
 		const data = {
 			requestId: this.requestId,
-			rewardIndex: rewardIndex,
-			favourTypeIndex: favourTypeIndex
+			fromUserId: reward.fromUser.userId,
+			favourTypeId: reward.favourType.favourTypeId
 		};
 		await axios.patch('/request/delete-reward', data, config);
 	}
 
-	async udpateRewardQuantity(quantity, rewardIndex, favourTypeIndex) {
+	async udpateRewardQuantity(reward, quantity) {
 		const data = {
 			requestId: this.requestId,
-			quantity: quantity,
-			rewardIndex: rewardIndex,
-			favourTypeIndex: favourTypeIndex
+			fromUserId: reward.fromUser.userId,
+			favourTypeId: reward.favourType.favourTypeId,
+			quantity: quantity
 		};
 		await axios.patch('/request/udpate-reward-quantity', data, config);
 	}
@@ -93,7 +85,7 @@ export default class Request {
 
 	static async create(values) {
 		const data = {
-			act: values.act,
+			task: values.task,
 			favourType: values.favourType,
 			quantity: values.quantity
 		};

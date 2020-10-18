@@ -54,6 +54,7 @@ module.exports.updateSettings = [
 	body('settings').custom(async (value, { _req }) => {
 		if (
 			typeof value.darkMode !== BOOLEAN ||
+			typeof value.notifications !== BOOLEAN ||
 			typeof value.expandFavoursGroup !== BOOLEAN ||
 			typeof value.expandRequestsGroup !== BOOLEAN
 		) {

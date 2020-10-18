@@ -8,21 +8,11 @@ const requestSchema = new Schema(
 			ref: 'User',
 			required: true
 		},
-		act: {
+		task: {
 			type: String,
 			required: true,
 			maxlength: 50
 		},
-		//To be implemented later when Ding created the FavourTypes
-		// favourTypes: [
-		// 	{
-		// 		favourType: {
-		// 			type: Schema.Types.ObjectId,
-		// 			ref: 'FavourType',
-		// 			required: true
-		// 		}
-		// 	}
-		// ],
 		rewards: [
 			{
 				fromUser: {
@@ -30,20 +20,17 @@ const requestSchema = new Schema(
 					ref: 'User',
 					required: true
 				},
-				favourTypes: [
-					{
-						favourType: {
-							type: String,
-							required: true
-						},
-						quantity: {
-							type: Number,
-							required: true,
-							min: 1,
-							max: 1000
-						}
-					}
-				]
+				favourType: {
+					type: Schema.Types.ObjectId,
+					ref: 'FavourType',
+					required: true
+				},
+				quantity: {
+					type: Number,
+					required: true,
+					min: 1,
+					max: 100
+				}
 			}
 		],
 		completed: {

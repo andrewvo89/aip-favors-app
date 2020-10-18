@@ -25,6 +25,7 @@ const RequestsList = () => {
 	const tabs = [ACTIVE, COMPLETED];
 	const [activeTab, setActiveTab] = useState(tabs[0]);
 	const { authUser } = useSelector((state) => state.authState);
+	const { favourTypes } = useSelector((state) => state.favourTypeState);
 	const [searchParams, setSearchParams] = useState();
 	const [searchResults, setSearchResults] = useState();
 	const [socketData, setSocketData] = useState();
@@ -66,24 +67,23 @@ const RequestsList = () => {
 			const extractedRewards = [];
 			requests.forEach((request) =>
 				request.rewards.forEach((reward) =>
-					reward.favourTypes.forEach((favourType) =>
-						extractedRewards.push(favourType.favourType)
-					)
+					extractedRewards.push(reward.favourType.name)
 				)
 			);
 			const uniqueRewards = [...new Set(extractedRewards)];
 			uniqueRewards.sort();
 			setRequestRewards(uniqueRewards);
 		}
-	}, [requests]);
+	}, [requests, searchParams]);
 	//Update search results
 	useEffect(() => {
 		if (requests) {
 			if (searchParams) {
-				if (searchParams && requests) {
+				if (requests) {
 					const newSearchResults = requestController.getSearchResults(
 						searchParams,
-						requests
+						requests,
+						favourTypes
 					);
 					setSearchResults(newSearchResults);
 					setPage(1);
@@ -94,7 +94,7 @@ const RequestsList = () => {
 				setSearchResults(requests);
 			}
 		}
-	}, [requests, searchParams]);
+	}, [searchParams, requests, favourTypes]);
 	//Update requests based on filter
 	useEffect(() => {
 		if (searchResults && activeTab) {
@@ -139,7 +139,6 @@ const RequestsList = () => {
 				<Grid item>
 					<RequestSearch
 						setSearchParams={setSearchParams}
-						requestRewards={requestRewards}
 						disabled={noRequests}
 					/>
 				</Grid>
@@ -173,7 +172,11 @@ const RequestsList = () => {
 					{paginatedRequests.map((request) => {
 						return (
 							<Grid key={request.requestId} item>
-								<RequestCard request={request} />
+								<RequestCard
+									request={request}
+									tabs={tabs}
+									setActiveTab={setActiveTab}
+								/>
 							</Grid>
 						);
 					})}

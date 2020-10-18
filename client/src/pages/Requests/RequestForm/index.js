@@ -9,7 +9,7 @@ import {
 	TextField,
 	Typography
 } from '@material-ui/core';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,23 +22,18 @@ import FavourType from '../../../models/favour-type';
 const RequestForm = (props) => {
 	const history = useHistory();
 	const dispatch = useDispatch();
+	const [validatedOnMount, setValidatedOnMount] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const { favourTypes } = useSelector((state) => state.favourTypeState);
 
 	const initialValues = {
-		act: '',
+		task: '',
 		quantity: 1,
-		favourType: ''
-	};
-
-	const initialErrors = {
-		act: true,
-		quantity: true,
-		favourType: true
+		favourType: favourTypes[0]
 	};
 
 	const validationSchema = yup.object().shape({
-		act: yup.string().label('act').required().max(100),
+		task: yup.string().label('task').required().max(100),
 		quantity: yup.number().label('quanity').required().min(1).max(10),
 		favourType: yup
 			.object()
@@ -65,10 +60,17 @@ const RequestForm = (props) => {
 
 	const formik = useFormik({
 		initialValues: initialValues,
-		initialErrors: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
+
+	const { validateForm } = formik;
+
+	useEffect(() => {
+		//formik.validateOnMount does not work
+		validateForm();
+		setValidatedOnMount(true);
+	}, [validateForm]);
 
 	const requestListClickHandler = () => {
 		history.push('/requests/view/all');
@@ -91,11 +93,11 @@ const RequestForm = (props) => {
 								<Grid container direction="column" spacing={1}>
 									<Grid item>
 										<TextField
-											label="Request"
+											label="Task"
 											fullWidth={true}
-											multiline={true}
-											value={formik.values.act}
-											onChange={formik.handleChange('act')}
+											value={formik.values.task}
+											onChange={formik.handleChange('task')}
+											onBlur={formik.handleBlur('task')}
 											disabled={loading}
 											autoFocus={true}
 										/>
@@ -112,6 +114,7 @@ const RequestForm = (props) => {
 												fullWidth={true}
 												value={formik.values.quantity}
 												onChange={formik.handleChange('quantity')}
+												onBlur={formik.handleBlur('quantity')}
 											/>
 										</Grid>
 										<Grid item xs={8}>
@@ -120,6 +123,7 @@ const RequestForm = (props) => {
 												select={true}
 												value={formik.values.favourType}
 												onChange={formik.handleChange('favourType')}
+												onBlur={formik.handleBlur('favourType')}
 												fullWidth={true}
 												disabled={loading}
 											>
@@ -142,7 +146,7 @@ const RequestForm = (props) => {
 									variant="contained"
 									color="primary"
 									fullWidth
-									disabled={!formik.isValid || loading}
+									disabled={!formik.isValid || loading || !validatedOnMount}
 								>
 									Submit
 								</Button>

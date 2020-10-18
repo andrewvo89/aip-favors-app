@@ -13,12 +13,14 @@ export default class Favour {
 			userId: favour.forUser._id,
 			...favour.forUser
 		};
-		this.repaid = favour.repaid;
 		this.proof = favour.proof;
+		this.repaid = favour.repaid;
+		this.repaidProof = favour.repaidProof;
 		this.createdAt = favour.createdAt;
 		this.updatedAt = favour.updatedAt;
-		this.favourType = favour.favourType.name;
+		this.favourType = favour.favourType;
 		this.quantity = favour.quantity;
+		this.requestTask = favour.requestTask;
 		// remove unnecessary _id property
 		delete this.fromUser._id;
 		delete this.forUser._id;
@@ -40,7 +42,6 @@ export default class Favour {
 
 	static async getFavour(favourId) {
 		const result = await axios.get(`/favours/view/${favourId}`, config);
-		console.log(result);
 		const favour = new Favour(result.data);
 		return favour;
 	}

@@ -5,7 +5,7 @@ import {
 	DialogContent,
 	DialogTitle
 } from '@material-ui/core';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,11 +22,6 @@ const AddRewardDialog = (props) => {
 	const initialValues = {
 		quantity: 1,
 		favourType: favourTypes[0]
-	};
-
-	const initialErrors = {
-		quantity: true,
-		favourType: true
 	};
 
 	const validationSchema = yup.object().shape({
@@ -64,10 +59,15 @@ const AddRewardDialog = (props) => {
 
 	const formik = useFormik({
 		initialValues: initialValues,
-		initialErrors: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
+
+	const { validateForm } = formik;
+
+	useEffect(() => {
+		validateForm();
+	}, [validateForm]);
 
 	return (
 		<Dialog fullWidth maxWidth="xs" open={open} onClose={closeHandler}>

@@ -7,16 +7,39 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
 const User = require('../models/user');
-const FavourTypes = require('../models/favour-type');
 const _ = require('lodash');
 
 // Catches any errors detected through express-validator middlware
-
 const catchValidationErrors = (req) => {
 	const validationErrors = validationResult(req);
 	if (!validationErrors.isEmpty()) {
 		throw getError(422, validationErrors.errors[0].msg, DIALOG);
 	}
+};
+
+module.exports.createFavour = async (
+	fromUser,
+	forUser,
+	proof,
+	favourType,
+	quantity,
+	requestTask
+) => {
+	const favour = new Favour({
+		fromUser: fromUser,
+		forUser: forUser,
+		proof: proof,
+		favourType: favourType,
+		quantity: quantity,
+		requestTask: requestTask
+	});
+	const favourDoc = await favour.save();
+	//Populate favour with user data and add to response
+	await favourDoc
+		.populate('fromUser forUser', '_id firstName lastName profilePicture')
+		.populate('favourType')
+		.execPopulate();
+	return favourDoc;
 };
 
 module.exports.getById = async (req, res, next) => {
@@ -27,7 +50,6 @@ module.exports.getById = async (req, res, next) => {
 		const favourDoc = await Favour.findById(favourId)
 			.populate('fromUser forUser', '_id firstName lastName profilePicture')
 			.populate('favourType');
-
 		if (!favourDoc) {
 			throw getError(404, 'Favour not found', DIALOG);
 		}
@@ -70,22 +92,13 @@ module.exports.create = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
 		const { fromUser, forUser, proof, favourType, quantity } = req.body;
-		const favour = new Favour({
-			fromUser: fromUser,
-			forUser: forUser,
-			proof: {
-				actImage: proof.actImage
-			},
-			favourType: favourType,
-			quantity: quantity
-		});
-		const favourDoc = await favour.save();
-		// populate favour with user data and add to response
-		await favourDoc
-			.populate('fromUser forUser', '_id firstName lastName profilePicture')
-			.populate('favourType')
-			.execPopulate();
-
+		const favourDoc = await this.createFavour(
+			fromUser,
+			forUser,
+			proof,
+			favourType,
+			quantity
+		);
 		res.status(201).send(favourDoc);
 	} catch (error) {
 		next(error);
@@ -95,11 +108,10 @@ module.exports.create = async (req, res, next) => {
 module.exports.repay = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
-
-		const { favourId, repaidImage } = req.body;
+		const { favourId, repaidProof } = req.body;
 		const favour = await Favour.findById(favourId);
 
-		favour.proof.repaidImage = repaidImage;
+		favour.repaidProof = repaidProof;
 		favour.repaid = true;
 
 		const favourDoc = await favour.save();

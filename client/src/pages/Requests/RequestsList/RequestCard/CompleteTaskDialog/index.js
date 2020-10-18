@@ -17,7 +17,7 @@ import { useDispatch } from 'react-redux';
 import * as requestController from '../../../../../controllers/request';
 
 const CompleteTaskDialog = (props) => {
-	const { request } = props;
+	const { request, tabs, setActiveTab } = props;
 	const fileInputRef = useRef();
 	const dispatch = useDispatch();
 	const [loading, setLoading] = useState(false);
@@ -55,6 +55,7 @@ const CompleteTaskDialog = (props) => {
 		setLoading(true);
 		const result = await dispatch(requestController.complete(request, file));
 		if (result) {
+			setActiveTab(tabs[1]);
 			dialogCloseHandler();
 		}
 		setLoading(false);

@@ -4,6 +4,7 @@ const requestValidator = require('../validators/request');
 const router = express.Router();
 const verifyAuth = require('../middleware/verify-auth');
 const uploaders = require('../utils/uploaders');
+const { request } = require('express');
 
 router.post('/get-requests', requestController.getRequests);
 
@@ -39,6 +40,7 @@ router.patch(
 	'/complete',
 	verifyAuth,
 	uploaders.requestProofUploader,
+	requestValidator.complete,
 	requestController.complete
 );
 

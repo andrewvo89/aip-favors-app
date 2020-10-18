@@ -234,7 +234,7 @@ const FavourList = () => {
 												</Grid>
 											</Grid>
 											<Grid container item justify="center">
-												{`${favour.quantity}x ${favour.favourType}`}
+												{`${favour.quantity}x ${favour.favourType.name}`}
 											</Grid>
 											<Grid container className={classes.subInfo}>
 												<AccessTimeIcon fontSize="small" />

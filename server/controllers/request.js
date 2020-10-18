@@ -1,10 +1,11 @@
-const { validationResult } = require('express-validator');
+const { validationResult, body } = require('express-validator');
 const Request = require('../models/request');
 const { DIALOG, CREATE, UPDATE, DELETE } = require('../utils/constants');
 const { getError } = require('../utils/error');
 const mongoose = require('mongoose');
 const socket = require('../utils/socket');
 const notificationController = require('./notification');
+const favourController = require('./favour');
 const User = require('../models/user');
 const sharp = require('sharp');
 const path = require('path');
@@ -20,7 +21,7 @@ const catchValidationErrors = (req) => {
 
 const getRequestForClient = (request) => {
 	let completedBy = null;
-	//Only get populated data for requests that have been requested
+	//Only get populated data for requests that have been completed
 	if (request.completedBy) {
 		completedBy = {
 			userId: request.completedBy._id,
@@ -38,7 +39,7 @@ const getRequestForClient = (request) => {
 			profilePicture: request.createdBy.profilePicture
 		},
 		createdAt: request.createdAt,
-		act: request.act,
+		task: request.task,
 		rewards: request.rewards.map((reward) => ({
 			fromUser: {
 				userId: reward.fromUser._id,
@@ -46,7 +47,11 @@ const getRequestForClient = (request) => {
 				lastName: reward.fromUser.lastName,
 				profilePicture: reward.fromUser.profilePicture
 			},
-			favourTypes: reward.favourTypes
+			favourType: {
+				favourTypeId: reward.favourType._id,
+				name: reward.favourType.name
+			},
+			quantity: reward.quantity
 		})),
 		completed: request.completed,
 		completedBy: completedBy,
@@ -57,34 +62,27 @@ const getRequestForClient = (request) => {
 module.exports.create = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
-		const { act, favourType, quantity } = req.body;
+		const { task, favourType, quantity } = req.body;
 		const { userId } = res.locals;
 		const request = new Request({
 			createdBy: new mongoose.Types.ObjectId(userId),
-			act: act,
+			task: task,
 			rewards: [
 				{
 					fromUser: new mongoose.Types.ObjectId(userId),
-					favourTypes: [
-						{
-							favourType: favourType,
-							quantity: quantity
-						}
-					]
+					favourType: new mongoose.Types.ObjectId(favourType.favourTypeId),
+					quantity: quantity
 				}
 			],
 			complete: false,
 			proof: ''
 		});
-		await request.execPopulate(
-			'createdBy',
-			'firstName lastName profilePicture'
-		);
-		await request.execPopulate(
-			'rewards.fromUser',
-			'firstName lastName profilePicture'
-		);
 		await request.save();
+		await request
+			.populate('createdBy', 'firstName lastName profilePicture')
+			.populate('rewards.fromUser', 'firstName lastName profilePicture')
+			.populate('rewards.favourType')
+			.execPopulate();
 		socket.get().emit('requests', {
 			action: CREATE,
 			request: getRequestForClient(request)
@@ -100,7 +98,7 @@ module.exports.create = async (req, res, next) => {
 					userId,
 					'/requests/view/all',
 					user._id,
-					`${fromUser.fullName} added a new public request to "${request.act}"`
+					`${fromUser.fullName} added a new public request to "${request.task}"`
 				)
 			);
 		}
@@ -118,42 +116,36 @@ module.exports.addReward = async (req, res, next) => {
 		const { userId } = res.locals;
 		const request = await Request.findById(
 			new mongoose.Types.ObjectId(requestId)
-		);
-		const indexOfFromId = request.rewards.findIndex(
-			(reward) => reward.fromUser.toString() === userId
-		);
-		if (indexOfFromId !== -1) {
-			//If a user record exist in .rewards, find if favour exists in user record
-			const indexOfFavourType = request.rewards[
-				indexOfFromId
-			].favourTypes.findIndex((reward) => reward.favourType === favourType);
-			if (indexOfFavourType !== -1) {
-				//If a favour exists, add the quantity to existing quantity
-				request.rewards[indexOfFromId].favourTypes[
-					indexOfFavourType
-				].quantity += quantity;
-			} else {
-				//If a favour does not exists, create a new favour record inside the user record
-				request.rewards[indexOfFromId].favourTypes.push({
-					favourType: favourType,
-					quantity: quantity
-				});
-			}
-		} else {
-			//If a user record does not exist in .rewards, push new user record in
+		)
+			.populate('createdBy')
+			.populate('rewards.fromUser')
+			.populate('rewards.favourType');
+		if (!request) {
+			//If wrong requestId is sent from the client
+			throw getError(404, 'Request does not exist', DIALOG);
+		}
+		const rewardExistsIndex = request.rewards.findIndex((reward) => {
+			const favourTypeExists =
+				reward.favourType._id.toString() === favourType.favourTypeId;
+			const fromUserExists = reward.fromUser._id.toString() === userId;
+			return favourTypeExists && fromUserExists;
+		});
+		if (rewardExistsIndex === -1) {
+			//If the favour type does not already exist for this user
 			request.rewards.push({
-				fromUser: userId,
-				favourTypes: [
-					{
-						favourType: favourType,
-						quantity: quantity
-					}
-				]
+				fromUser: new mongoose.Types.ObjectId(userId),
+				favourType: new mongoose.Types.ObjectId(favourType.favourTypeId),
+				quantity: quantity
 			});
+		} else {
+			//Favour type for this user already exists, just increment the quantity
+			request.rewards[rewardExistsIndex].quantity += quantity;
 		}
 		await request.save();
-		await request.execPopulate('createdBy');
-		await request.execPopulate('rewards.fromUser');
+		await request
+			.populate('rewards.fromUser')
+			.populate('rewards.favourType')
+			.execPopulate();
 		socket.get().emit('requests', {
 			action: UPDATE,
 			request: getRequestForClient(request)
@@ -175,7 +167,7 @@ module.exports.addReward = async (req, res, next) => {
 					userId,
 					'/requests/view/all',
 					user._id,
-					`${fromUser.fullName} added ${quantity}x ${favourType} as a reward for the request to "${request.act}"`
+					`${fromUser.fullName} added ${quantity}x ${favourType.name} as a reward for the request to "${request.task}"`
 				)
 			);
 		}
@@ -189,24 +181,33 @@ module.exports.addReward = async (req, res, next) => {
 module.exports.deleteReward = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
-		const { requestId, rewardIndex, favourTypeIndex } = req.body;
+		const { requestId, favourTypeId, fromUserId } = req.body;
 		const { userId } = res.locals;
 		const request = await Request.findById(
 			new mongoose.Types.ObjectId(requestId)
-		);
-		const fromUserId = request.rewards[rewardIndex].fromUser.toString();
+		)
+			.populate('createdBy', 'firstName lastName profilePicture')
+			.populate('rewards.fromUser', 'firstName lastName profilePicture')
+			.populate('rewards.favourType');
+		if (!request) {
+			//If wrong requestId is sent from the client
+			throw getError(404, 'Request does not exist', DIALOG);
+		}
 		if (fromUserId !== res.locals.userId) {
 			//If your userId does not match the userId of the reward being deleted (prevent deleting other people's rewards)
 			throw getError(403, 'Unauthorized to delete reward', DIALOG);
 		}
-		const deletedReward = request.rewards[rewardIndex].favourTypes.splice(
-			favourTypeIndex,
-			1
-		)[0];
-		if (request.rewards[rewardIndex].favourTypes.length === 0) {
-			//If user has no more rewards, remove the user from rewards array
-			request.rewards.splice(rewardIndex, 1);
+		const rewardIndex = request.rewards.findIndex((reward) => {
+			const favourTypeExists =
+				reward.favourType._id.toString() === favourTypeId;
+			const fromUserExists = reward.fromUser._id.toString() === fromUserId;
+			return favourTypeExists && fromUserExists;
+		});
+		if (rewardIndex === -1) {
+			//If wrong favour type reference is sent from the client
+			throw getError(404, 'Reward does not exist', DIALOG);
 		}
+		const deletedReward = request.rewards.splice(rewardIndex, 1)[0];
 		if (request.rewards.length === 0) {
 			//If no rewards are left, set completed flag to true to delete request
 			await request.deleteOne();
@@ -216,18 +217,6 @@ module.exports.deleteReward = async (req, res, next) => {
 			});
 		} else {
 			await request.save();
-			await request.execPopulate(
-				'completedBy',
-				'firstName lastName profilePicture'
-			);
-			await request.execPopulate(
-				'createdBy',
-				'firstName lastName profilePicture'
-			);
-			await request.execPopulate(
-				'rewards.fromUser',
-				'firstName lastName profilePicture'
-			);
 			socket.get().emit('requests', {
 				action: UPDATE,
 				request: getRequestForClient(request)
@@ -245,9 +234,9 @@ module.exports.deleteReward = async (req, res, next) => {
 		const promises = [];
 		//Execute all the notifications in parallel to save on time for function to finish
 		for (const user of users) {
-			let title = `${fromUser.fullName} removed ${deletedReward.quantity}x ${deletedReward.favourType} for the request to "${request.act}"`;
+			let title = `${fromUser.fullName} removed ${deletedReward.quantity}x ${deletedReward.favourType.name} for the request to "${request.task}"`;
 			if (request.rewards.length === 0) {
-				title = `${fromUser.fullName} removed the request to "${request.act}"`;
+				title = `${fromUser.fullName} removed the request to "${request.task}"`;
 			}
 			promises.push(
 				notificationController.create(
@@ -268,54 +257,59 @@ module.exports.deleteReward = async (req, res, next) => {
 module.exports.udpateRewardQuantity = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
-		const { requestId, quantity, rewardIndex, favourTypeIndex } = req.body;
+		const { requestId, fromUserId, favourTypeId, quantity } = req.body;
 		const { userId } = res.locals;
 		const request = await Request.findById(
 			new mongoose.Types.ObjectId(requestId)
-		);
-		const fromUserId = request.rewards[rewardIndex].fromUser.toString();
-		if (fromUserId !== userId) {
-			//If your userId does not match the userId of the reward being udpated (prevent deleting other people's rewards)
-			throw getError(403, 'Unauthorized to update reward quantity', DIALOG);
+		)
+			.populate('createdBy', 'firstName lastName profilePicture')
+			.populate('rewards.fromUser', 'firstName lastName profilePicture')
+			.populate('rewards.favourType');
+		if (!request) {
+			//If wrong requestId is sent from the client
+			throw getError(404, 'Request does not exist', DIALOG);
 		}
-		const favourType =
-			request.rewards[rewardIndex].favourTypes[favourTypeIndex];
-		const prevQuantity = favourType.quantity;
-		request.rewards[rewardIndex].favourTypes[
-			favourTypeIndex
-		].quantity = quantity;
+		if (fromUserId !== res.locals.userId) {
+			//If your userId does not match the userId of the reward being deleted (prevent deleting other people's rewards)
+			throw getError(403, 'Unauthorized to delete reward', DIALOG);
+		}
+		const rewardIndex = request.rewards.findIndex((reward) => {
+			const favourTypeExists =
+				reward.favourType._id.toString() === favourTypeId;
+			const fromUserExists = reward.fromUser._id.toString() === fromUserId;
+			return favourTypeExists && fromUserExists;
+		});
+		if (rewardIndex === -1) {
+			//If wrong favour type reference is sent from the client
+			throw getError(404, 'Reward does not exist', DIALOG);
+		}
+		const reward = request.rewards[rewardIndex];
+		const prevQuantity = reward.quantity;
+		reward.quantity = quantity;
 		await request.save();
-		await request.execPopulate(
-			'createdBy',
-			'firstName lastName profilePicture'
-		);
-		await request.execPopulate(
-			'rewards.fromUser',
-			'firstName lastName profilePicture'
-		);
 		socket.get().emit('requests', {
 			action: UPDATE,
 			request: getRequestForClient(request)
 		});
 		//Send a notification to all users about the udpated request
-		const fromUser = await User.findById(new mongoose.Types.ObjectId(userId));
-		const users = request.rewards.map((reward) => reward.fromUser);
-		const createdByUserExists = users.find(
+		const rewardUsers = request.rewards.map((reward) => reward.fromUser);
+		//If the user that created the request is not offering a reward, add to list of users to notify as well
+		const createdByUserExists = rewardUsers.find(
 			(user) => user._id.toString() === request.createdBy._id.toString()
 		);
 		if (!createdByUserExists) {
-			users.push(request.createdBy);
+			rewardUsers.push(request.createdBy);
 		}
 		const promises = [];
 		//Execute all the notifications in parallel to save on time for function to finish
-		for (const user of users) {
+		for (const user of rewardUsers) {
 			const action = prevQuantity < quantity ? 'added' : 'removed';
 			promises.push(
 				notificationController.create(
 					userId,
 					'/requests/view/all',
 					user._id,
-					`${fromUser.fullName} ${action} a ${favourType.favourType} for the request to "${request.act}"`
+					`${reward.fromUser.firstName} ${reward.fromUser.lastName} ${action} a ${reward.favourType.name} for the request to "${request.task}"`
 				)
 			);
 		}
@@ -333,6 +327,7 @@ module.exports.getRequests = async (req, res, next) => {
 			.populate('completedBy', 'firstName lastName profilePicture')
 			.populate('createdBy', 'firstName lastName profilePicture')
 			.populate('rewards.fromUser', 'firstName lastName profilePicture')
+			.populate('rewards.favourType')
 			.sort({ createdAt: 'desc' });
 		const requests = requestDocs.map((request) => {
 			return getRequestForClient(request);
@@ -346,52 +341,71 @@ module.exports.getRequests = async (req, res, next) => {
 module.exports.complete = async (req, res, next) => {
 	try {
 		const { userId } = res.locals;
+		const { requestId } = req.body;
 		const imagePath = path.join(req.file.destination, `${uuidv4()}_400.jpg`);
 		await sharp(req.file.path).jpeg().toFile(imagePath);
-		const request = await Request.findOne({
-			_id: new mongoose.Types.ObjectId(req.body.requestId)
-		});
+		const request = await Request.findById(
+			new mongoose.Types.ObjectId(requestId)
+		)
+			.populate('createdBy', 'firstName lastName profilePicture')
+			.populate('rewards.fromUser', 'firstName lastName profilePicture')
+			.populate('rewards.favourType');
+		if (!request) {
+			//If wrong requestId is sent from the client
+			throw getError(404, 'Request does not exist', DIALOG);
+		}
+		//Step 1. Close off the request
+		//Remove any rewards that the user completing the task is offering (cannot rewards yourself favours)
+		request.rewards = request.rewards.filter(
+			(reward) => reward.fromUser._id.toString() !== userId
+		);
 		request.proof = imagePath;
 		request.completed = true;
-		request.completedBy = userId;
+		request.completedBy = new mongoose.Types.ObjectId(userId);
 		await request.save();
-		await request.execPopulate(
-			'completedBy',
-			'firstName lastName profilePicture'
-		);
-		await request.execPopulate(
-			'createdBy',
-			'firstName lastName profilePicture'
-		);
-		await request.execPopulate(
-			'rewards.fromUser',
-			'firstName lastName profilePicture'
-		);
+		await request
+			.populate('completedBy', 'firstName lastName profilePicture')
+			.execPopulate();
+		//Step 2. Send through updated completed request back to the client for live updating
 		socket.get().emit('requests', {
 			action: UPDATE,
 			request: getRequestForClient(request)
 		});
-		//Send a notification to all users about the request being completed
-		const fromUser = await User.findById(new mongoose.Types.ObjectId(userId));
-		const users = request.rewards.map((reward) => reward.fromUser);
-		const createdByUserExists = users.find(
+		//Step 3. Send a notification to all users about the udpated request
+		const rewardUsers = request.rewards.map((reward) => reward.fromUser);
+		//If the user that created the request is not offering a reward, add to list of users to notify as well
+		const createdByUserExists = rewardUsers.find(
 			(user) => user._id.toString() === request.createdBy._id.toString()
 		);
 		if (!createdByUserExists) {
-			users.push(request.createdBy);
+			rewardUsers.push(request.createdBy);
 		}
-		const promises = [];
-		//Execute all the notifications in parallel to save on time for function to finish
-		for (const user of users) {
+		let promises = [];
+		//Step 4. Execute all the notifications in parallel to save on time for function to finish
+		for (const user of rewardUsers) {
 			promises.push(
 				notificationController.create(
 					userId,
 					'/requests/view/all',
 					user._id,
-					`${fromUser.fullName} has completed the request to "${request.act}"`
+					`${request.completedBy.firstName} ${request.completedBy.lastName} has completed the request to "${request.task}"`
 				)
 			);
 		}
+		//Step 5. Convert the rewards into favours owed to the user that completed the request
+		for (const reward of request.rewards) {
+			promises.push(
+				favourController.createFavour(
+					request.completedBy._id,
+					reward.fromUser._id,
+					request.proof,
+					reward.favourType._id,
+					reward.quantity,
+					request.task
+				)
+			);
+		}
+		await Promise.all(promises);
 		res.status(201).send();
 	} catch (error) {
 		next(error);

@@ -81,7 +81,6 @@ export const repay = (data) => {
 	return async (dispatch) => {
 		try {
 			const result = await Favour.repay(data);
-
 			dispatch({
 				type: SET_MESSAGE,
 				message: new Message({

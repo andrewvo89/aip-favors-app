@@ -54,9 +54,7 @@ const CreateFavourForm = () => {
 	const initialValues = {
 		fromUser: authUser,
 		forUser: {},
-		proof: {
-			actImage: ''
-		},
+		proof: '',
 		favourType: favourTypes[0],
 		quantity: 1
 	};
@@ -89,7 +87,6 @@ const CreateFavourForm = () => {
 
 	const submitHandler = async (values) => {
 		setLoading(true);
-
 		// document population only requires userId
 		values = {
 			...values,
@@ -97,7 +94,6 @@ const CreateFavourForm = () => {
 			forUser: values.forUser.userId,
 			favourType: values.favourType.favourTypeId
 		};
-
 		const favour = await dispatch(favourController.create(values));
 		if (favour) {
 			// route to the new favour's page
@@ -114,7 +110,7 @@ const CreateFavourForm = () => {
 
 	const handleSetImage = (url) => {
 		setImageUrl(url);
-		formik.setFieldValue('proof', { actImage: url });
+		formik.setFieldValue('proof', url);
 	};
 
 	const proofRequired = (checkUrl = true) => {

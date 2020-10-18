@@ -38,7 +38,7 @@ export const addRequest = (values) => {
 				type: SET_MESSAGE,
 				message: new Message({
 					title: 'Request Successful',
-					text: `Your request for "${values.act.trim()}" has been added successfully`,
+					text: `Your request for "${values.task.trim()}" has been added successfully`,
 					feedback: DIALOG
 				})
 			});
@@ -70,11 +70,10 @@ export const addReward = (request, values) => {
 	};
 };
 
-export const deleteReward = (request, selectedReward) => {
+export const deleteReward = (request, reward) => {
 	return async (dispatch, _getState) => {
 		try {
-			const { rewardIndex, favourTypeIndex } = selectedReward;
-			await request.deleteReward(rewardIndex, favourTypeIndex);
+			await request.deleteReward(reward);
 			return true;
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
@@ -87,19 +86,10 @@ export const deleteReward = (request, selectedReward) => {
 	};
 };
 
-export const udpateRewardQuantity = (
-	request,
-	quantity,
-	rewardIndex,
-	favourTypeIndex
-) => {
+export const udpateRewardQuantity = (request, reward, quantity) => {
 	return async (dispatch, _getState) => {
 		try {
-			await request.udpateRewardQuantity(
-				quantity,
-				rewardIndex,
-				favourTypeIndex
-			);
+			await request.udpateRewardQuantity(reward, quantity);
 			return true;
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
@@ -133,20 +123,20 @@ export const handleSocketUpdate = (socketData, requests) => {
 
 export const getSearchResults = (searchParams, requests) => {
 	return requests.filter((request) => {
-		const textMatch = request.act
+		//Text search filter
+		const textMatch = request.task
 			.trim()
 			.toLowerCase()
 			.includes(searchParams.text.trim().toLowerCase());
-		const requestRewards = [];
+		//Get a unique list of all request rewards
+		const extractedRewards = [];
 		request.rewards.forEach((reward) =>
-			reward.favourTypes.forEach((favourType) =>
-				requestRewards.push(favourType.favourType.trim().toLowerCase())
-			)
+			extractedRewards.push(reward.favourType.favourTypeId)
 		);
-		const rewardMatch = requestRewards.some((requestReward) =>
-			searchParams.rewards
-				.map((reward) => reward.trim().toLowerCase())
-				.includes(requestReward)
+		const requestRewards = [...new Set(extractedRewards)];
+		//Rewards filter
+		const rewardMatch = searchParams.rewards.some((searchParamReward) =>
+			requestRewards.includes(searchParamReward)
 		);
 		return textMatch && rewardMatch;
 	});
@@ -156,6 +146,7 @@ export const complete = (request, file) => {
 	return async (dispatch, _getState) => {
 		try {
 			await request.complete(file);
+			return true;
 		} catch (error) {
 			const errorMessage = getErrorMessage(error);
 			dispatch({

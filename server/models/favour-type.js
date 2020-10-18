@@ -5,7 +5,8 @@ const favourTypeShchema = new Schema(
 	{
 		name: {
 			type: String,
-			required: true
+			required: true,
+			maxlength: 50
 		}
 	},
 	{
