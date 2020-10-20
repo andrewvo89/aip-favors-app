@@ -6,6 +6,7 @@ const sharp = require('sharp');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
+const socket = require('../utils/socket');
 const User = require('../models/user');
 const _ = require('lodash');
 
@@ -99,6 +100,9 @@ module.exports.create = async (req, res, next) => {
 			favourType,
 			quantity
 		);
+
+		socket.get().emit('favour created', {userId: fromUser});
+
 		res.status(201).send(favourDoc);
 	} catch (error) {
 		next(error);
