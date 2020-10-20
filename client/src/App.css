@@ -36,3 +36,16 @@
     transform: rotate(360deg);
   }
 }
+
+.highlight {
+  animation: highlight 2000ms ease-out;
+}
+
+@keyframes highlight {
+  0% {
+    background-color: yellow;
+  }
+  100% {
+    background-color: inherit;
+  }
+}
