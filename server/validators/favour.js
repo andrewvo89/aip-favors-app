@@ -13,7 +13,7 @@ module.exports.create = [
 		.isEmpty()
 		.withMessage('favourType is invalid'),
 	body('quantity')
-		.isInt({ min: 1, max: 10 })
+		.isInt({ min: 1, max: 100 })
 		.withMessage('Quantity favour type is invalid')
 ];
 
