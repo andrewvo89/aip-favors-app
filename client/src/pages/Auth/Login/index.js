@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
 	IconButton,
 	InputAdornment,
@@ -21,15 +21,11 @@ export default (props) => {
 	const dispatch = useDispatch();
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [validatedOnMount, setValidatedOnMount] = useState(false);
 
 	const initialValues = {
 		email: '',
 		password: ''
-	};
-
-	const initialErrors = {
-		email: true,
-		password: true
 	};
 
 	const validationSchema = yup.object().shape({
@@ -51,10 +47,15 @@ export default (props) => {
 
 	const formik = useFormik({
 		initialValues: initialValues,
-		initialErrors: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
+
+	const { validateForm } = formik;
+	useEffect(() => {
+		validateForm();
+		setValidatedOnMount(true);
+	}, [validateForm]);
 
 	return (
 		<Card>
@@ -124,7 +125,7 @@ export default (props) => {
 										variant="contained"
 										color="primary"
 										type="submit"
-										disabled={!formik.isValid}
+										disabled={!formik.isValid || !validatedOnMount}
 									>
 										Login
 									</Button>

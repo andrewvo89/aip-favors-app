@@ -34,7 +34,7 @@ const RequestForm = (props) => {
 
 	const validationSchema = yup.object().shape({
 		task: yup.string().label('task').required().max(100),
-		quantity: yup.number().label('quanity').required().min(1).max(10),
+		quantity: yup.number().label('quanity').required().min(1).max(100),
 		favourType: yup
 			.object()
 			.label('Favour')

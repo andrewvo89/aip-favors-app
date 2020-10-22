@@ -18,6 +18,7 @@ const AddRewardDialog = (props) => {
 	const dispatch = useDispatch();
 	const { open, setOpen } = props;
 	const [loading, setLoading] = useState(false);
+	const [validatedOnMount, setValidatedOnMount] = useState(false);
 
 	const initialValues = {
 		quantity: 1,
@@ -67,6 +68,7 @@ const AddRewardDialog = (props) => {
 
 	useEffect(() => {
 		validateForm();
+		setValidatedOnMount(true);
 	}, [validateForm]);
 
 	return (
@@ -112,7 +114,7 @@ const AddRewardDialog = (props) => {
 						type="submit"
 						variant="contained"
 						color="primary"
-						disabled={!formik.isValid || loading}
+						disabled={!formik.isValid || loading || !validatedOnMount}
 					>
 						Confirm
 					</Button>

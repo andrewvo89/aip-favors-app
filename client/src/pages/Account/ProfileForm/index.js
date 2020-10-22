@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
 	Grid,
 	CircularProgress,
@@ -24,6 +24,7 @@ const ProfileForm = () => {
 
 	const [showPasswordDialog, setShowPasswordDialog] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [validatedOnMount, setValidatedOnMount] = useState(false);
 
 	const initialValues = {
 		email: authUser.email,
@@ -31,14 +32,6 @@ const ProfileForm = () => {
 		passwordConfirm: '',
 		firstName: authUser.firstName,
 		lastName: authUser.lastName
-	};
-
-	const initialErrors = {
-		email: true,
-		password: true,
-		passwordConfirm: true,
-		firstName: true,
-		lastName: true
 	};
 
 	const validationSchema = yup.object().shape({
@@ -70,10 +63,15 @@ const ProfileForm = () => {
 
 	const formik = useFormik({
 		initialValues: initialValues,
-		initialStatus: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
+
+	const { validateForm } = formik;
+	useEffect(() => {
+		validateForm();
+		setValidatedOnMount(true);
+	}, [validateForm]);
 
 	return (
 		<Fragment>
@@ -153,7 +151,7 @@ const ProfileForm = () => {
 									variant="contained"
 									color="primary"
 									type="submit"
-									disabled={!formik.isValid}
+									disabled={!formik.isValid || !validatedOnMount}
 								>
 									Update
 								</Button>

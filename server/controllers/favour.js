@@ -79,7 +79,7 @@ module.exports.getAll = async (req, res, next) => {
 		catchValidationErrors(req);
 		const userId = res.locals.userId;
 		const favourDocs = await Favour.find()
-			.or([{ fromUser: userId }, { forUser: userId }])
+			.or([{ fromUser: { $eq: userId } }, { forUser: { $eq: userId } }])
 			.populate('fromUser forUser', '_id firstName lastName profilePicture')
 			.populate('favourType')
 			.sort({ repaid: 1, createdAt: 'desc' })
@@ -102,7 +102,7 @@ module.exports.create = async (req, res, next) => {
 			quantity
 		);
 
-		socket.get().emit('favour created', {userId: fromUser});
+		socket.get().emit('favour created', { userId: fromUser });
 
 		res.status(201).send(favourDoc);
 

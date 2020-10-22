@@ -16,14 +16,14 @@ import HttpStatus from 'http-status-codes';
 import { SNACKBAR } from '../../utils/constants';
 
 const ImageUploadDialog = (props) => {
-	const { open, setOpen, setFile, loading, title } = props;
+	const { open, setOpen, loading, title, confirmHandler } = props;
 	const fileInputRef = useRef();
 	const dispatch = useDispatch();
-	const [preview, setPreview] = useState();
+	const [file, setFile] = useState();
 
 	const dialogCloseHandler = () => {
 		setOpen(false);
-		setPreview(null);
+		setFile(null);
 	};
 
 	const fileSelectedHandler = (event) => {
@@ -33,7 +33,7 @@ const ImageUploadDialog = (props) => {
 				if (!files[0].type.includes('image')) {
 					throw new Error('File must a valid image');
 				}
-				setPreview(files[0]);
+				setFile(files[0]);
 			} catch (error) {
 				dispatch(
 					errorController.setError({
@@ -48,10 +48,6 @@ const ImageUploadDialog = (props) => {
 		}
 	};
 
-	const confirmClickHandler = async () => {
-		setFile(preview);
-	};
-
 	return (
 		<Dialog maxWidth="xs" fullWidth open={open} onClose={dialogCloseHandler}>
 			<input
@@ -64,7 +60,7 @@ const ImageUploadDialog = (props) => {
 			<DialogTitle>{title}</DialogTitle>
 			<DialogContent>
 				<Grid container direction="column" alignItems="center" spacing={2}>
-					{preview && (
+					{file && (
 						<Grid
 							item
 							container
@@ -75,14 +71,14 @@ const ImageUploadDialog = (props) => {
 							<Grid item>
 								<Paper variant="outlined">
 									<img
-										alt="preview"
-										src={URL.createObjectURL(preview)}
+										alt="file"
+										src={URL.createObjectURL(file)}
 										style={{ width: '100%', height: 'auto' }}
 									/>
 								</Paper>
 							</Grid>
 							<Grid item>
-								<Typography>{preview.name}</Typography>
+								<Typography>{file.name}</Typography>
 							</Grid>
 						</Grid>
 					)}
@@ -104,8 +100,8 @@ const ImageUploadDialog = (props) => {
 					type="submit"
 					variant="contained"
 					color="primary"
-					disabled={!preview || loading}
-					onClick={confirmClickHandler}
+					disabled={!file || loading}
+					onClick={() => confirmHandler(file)}
 				>
 					Confirm
 				</Button>

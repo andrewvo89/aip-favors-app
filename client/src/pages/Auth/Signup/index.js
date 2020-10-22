@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
 	IconButton,
 	InputAdornment,
@@ -22,6 +22,7 @@ export default (props) => {
 	const [loading, setLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+	const [validatedOnMount, setValidatedOnMount] = useState(false);
 
 	const initialValues = {
 		email: '',
@@ -30,15 +31,6 @@ export default (props) => {
 		firstName: '',
 		lastName: ''
 	};
-
-	const initialErrors = {
-		email: true,
-		password: true,
-		passwordConfirm: true,
-		firstName: true,
-		lastName: true
-	};
-
 	const validationSchema = yup.object().shape({
 		firstName: yup.string().label('First name').required().max(50),
 		lastName: yup.string().label('Last name').required().max(50),
@@ -69,10 +61,15 @@ export default (props) => {
 
 	const formik = useFormik({
 		initialValues: initialValues,
-		initialErrors: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
+
+	const { validateForm } = formik;
+	useEffect(() => {
+		validateForm();
+		setValidatedOnMount(true);
+	}, [validateForm]);
 
 	return (
 		<Card>
@@ -93,6 +90,9 @@ export default (props) => {
 									}
 									autoFocus={true}
 									fullWidth={true}
+									helperText={
+										formik.touched.firstName && formik.errors.firstName
+									}
 								/>
 							</Grid>
 							<Grid item xs={6}>
@@ -201,7 +201,7 @@ export default (props) => {
 										variant="contained"
 										color="primary"
 										type="submit"
-										disabled={!formik.isValid}
+										disabled={!formik.isValid || !validatedOnMount}
 									>
 										Signup
 									</Button>

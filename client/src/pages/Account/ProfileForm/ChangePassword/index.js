@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	Dialog,
 	DialogActions,
@@ -24,17 +24,12 @@ const ChangePassword = (props) => {
 	const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+	const [validatedOnMount, setValidatedOnMount] = useState(false);
 
 	const initialValues = {
 		currentPassword: '',
 		password: '',
 		passwordConfirm: ''
-	};
-
-	const initialErrors = {
-		currentPassword: true,
-		password: true,
-		passwordConfirm: true
 	};
 
 	const validationSchema = yup.object().shape({
@@ -77,10 +72,15 @@ const ChangePassword = (props) => {
 
 	const formik = useFormik({
 		initialValues: initialValues,
-		initialStatus: initialErrors,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
+
+	const { validateForm } = formik;
+	useEffect(() => {
+		validateForm();
+		setValidatedOnMount(true);
+	}, [validateForm]);
 
 	return (
 		<Dialog
@@ -205,7 +205,7 @@ const ChangePassword = (props) => {
 						variant="contained"
 						color="primary"
 						type="submit"
-						disabled={!formik.isValid || loading}
+						disabled={!formik.isValid || loading || !validatedOnMount}
 					>
 						Confirm
 					</Button>

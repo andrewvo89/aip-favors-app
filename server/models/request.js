@@ -11,7 +11,7 @@ const requestSchema = new Schema(
 		task: {
 			type: String,
 			required: true,
-			maxlength: 50
+			maxlength: 100
 		},
 		rewards: [
 			{

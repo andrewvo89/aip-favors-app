@@ -41,6 +41,8 @@ const CreateFavourForm = () => {
 	const [userList, setUserList] = useState([]);
 	const [imageUrl, setImageUrl] = useState('');
 
+	const [validatedOnMount, setValidatedOnMount] = useState(false);
+
 	// fetch list of users on page load
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -156,10 +158,9 @@ const CreateFavourForm = () => {
 	});
 
 	const { validateForm } = formik;
-
 	useEffect(() => {
-		//formik.validateOnMount() does not work
 		validateForm();
+		setValidatedOnMount(true);
 	}, [validateForm]);
 
 	return (
@@ -279,7 +280,9 @@ const CreateFavourForm = () => {
 											variant="contained"
 											color="primary"
 											type="submit"
-											disabled={!formik.isValid || proofRequired()}
+											disabled={
+												!formik.isValid || proofRequired() || !validatedOnMount
+											}
 										>
 											Create
 										</Button>
