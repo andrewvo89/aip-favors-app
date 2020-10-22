@@ -55,25 +55,32 @@ const CreateFavourForm = () => {
 
 	const initialValues = {
 		fromUser: authUser,
-		forUser: {},
+		forUser: null,
 		proof: '',
 		favourType: favourTypes[0],
 		quantity: 1
 	};
 
 	const validationSchema = yup.object().shape({
-		fromUser: yup.object().shape({
-			userId: yup.string().label('fromUser.userId').required().length(24),
-			firstName: yup.string().label('fromUser.firstName').required().max(50),
-			lastName: yup.string().label('fromUser.lastName').required().max(50),
-			profilePicture: yup.string().label('fromUser.profilePicture')
-		}),
-		forUser: yup.object().shape({
-			userId: yup.string().label('fromUser.userId').required().length(24),
-			firstName: yup.string().label('fromUser.firstName').required().max(50),
-			lastName: yup.string().label('fromUser.lastName').required().max(50),
-			profilePicture: yup.string().label('fromUser.profilePicture')
-		}),
+		fromUser: yup
+			.object()
+			.typeError('From is a required field')
+			.shape({
+				userId: yup.string().label('fromUser.userId').required().length(24),
+				firstName: yup.string().label('fromUser.firstName').required().max(50),
+				lastName: yup.string().label('fromUser.lastName').required().max(50),
+				profilePicture: yup.string().label('fromUser.profilePicture')
+			}),
+		forUser: yup
+			.object()
+			.typeError('For is a required field')
+			.shape({
+				userId: yup.string().label('fromUser.userId').required().length(24),
+				firstName: yup.string().label('fromUser.firstName').required().max(50),
+				lastName: yup.string().label('fromUser.lastName').required().max(50),
+				profilePicture: yup.string().label('fromUser.profilePicture')
+			}),
+		quantity: yup.number().label('Quantity').required().min(1).max(100),
 		favourType: yup
 			.object()
 			.label('Favour Type')
@@ -199,7 +206,13 @@ const CreateFavourForm = () => {
 										onChange={(newValue) =>
 											formik.setFieldValue('fromUser', newValue)
 										}
-										error={!!formik.touched.from && !!formik.errors.from}
+										onBlur={formik.handleBlur('fromUser')}
+										helperText={
+											formik.touched.fromUser && formik.errors.fromUser
+										}
+										error={
+											!!formik.touched.fromUser && !!formik.errors.fromUser
+										}
 										autoFocus={true}
 										defaultValue={initialValues.fromUser}
 									/>
@@ -212,7 +225,9 @@ const CreateFavourForm = () => {
 										onChange={(newValue) =>
 											formik.setFieldValue('forUser', newValue)
 										}
-										error={!!formik.touched.for && !!formik.errors.for}
+										onBlur={formik.handleBlur('forUser')}
+										helperText={formik.touched.forUser && formik.errors.forUser}
+										error={!!formik.touched.forUser && !!formik.errors.forUser}
 									/>
 								</Grid>
 								<Grid item container direction="row" spacing={1}>
@@ -227,6 +242,13 @@ const CreateFavourForm = () => {
 											fullWidth={true}
 											value={formik.values.quantity}
 											onChange={formik.handleChange('quantity')}
+											onBlur={formik.handleBlur('quantity')}
+											helperText={
+												formik.touched.quantity && formik.errors.quantity
+											}
+											error={
+												!!formik.touched.quantity && !!formik.errors.quantity
+											}
 										/>
 									</Grid>
 									<Grid item xs={8}>
@@ -237,6 +259,14 @@ const CreateFavourForm = () => {
 											onChange={formik.handleChange('favourType')}
 											fullWidth={true}
 											disabled={loading}
+											onBlur={formik.handleBlur('favourType')}
+											helperText={
+												formik.touched.favourType && formik.errors.favourType
+											}
+											error={
+												!!formik.touched.favourType &&
+												!!formik.errors.favourType
+											}
 										>
 											{favourTypes.map((favourType) => (
 												<MenuItem

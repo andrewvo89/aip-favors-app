@@ -104,6 +104,7 @@ export default (props) => {
 									onBlur={formik.handleBlur('lastName')}
 									error={!!formik.touched.lastName && !!formik.errors.lastName}
 									fullWidth={true}
+									helperText={formik.touched.lastName && formik.errors.lastName}
 								/>
 							</Grid>
 						</Grid>
@@ -116,6 +117,7 @@ export default (props) => {
 								onBlur={formik.handleBlur('email')}
 								error={!!formik.touched.email && !!formik.errors.email}
 								fullWidth={true}
+								helperText={formik.touched.email && formik.errors.email}
 							/>
 						</Grid>
 						<Grid item>
@@ -127,6 +129,7 @@ export default (props) => {
 								onBlur={formik.handleBlur('password')}
 								error={!!formik.touched.password && !!formik.errors.password}
 								fullWidth={true}
+								helperText={formik.touched.password && formik.errors.password}
 								InputProps={{
 									endAdornment: (
 										<InputAdornment position="end">
@@ -157,6 +160,10 @@ export default (props) => {
 									!!formik.errors.passwordConfirm
 								}
 								fullWidth={true}
+								helperText={
+									formik.touched.passwordConfirm &&
+									formik.errors.passwordConfirm
+								}
 								InputProps={{
 									endAdornment: (
 										<InputAdornment position="end">

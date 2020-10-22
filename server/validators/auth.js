@@ -11,7 +11,7 @@ module.exports.signup = [
 		.not()
 		.isEmpty()
 		.withMessage('Password is invalid')
-		.isLength({ min: 6 })
+		.isLength({ min: 6, max: 50 })
 		.withMessage('Password is invalid'),
 	body('passwordConfirm')
 		.not()

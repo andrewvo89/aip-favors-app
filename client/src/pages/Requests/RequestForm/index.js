@@ -33,8 +33,8 @@ const RequestForm = (props) => {
 	};
 
 	const validationSchema = yup.object().shape({
-		task: yup.string().label('task').required().max(100),
-		quantity: yup.number().label('quanity').required().min(1).max(100),
+		task: yup.string().label('Task').required().min(5).max(100),
+		quantity: yup.number().label('Quantity').required().min(1).max(100),
 		favourType: yup
 			.object()
 			.label('Favour')
@@ -100,6 +100,8 @@ const RequestForm = (props) => {
 											onBlur={formik.handleBlur('task')}
 											disabled={loading}
 											autoFocus={true}
+											helperText={formik.touched.task && formik.errors.task}
+											error={!!formik.touched.task && !!formik.errors.task}
 										/>
 									</Grid>
 									<Grid item container direction="row" spacing={1}>
@@ -115,6 +117,12 @@ const RequestForm = (props) => {
 												value={formik.values.quantity}
 												onChange={formik.handleChange('quantity')}
 												onBlur={formik.handleBlur('quantity')}
+												helperText={
+													formik.touched.quantity && formik.errors.quantity
+												}
+												error={
+													!!formik.touched.quantity && !!formik.errors.quantity
+												}
 											/>
 										</Grid>
 										<Grid item xs={8}>
@@ -124,6 +132,13 @@ const RequestForm = (props) => {
 												value={formik.values.favourType}
 												onChange={formik.handleChange('favourType')}
 												onBlur={formik.handleBlur('favourType')}
+												helperText={
+													formik.touched.favourType && formik.errors.favourType
+												}
+												error={
+													!!formik.touched.favourType &&
+													!!formik.errors.favourType
+												}
 												fullWidth={true}
 												disabled={loading}
 											>

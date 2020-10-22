@@ -78,7 +78,6 @@ const AddRewardDialog = (props) => {
 				<DialogContent>
 					<Grid container direction="row" spacing={1}>
 						<Grid item xs={4}>
-							{' '}
 							<TextField
 								label="Quantity"
 								type="number"
@@ -89,6 +88,9 @@ const AddRewardDialog = (props) => {
 								fullWidth={true}
 								value={formik.values.quantity}
 								onChange={formik.handleChange('quantity')}
+								onBlur={formik.handleBlur('quantity')}
+								helperText={formik.touched.quantity && formik.errors.quantity}
+								error={!!formik.touched.quantity && !!formik.errors.quantity}
 							/>
 						</Grid>
 						<Grid item xs={8}>
@@ -97,6 +99,13 @@ const AddRewardDialog = (props) => {
 								select={true}
 								value={formik.values.favourType}
 								onChange={formik.handleChange('favourType')}
+								onBlur={formik.handleBlur('favourType')}
+								helperText={
+									formik.touched.favourType && formik.errors.favourType
+								}
+								error={
+									!!formik.touched.favourType && !!formik.errors.favourType
+								}
 								fullWidth={true}
 								disabled={loading}
 							>

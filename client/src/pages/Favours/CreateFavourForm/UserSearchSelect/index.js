@@ -12,7 +12,9 @@ const UserSearchSelect = (props) => {
 		onChange,
 		error,
 		autoFocus = false,
-		defaultValue
+		defaultValue,
+		onBlur,
+		helperText
 	} = props;
 	const [open, setOpen] = useState(false);
 	const loading = open && userList.length === 0;
@@ -29,12 +31,14 @@ const UserSearchSelect = (props) => {
 			options={userList}
 			value={value}
 			onChange={(e, newVal) => onChange(newVal)}
+			onBlur={onBlur}
 			autoHighlight
 			autoSelect
 			defaultValue={defaultValue}
 			renderInput={(params) => (
 				<TextField
 					{...params}
+					helperText={helperText}
 					label={label}
 					error={error}
 					autoFocus={autoFocus}

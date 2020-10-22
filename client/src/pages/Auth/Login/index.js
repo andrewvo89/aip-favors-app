@@ -29,8 +29,8 @@ export default (props) => {
 	};
 
 	const validationSchema = yup.object().shape({
-		email: yup.string().label('email').required().email().max(100),
-		password: yup.string().label('password').required().min(6).max(50)
+		email: yup.string().label('Email').required().email().max(100),
+		password: yup.string().label('Password').required().min(6).max(50)
 	});
 
 	const signupClickHandler = () => {
@@ -74,6 +74,7 @@ export default (props) => {
 								error={!!formik.touched.email && !!formik.errors.email}
 								autoFocus={true}
 								fullWidth={true}
+								helperText={formik.touched.email && formik.errors.email}
 							/>
 						</Grid>
 						<Grid item>
@@ -86,6 +87,7 @@ export default (props) => {
 								onBlur={formik.handleBlur('password')}
 								error={!!formik.touched.password && !!formik.errors.password}
 								fullWidth={true}
+								helperText={formik.touched.password && formik.errors.password}
 								InputProps={{
 									endAdornment: (
 										<InputAdornment position="end">
