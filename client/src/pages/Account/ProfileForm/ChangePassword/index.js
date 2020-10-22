@@ -104,6 +104,10 @@ const ChangePassword = (props) => {
 									!!formik.touched.currentPassword &&
 									!!formik.errors.currentPassword
 								}
+								helperText={
+									formik.touched.currentPassword &&
+									formik.errors.currentPassword
+								}
 								autoFocus={true}
 								fullWidth={true}
 								InputProps={{
@@ -137,6 +141,7 @@ const ChangePassword = (props) => {
 								onChange={formik.handleChange('password')}
 								onBlur={formik.handleBlur('password')}
 								error={!!formik.touched.password && !!formik.errors.password}
+								helperText={formik.touched.password && formik.errors.password}
 								fullWidth={true}
 								InputProps={{
 									endAdornment: (
@@ -166,6 +171,10 @@ const ChangePassword = (props) => {
 								error={
 									!!formik.touched.passwordConfirm &&
 									!!formik.errors.passwordConfirm
+								}
+								helperText={
+									formik.touched.passwordConfirm &&
+									formik.errors.passwordConfirm
 								}
 								fullWidth={true}
 								InputProps={{

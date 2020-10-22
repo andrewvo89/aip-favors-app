@@ -107,6 +107,9 @@ const ProfileForm = () => {
 									error={
 										!!formik.touched.firstName && !!formik.errors.firstName
 									}
+									helperText={
+										formik.touched.firstName && formik.errors.firstName
+									}
 									autoFocus={true}
 									fullWidth={true}
 								/>
@@ -119,6 +122,7 @@ const ProfileForm = () => {
 									onChange={formik.handleChange('lastName')}
 									onBlur={formik.handleBlur('lastName')}
 									error={!!formik.touched.lastName && !!formik.errors.lastName}
+									helperText={formik.touched.lastName && formik.errors.lastName}
 									fullWidth={true}
 								/>
 							</Grid>
@@ -130,6 +134,7 @@ const ProfileForm = () => {
 								onChange={formik.handleChange('email')}
 								onBlur={formik.handleBlur('email')}
 								error={!!formik.touched.email && !!formik.errors.email}
+								helperText={formik.touched.email && formik.errors.email}
 								fullWidth={true}
 							/>
 						</Grid>

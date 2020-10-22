@@ -80,7 +80,6 @@ export default class Request {
 		data.append('requestId', this.requestId);
 		data.append('file', resizedFile);
 		const result = await axios.patch('/request/complete', data, config);
-		console.log('result', result);
 		return result;
 	}
 

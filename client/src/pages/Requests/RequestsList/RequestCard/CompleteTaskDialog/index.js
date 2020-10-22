@@ -13,7 +13,6 @@ const CompleteTaskDialog = (props) => {
 		setLoading(true);
 		const result = await dispatch(requestController.complete(request, file));
 		if (result) {
-			console.log(result);
 			setActiveTab(tabs[1]);
 			setOpen(false);
 		} else {

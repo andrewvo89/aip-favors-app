@@ -20,15 +20,14 @@ const hasLoop = (party) => {
 
 	const firstFavour = partyArr[0];
 	const lastFavour = partyArr[partyArr.length - 1];
-	return (lastFavour.forUser.id == firstFavour.fromUser.id);
+	return lastFavour.forUser.id == firstFavour.fromUser.id;
 };
 
 const detectParty = async (initiatorId) => {
 	try {
 		console.time('detectParty');
 
-		const favourDocs = await Favour
-			.find({ repaid: false })
+		const favourDocs = await Favour.find({ repaid: false })
 			.select('_id fromUser forUser')
 			.populate('fromUser forUser', '_id firstName lastName')
 			.exec();
@@ -50,11 +49,13 @@ const detectParty = async (initiatorId) => {
 					const fromUser = favour.fromUser.id;
 					const userMatches = currentFavour.forUser.id == fromUser;
 
-					return userMatches && !fromUsers.has(fromUser) && !visited.has(favour.id);
+					return (
+						userMatches && !fromUsers.has(fromUser) && !visited.has(favour.id)
+					);
 				});
 			}
 
-			// Party qualifies if: 
+			// Party qualifies if:
 			// - it has more than 2 favours.
 			// - it doesn't contain a favour that is already in another party.
 			// - the party's last user owes the party's first user a favour (has a loop).
@@ -81,7 +82,12 @@ const detectParty = async (initiatorId) => {
 					initiatorId,
 					'/favours/view/all',
 					userId,
-					`You're in a favour cycle with ${party.size - 1} other users: ${partyNames(partyUsers, userId)}`
+					`Party Detected! You're in a favour cycle with ${
+						party.size - 1
+					} other users: ${partyNames(
+						partyUsers,
+						userId
+					)}. Why not have a party and settle all your favours!`
 				);
 			});
 		});

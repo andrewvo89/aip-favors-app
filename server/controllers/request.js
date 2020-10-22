@@ -1,4 +1,4 @@
-const { validationResult, body } = require('express-validator');
+const { validationResult } = require('express-validator');
 const Request = require('../models/request');
 const { DIALOG, CREATE, UPDATE, DELETE } = require('../utils/constants');
 const { getError } = require('../utils/error');
@@ -7,7 +7,6 @@ const socket = require('../utils/socket');
 const notificationController = require('./notification');
 const favourController = require('./favour');
 const User = require('../models/user');
-const Favour = require('../models/favour');
 const sharp = require('sharp');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');

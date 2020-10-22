@@ -31,11 +31,10 @@ const RequestsList = () => {
 	const [socketData, setSocketData] = useState();
 	const [requests, setRequests] = useState();
 	const [filteredRequests, setFilteredRequests] = useState();
-	const [requestRewards, setRequestRewards] = useState();
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const initialPage = 1;
-	const MAX_PER_PAGE = 10;
+	const MAX_PER_PAGE = 5;
 	const [page, setPage] = useState(initialPage);
 
 	useEffect(() => {
@@ -55,26 +54,12 @@ const RequestsList = () => {
 		if (socketData) {
 			const newRequests = requestController.handleSocketUpdate(
 				socketData,
-				requests
+				filteredRequests
 			);
 			setRequests(newRequests);
 			setSocketData(null);
 		}
-	}, [socketData, requests]);
-	//Set unique list rewards based on requests
-	useEffect(() => {
-		if (requests) {
-			const extractedRewards = [];
-			requests.forEach((request) =>
-				request.rewards.forEach((reward) =>
-					extractedRewards.push(reward.favourType.name)
-				)
-			);
-			const uniqueRewards = [...new Set(extractedRewards)];
-			uniqueRewards.sort();
-			setRequestRewards(uniqueRewards);
-		}
-	}, [requests, searchParams]);
+	}, [socketData, filteredRequests]);
 	//Update search results
 	useEffect(() => {
 		if (requests) {
@@ -110,7 +95,7 @@ const RequestsList = () => {
 		}
 	}, [searchResults, activeTab]);
 
-	if (!filteredRequests || !requestRewards) {
+	if (!filteredRequests) {
 		return (
 			<Grid container justify="center">
 				<CircularProgress />
@@ -187,7 +172,6 @@ const RequestsList = () => {
 							<Typography>
 								No public requests.
 								<Link onClick={newRequestClickHandler}>
-									{' '}
 									Click here to create a new public request.
 								</Link>
 							</Typography>

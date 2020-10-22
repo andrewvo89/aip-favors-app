@@ -68,7 +68,7 @@ const FavourList = () => {
 
 	// for pagination
 	const initialPage = 1;
-	const MAX_PER_PAGE = 10;
+	const MAX_PER_PAGE = 5;
 	const [page, setPage] = useState(initialPage);
 
 	// fetch user's favours on page load

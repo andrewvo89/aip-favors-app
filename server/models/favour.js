@@ -43,7 +43,6 @@ const favourSchema = new Schema(
 			type: String,
 			default: '',
 			required: false,
-			minlength: 5,
 			maxlength: 100
 		}
 	},

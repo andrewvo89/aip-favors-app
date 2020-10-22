@@ -128,8 +128,8 @@ export default (props) => {
 								onChange={formik.handleChange('password')}
 								onBlur={formik.handleBlur('password')}
 								error={!!formik.touched.password && !!formik.errors.password}
-								fullWidth={true}
 								helperText={formik.touched.password && formik.errors.password}
+								fullWidth={true}
 								InputProps={{
 									endAdornment: (
 										<InputAdornment position="end">
