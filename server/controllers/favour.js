@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const socket = require('../utils/socket');
 const User = require('../models/user');
 const _ = require('lodash');
+const partyDetection = require('../utils/party-detection');
 
 // Catches any errors detected through express-validator middlware
 const catchValidationErrors = (req) => {
@@ -104,6 +105,9 @@ module.exports.create = async (req, res, next) => {
 		socket.get().emit('favour created', {userId: fromUser});
 
 		res.status(201).send(favourDoc);
+
+		// Detect favour cycles.
+		await partyDetection(favourDoc.fromUser.id);
 	} catch (error) {
 		next(error);
 	}
