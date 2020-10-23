@@ -102,7 +102,6 @@ export const getLeaderboard = () => {
 	return async (dispatch) => {
 		try {
 			const result = await Favour.getLeaderboard();
-
 			return result;
 		} catch (error) {
 			dispatchError(error, dispatch);

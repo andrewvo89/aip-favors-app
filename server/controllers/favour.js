@@ -176,7 +176,7 @@ module.exports.getLeaderboard = async (req, res, next) => {
 
 		// order by favour count descending and limit to top 15 for leaderboard output
 		data = _.orderBy(data, ['favourCount'], ['desc']);
-		data = data.slice(0, 15);
+		data = data.slice(0, 10);
 
 		res.status(200).json(data);
 

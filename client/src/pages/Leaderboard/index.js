@@ -39,16 +39,17 @@ const Leaderboard = () => {
 
 	useEffect(() => {
 		// subscribe to the socket.io for favours updates
-		socket.on('favour created', function(data) {			
+		socket.on('favour created', function (data) {
 			const fetchFavours = async () => {
 				const results = await dispatch(favourController.getLeaderboard());
 				setLeaderboardList(results);
-				
 				// highlight the specific row in table on update
 				let row = document.getElementById(data.userId);
 				if (row) {
 					row.classList.add('highlight');
-					setTimeout(function() { row.classList.remove('highlight'); }, 3500);
+					setTimeout(function () {
+						row.classList.remove('highlight');
+					}, 3500);
 				}
 			};
 			fetchFavours();
@@ -65,7 +66,7 @@ const Leaderboard = () => {
 		<Container maxWidth="xs" disableGutters>
 			<Card elevation={6}>
 				<CardHeader
-					title="Leaderboard"
+					title="Top 10 Leaderboard"
 					subheader="Ranking users by favours provided"
 				/>
 				{loading ? (
