@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import {
 	Card,
@@ -27,37 +27,41 @@ const Leaderboard = () => {
 	const [loading, setLoading] = useState(false);
 	const [leaderboardList, setLeaderboardList] = useState([]);
 
-	useEffect(() => {
-		setLoading(true);
-		const fetchFavoursCount = async () => {
-			const results = await dispatch(favourController.getLeaderboard());
+	const getLeaderboard = useCallback(() => {
+		const fetchFavours = async () => {
+			let results = await dispatch(favourController.getLeaderboard());
 			setLeaderboardList(results);
 			setLoading(false);
 		};
-		fetchFavoursCount();
+		fetchFavours();
 	}, [dispatch]);
 
 	useEffect(() => {
+		// initial render
+		setLoading(true);
+		getLeaderboard();
+
 		// subscribe to the socket.io for favours updates
 		socket.on('favour created', function (data) {
-			const fetchFavours = async () => {
-				const results = await dispatch(favourController.getLeaderboard());
-				setLeaderboardList(results);
-				// highlight the specific row in table on update
-				let row = document.getElementById(data.userId);
-				if (row) {
-					row.classList.add('highlight');
-					setTimeout(function () {
-						row.classList.remove('highlight');
-					}, 3500);
-				}
-			};
-			fetchFavours();
+			// update leaderboard when a new favour is created
+			getLeaderboard();
+
+			// highlight the specific row in table on update
+			let row = document.getElementById(data.userId);
+			if (row) {
+				row.classList.add('highlight');
+				setTimeout(function () {
+					row.classList.remove('highlight');
+				}, 3500);
+			}
 		});
-	}, [dispatch, leaderboardList]);
+	}, [dispatch, getLeaderboard]);
 
 	const useStyles = makeStyles({
-		table: {}
+		loading: {
+			display: "block",
+			margin: "auto"
+		}
 	});
 
 	const classes = useStyles();
@@ -69,12 +73,13 @@ const Leaderboard = () => {
 					title="Top 10 Leaderboard"
 					subheader="Ranking users by favours provided"
 				/>
-				{loading ? (
-					<CircularProgress />
-				) : (
-					<CardContent>
+
+				<CardContent>
+					{loading ? (
+						<CircularProgress className={classes.loading} />
+					) : (
 						<TableContainer component={Paper} variant="outlined">
-							<Table className={classes.table} aria-label="simple table">
+							<Table aria-label="simple table">
 								<TableHead>
 									<TableRow>
 										<TableCell>#</TableCell>
@@ -101,8 +106,8 @@ const Leaderboard = () => {
 								</TableBody>
 							</Table>
 						</TableContainer>
-					</CardContent>
-				)}
+					)}
+				</CardContent>
 			</Card>
 		</Container>
 	);
