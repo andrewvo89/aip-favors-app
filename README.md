@@ -1,5 +1,17 @@
 # aip-favors-app
 
+Quoc Hao Vo-Nguyen
+GitHub: andrewvo89
+
+Sean Clark
+GitHub: bitcyked
+
+Marshall Sutton
+GitHub: peefeeyatko
+
+Ding Sun
+GitHub: qqqwwweee12339
+
 ### Connect to MongoDB through CLI
 
 1. Install [MongoDB Shell](https://www.mongodb.com/try/download/shell)
