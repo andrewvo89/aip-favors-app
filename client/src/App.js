@@ -36,13 +36,13 @@ const App = withRouter((props) => {
 			dispatch(notificationController.subscribeToNotifications());
 		}
 	}, [notifications, dispatch]);
-
+	//By default, render a loading spinners
 	let children = (
 		<Grid container justify="center">
 			<CircularProgress />
 		</Grid>
 	);
-
+	//Render request page only after authentical loading
 	if (!authLoading && !!favourTypes) {
 		children = (
 			<Switch>
@@ -52,7 +52,7 @@ const App = withRouter((props) => {
 				<Redirect to="/" />
 			</Switch>
 		);
-
+		//Once auth logged in, render protected pagesd
 		if (authUser && !!favourTypes) {
 			children = (
 				<Switch>

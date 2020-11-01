@@ -12,7 +12,7 @@ import {
 import { Alert, AlertTitle } from '@material-ui/lab';
 import * as messageController from '../controllers/message';
 import { DIALOG, SILENT, SNACKBAR } from './constants';
-
+//Provide a messaing view to show messages
 const MessageProvider = (props) => {
 	const dispatch = useDispatch();
 	const { message } = useSelector((state) => state.messageState);

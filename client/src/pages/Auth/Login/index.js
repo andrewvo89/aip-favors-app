@@ -22,7 +22,7 @@ export default (props) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [validatedOnMount, setValidatedOnMount] = useState(false);
-
+	//Initialize form values
 	const initialValues = {
 		email: '',
 		password: ''
@@ -32,11 +32,11 @@ export default (props) => {
 		email: yup.string().label('Email').required().email().max(100),
 		password: yup.string().label('Password').required().min(6).max(50)
 	});
-
+	//Create schema for form
 	const signupClickHandler = () => {
 		props.setSignup(true);
 	};
-
+	//Action to login
 	const submitHandler = async (values) => {
 		setLoading(true);
 		const result = await dispatch(authController.login(values));
@@ -44,13 +44,13 @@ export default (props) => {
 			setLoading(false); //If login passed, cannot perform this action on unmounted component
 		}
 	};
-
+	//Initialize formik hook
 	const formik = useFormik({
 		initialValues: initialValues,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
-
+	//Validate form upon mounting
 	const { validateForm } = formik;
 	useEffect(() => {
 		validateForm();

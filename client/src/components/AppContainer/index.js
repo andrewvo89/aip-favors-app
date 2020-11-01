@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Fragment } from 'react';
 import Navbar from '../Navbar';
 import SideDrawer from '../SideDrawer';
-
+//General container for the entire app
 const AppContainer = (props) => {
 	const { authUser } = props;
 	const [drawerOpen, setDrawerOpen] = useState(false);

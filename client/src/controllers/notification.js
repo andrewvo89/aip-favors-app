@@ -13,7 +13,7 @@ import {
 import { getErrorMessage } from '../utils/error-handler';
 const { REACT_APP_REST_URL: REST_URL } = process.env;
 const socket = openSocket(REST_URL);
-
+//Subscribe to the socket.io stream to receive notifications
 export const subscribeToNotifications = () => {
 	return async (dispatch, getState) => {
 		try {
@@ -25,6 +25,7 @@ export const subscribeToNotifications = () => {
 			});
 			//Subscribe to the socket.io for notification updates
 			socket.on(`notifications-${authUser.userId}`, (data) => {
+				//Every time there is a new notification, dispatch new notification
 				let newNotifications = [...getState().notificationState.notifications];
 				const actions = [];
 				if (data.action === CREATE) {
@@ -62,7 +63,7 @@ export const subscribeToNotifications = () => {
 		}
 	};
 };
-
+//Ubsubscibe to the socket.io stream to prevent memory leaks
 export const unsubscribeToNotifications = () => {
 	return async (dispatch, getState) => {
 		const { authUser } = getState().authState;
@@ -84,7 +85,7 @@ export const unsubscribeToNotifications = () => {
 		}
 	};
 };
-
+//Delete all notifications for a user
 export const clearNotifications = () => {
 	return async (dispatch, _getState) => {
 		try {
@@ -98,7 +99,7 @@ export const clearNotifications = () => {
 		}
 	};
 };
-
+//Delte a single notification
 export const clearNotification = (notification) => {
 	return async (dispatch, _getState) => {
 		try {

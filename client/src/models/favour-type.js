@@ -6,7 +6,7 @@ export default class FavourType {
 		this.favourTypeId = favourTypeId;
 		this.name = name;
 	}
-
+	//Get all favour types from the back end
 	static async getAll() {
 		const result = await axios.get('/favour-types/get-all', config);
 		const favourTypes = result.data.favourTypes;

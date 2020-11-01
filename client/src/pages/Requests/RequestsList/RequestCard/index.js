@@ -97,11 +97,6 @@ const Request = (props) => {
 	const proofClickHandler = () => {
 		if (authUser) {
 			setimageDialogOpen(true);
-			// window.open(
-			// 	`${REST_URL}/${request.proof.split('\\').join('/')}`,
-			// 	'_blank',
-			// 	'noreferrer'
-			// );
 		} else {
 			dispatch(authController.showLoginDialog());
 		}

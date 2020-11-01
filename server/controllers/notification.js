@@ -5,6 +5,16 @@ const { DELETE, DELETE_ALL, CREATE, DIALOG } = require('../utils/constants');
 const { getError } = require('../utils/error');
 const socket = require('../utils/socket');
 
+//Transoform object for client side
+const getNotificationForClient = (notification) => {
+	return {
+		notificationId: notification._id,
+		createdAt: notification.createdAt,
+		link: notification.link,
+		title: notification.title
+	};
+};
+//Get all notifications for a specific user
 module.exports.getAll = async (req, res, next) => {
 	try {
 		const docs = await Notification.find({
@@ -18,7 +28,7 @@ module.exports.getAll = async (req, res, next) => {
 		next(error);
 	}
 };
-
+//Create a notification and emit it too all clients connected to socket.io
 module.exports.create = async (createdBy, link, recipient, title) => {
 	const notification = new Notification({
 		createdBy: new mongoose.Types.ObjectId(createdBy),
@@ -32,7 +42,7 @@ module.exports.create = async (createdBy, link, recipient, title) => {
 		notification: getNotificationForClient(notification)
 	});
 };
-
+//Remove a single notification
 module.exports.delete = async (req, res, next) => {
 	try {
 		const validationErrors = validationResult(req);
@@ -57,7 +67,7 @@ module.exports.delete = async (req, res, next) => {
 		next(error);
 	}
 };
-
+//Clear all notifications
 module.exports.deleteAll = async (req, res, next) => {
 	try {
 		const { userId } = res.locals;
@@ -71,13 +81,4 @@ module.exports.deleteAll = async (req, res, next) => {
 	} catch (error) {
 		next(error);
 	}
-};
-
-const getNotificationForClient = (notification) => {
-	return {
-		notificationId: notification._id,
-		createdAt: notification.createdAt,
-		link: notification.link,
-		title: notification.title
-	};
 };

@@ -25,13 +25,13 @@ const ChangePassword = (props) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 	const [validatedOnMount, setValidatedOnMount] = useState(false);
-
+	//Initial form values
 	const initialValues = {
 		currentPassword: '',
 		password: '',
 		passwordConfirm: ''
 	};
-
+	//Validation schema for the form
 	const validationSchema = yup.object().shape({
 		currentPassword: yup.string().label('Password').required(),
 		password: yup.string().label('New password').required().min(6).max(50),
@@ -46,13 +46,13 @@ const ChangePassword = (props) => {
 				'Confirmation password must match password.'
 			)
 	});
-
+	//Close the dialog
 	const dialogCloseHandler = () => {
 		if (!loading) {
 			props.setShowPasswordDialog(false);
 		}
 	};
-
+	//Dispatch action update password
 	const submitHandler = async (values, _actions) => {
 		setLoading(true);
 		const result = await dispatch(userController.updatePassword(values));
@@ -69,13 +69,13 @@ const ChangePassword = (props) => {
 			setLoading(false);
 		}
 	};
-
+	//Initialize formik hook
 	const formik = useFormik({
 		initialValues: initialValues,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
-
+	//Validate upon mounting components
 	const { validateForm } = formik;
 	useEffect(() => {
 		validateForm();

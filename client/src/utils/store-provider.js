@@ -9,7 +9,7 @@ import messageReducer from '../store/message';
 import notificationReducer from '../store/notification';
 import favourTypeReducer from '../store/favour-type';
 import { composeWithDevTools } from 'redux-devtools-extension';
-
+//Redux store settings
 const rootReducer = combineReducers({
 	authState: authReducer,
 	errorState: errorReducer,

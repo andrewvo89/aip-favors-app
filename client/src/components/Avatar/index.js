@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { StyledAvatar } from './styled-components';
 import { useSelector } from 'react-redux';
 const { REACT_APP_REST_URL: REST_URL } = process.env;
-
+//Global avatar component
 const Avatar = (props) => {
 	const { authUser } = useSelector((state) => state.authState);
 	const { user, iconFallback, customFallback } = props;

@@ -21,7 +21,7 @@ export default class Request {
 		this.completedBy = completedBy;
 		this.proof = proof;
 	}
-
+	//API Call to save a new request
 	async save() {
 		if (!this.requestId) {
 			//If no requestId, create a new Request in the database
@@ -32,7 +32,7 @@ export default class Request {
 			await axios.post('/request/create', data, config);
 		}
 	}
-
+	//API Call to add a reward to a new request
 	async addReward(values) {
 		const data = {
 			requestId: this.requestId,
@@ -41,7 +41,7 @@ export default class Request {
 		};
 		await axios.patch('/request/add-reward', data, config);
 	}
-
+	//API Call delete a reward from a request
 	async deleteReward(reward) {
 		const data = {
 			requestId: this.requestId,
@@ -50,7 +50,7 @@ export default class Request {
 		};
 		await axios.patch('/request/delete-reward', data, config);
 	}
-
+	//API Call update reward quantity on request
 	async udpateRewardQuantity(reward, quantity) {
 		const data = {
 			requestId: this.requestId,
@@ -60,9 +60,10 @@ export default class Request {
 		};
 		await axios.patch('/request/udpate-reward-quantity', data, config);
 	}
-
+	//API Call to compelte a request
 	async complete(file) {
 		const resizedFile = await new Promise((resolve, reject) => {
+			//Use compressor to resize an image client side before uploading to save bandwidth adn time
 			return new Compressor(file, {
 				width: 400,
 				success: (result) => {
@@ -76,13 +77,14 @@ export default class Request {
 				error: (error) => reject(error)
 			});
 		});
+		//Need to send mixed data (image and json), so need to use FormData()
 		const data = new FormData();
 		data.append('requestId', this.requestId);
 		data.append('file', resizedFile);
 		const result = await axios.patch('/request/complete', data, config);
 		return result;
 	}
-
+	//API Call to create a new request
 	static async create(values) {
 		const data = {
 			task: values.task,
@@ -91,7 +93,7 @@ export default class Request {
 		};
 		await axios.post('/request/create', data, config);
 	}
-
+	//API Call to get a request and add a filter if required
 	static async get(filter) {
 		const data = { filter };
 		const result = await axios.post('/request/get-requests', data, config);

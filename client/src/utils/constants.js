@@ -1,3 +1,4 @@
+//Initialize constants to prevent typos
 export const AUTH_USER_CHANGED = 'AUTH_USER_CHANGED';
 export const LOGOUT = 'LOGOUT';
 export const SET_ERROR = 'SET_ERROR';

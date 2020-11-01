@@ -9,7 +9,7 @@ const catchValidationErrors = (req) => {
 		throw getError(422, validationErrors.errors[0].msg, DIALOG);
 	}
 };
-
+//Return all favour types to the front end upon app load
 module.exports.getAll = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);

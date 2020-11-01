@@ -17,12 +17,13 @@ import { get503Error } from '../utils/error-handler';
 import openSocket from 'socket.io-client';
 const { REACT_APP_REST_URL: REST_URL } = process.env;
 const socket = openSocket(REST_URL);
-
+//Check authentication upon app start
 export const verifyAuth = () => {
 	return async (dispatch, _getState) => {
 		try {
 			const result = await User.verifyAuth();
 			const authUser = new User(result.data.authUser);
+			//Once token is verified from back end, create User Object and dispatch it to redux store
 			dispatch([
 				{
 					type: AUTH_USER_CHANGED,
@@ -59,7 +60,7 @@ export const verifyAuth = () => {
 		}
 	};
 };
-
+//Process action to sign up
 export const signup = (values) => {
 	return async (dispatch, _getState) => {
 		try {
@@ -70,6 +71,7 @@ export const signup = (values) => {
 				values.firstName,
 				values.lastName
 			);
+			//If sign up is successful, log user in
 			const authUser = new User(result.data.authUser);
 			dispatch([
 				{
@@ -101,7 +103,7 @@ export const signup = (values) => {
 		}
 	};
 };
-
+//Login action
 export const login = (values) => {
 	return async (dispatch, _getState) => {
 		try {
@@ -123,6 +125,7 @@ export const login = (values) => {
 			]);
 			return true;
 		} catch (error) {
+			//If error thrown from back end due to failed log in credentials
 			const errorMessage = new ErrorMessage({
 				status: error.response?.status,
 				statusText: error.response?.statusText,
@@ -137,7 +140,7 @@ export const login = (values) => {
 		}
 	};
 };
-
+//Remove user from redux store and clear token
 export const logout = () => {
 	return async (dispatch, getState) => {
 		try {

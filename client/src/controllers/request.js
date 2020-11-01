@@ -9,7 +9,7 @@ import {
 	UPDATE
 } from '../utils/constants';
 import { getErrorMessage } from '../utils/error-handler';
-
+//Get requests using a filter from the backend
 export const getRequests = (filter) => {
 	return async (dispatch, _getState) => {
 		try {
@@ -29,7 +29,7 @@ export const getRequests = (filter) => {
 		}
 	};
 };
-
+//Add a new request to back end
 export const addRequest = (values) => {
 	return async (dispatch, _getState) => {
 		try {
@@ -53,7 +53,7 @@ export const addRequest = (values) => {
 		}
 	};
 };
-
+//Add a reward to and existing request
 export const addReward = (request, values) => {
 	return async (dispatch, _getState) => {
 		try {
@@ -69,7 +69,7 @@ export const addReward = (request, values) => {
 		}
 	};
 };
-
+//Delete a reward from a request
 export const deleteReward = (request, reward) => {
 	return async (dispatch, _getState) => {
 		try {
@@ -85,7 +85,7 @@ export const deleteReward = (request, reward) => {
 		}
 	};
 };
-
+//Update the quantity (increment or decrement) of a reward on a request
 export const udpateRewardQuantity = (request, reward, quantity) => {
 	return async (dispatch, _getState) => {
 		try {
@@ -101,7 +101,7 @@ export const udpateRewardQuantity = (request, reward, quantity) => {
 		}
 	};
 };
-
+//Perform certain actions on live socket updates depending on the action from the back end
 export const handleSocketUpdate = (socketData, requests) => {
 	let newRequests = [...requests];
 	const newRequest = new Request({ ...socketData.request });
@@ -120,7 +120,7 @@ export const handleSocketUpdate = (socketData, requests) => {
 	}
 	return newRequests;
 };
-
+//Get search results on the main page
 export const getSearchResults = (searchParams, requests) => {
 	return requests.filter((request) => {
 		//Text search filter
@@ -141,7 +141,7 @@ export const getSearchResults = (searchParams, requests) => {
 		return textMatch && rewardMatch;
 	});
 };
-
+//Complet action for a request
 export const complete = (request, file) => {
 	return async (dispatch, _getState) => {
 		try {

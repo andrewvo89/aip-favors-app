@@ -5,7 +5,7 @@ const {
 	REFRESH_TOKEN_EXPIRY
 } = process.env;
 const jwt = require('jsonwebtoken');
-
+//Returns both accessToken and refreshToken from JWT
 module.exports.getTokens = (userId) => {
 	const payload = {
 		iss: process.env.APP_NAME,
@@ -24,7 +24,7 @@ module.exports.getTokens = (userId) => {
 		)
 	};
 };
-
+S;
 module.exports.setCookies = (res, accessToken) => {
 	res.cookie('token', accessToken, {
 		secure: false, //Enabled true when changeing from development (http) to production (https)

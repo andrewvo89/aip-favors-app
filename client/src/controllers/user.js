@@ -19,7 +19,7 @@ const getErrorMessage = (error) => {
 		});
 	}
 };
-
+//Update a user's profile details action
 export const update = (values) => {
 	return async (dispatch, getState) => {
 		try {
@@ -45,7 +45,7 @@ export const update = (values) => {
 		}
 	};
 };
-
+//Update user's password
 export const updatePassword = (values) => {
 	return async (dispatch, getState) => {
 		try {
@@ -62,7 +62,7 @@ export const updatePassword = (values) => {
 		}
 	};
 };
-
+//Upload profile picture action
 export const uploadPicture = (file) => {
 	return async (dispatch, getState) => {
 		try {
@@ -84,7 +84,7 @@ export const uploadPicture = (file) => {
 		}
 	};
 };
-
+//Remove profile picture action
 export const removePicture = () => {
 	return async (dispatch, getState) => {
 		try {
@@ -107,7 +107,7 @@ export const removePicture = () => {
 		}
 	};
 };
-
+//Get users based on certain filter
 export const getUsers = (filter) => {
 	return async (dispatch) => {
 		try {
@@ -115,10 +115,6 @@ export const getUsers = (filter) => {
 			if (filter) {
 				transformedFilter = filter;
 			}
-			// TODO: maybe implement filter to grab specific users
-			// instead of returning all? e.g.:
-			// { firtName: 'David', email: 'blah@example.com' }
-			// const result = await axios.get('/user/get-users', config);
 			const users = await User.get(transformedFilter);
 			return users;
 		} catch (error) {

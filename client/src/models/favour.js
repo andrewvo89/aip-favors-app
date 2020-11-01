@@ -25,39 +25,36 @@ export default class Favour {
 		delete this.fromUser._id;
 		delete this.forUser._id;
 	}
-
+	//API call to create favour
 	static async create(data) {
 		const result = await axios.post('/favours/create', data, config);
 		const favour = new Favour(result.data);
 		return favour;
 	}
-
+	//API call to get all favours
 	static async getAllFavours() {
 		const result = await axios.get('/favours/view/all', config);
-
 		const favours = result.data.map((favour) => new Favour(favour));
-
 		return favours;
 	}
-
+	//API Call to get a single favour
 	static async getFavour(favourId) {
 		const result = await axios.get(`/favours/view/${favourId}`, config);
 		const favour = new Favour(result.data);
 		return favour;
 	}
-
+	//API Call to repay a favour
 	static async repay(data) {
 		const result = await axios.patch('/favours/repay', data, config);
 		const favour = new Favour(result.data);
 		return favour;
 	}
-
+	//API Call to get the initial leaderboard
 	static async getLeaderboard() {
 		const result = await axios.get('/favours/get-leaderboard', config);
-
 		return result.data;
 	}
-
+	//API Call to upload proof image
 	static async uploadImage({ file, userId }) {
 		const resizedFile = await new Promise((resolve, reject) => {
 			return new Compressor(file, {
@@ -73,11 +70,9 @@ export default class Favour {
 				error: (error) => reject(error)
 			});
 		});
-
 		const data = new FormData();
 		data.append('userId', userId);
 		data.append('file', resizedFile);
-
 		// upload image and return resulting image url
 		const result = await axios.post('/favours/upload-image', data, config);
 		return result.data;

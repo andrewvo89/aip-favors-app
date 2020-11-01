@@ -16,32 +16,32 @@ const AccountAvatar = withRouter((_props) => {
 	const [loading, setLoading] = useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 	const [anchorElement, setAnchorElement] = useState(null);
-
+	//Toggle upload menu
 	const menuCloseHandler = () => {
 		setAnchorElement(null);
 	};
-
+	//Remove profile picture
 	const removeClickHandler = () => {
 		setShowConfirmDialog(true);
 		menuCloseHandler();
 	};
-
+	//Open file dowload to select an image to upload
 	const uploadClickHandler = () => {
 		fileInputRef.current.click();
 		menuCloseHandler();
 	};
-
+	//Close confirm dialog
 	const cancelClickHandler = () => {
 		setShowConfirmDialog(false);
 	};
-
+	//Once confirmed, dispatch action to remove pofile picture
 	const confirmClickHandler = async () => {
 		setLoading(true);
 		await dispatch(userController.removePicture());
 		setLoading(false);
 		setShowConfirmDialog(false);
 	};
-
+	//Once a file is selected, upload the image
 	const fileSelectedHandler = async (event) => {
 		setLoading(true);
 		const files = [...event.target.files];
@@ -103,7 +103,8 @@ const AccountAvatar = withRouter((_props) => {
 					vertical: 'top',
 					horizontal: 'center'
 				}}
-				getContentAnchorEl={null}>
+				getContentAnchorEl={null}
+			>
 				<MenuItem onClick={uploadClickHandler}>Upload Picture</MenuItem>
 				<MenuItem onClick={removeClickHandler}>Remove Picture</MenuItem>
 			</Menu>

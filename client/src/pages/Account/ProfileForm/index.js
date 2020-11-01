@@ -25,7 +25,7 @@ const ProfileForm = () => {
 	const [showPasswordDialog, setShowPasswordDialog] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [validatedOnMount, setValidatedOnMount] = useState(false);
-
+	//Initialize form values
 	const initialValues = {
 		email: authUser.email,
 		password: '',
@@ -33,13 +33,13 @@ const ProfileForm = () => {
 		firstName: authUser.firstName,
 		lastName: authUser.lastName
 	};
-
+	//Create schema for form
 	const validationSchema = yup.object().shape({
 		firstName: yup.string().label('First name').required().max(50),
 		lastName: yup.string().label('Last name').required().max(50),
 		email: yup.string().label('Email').required().email().max(100)
 	});
-
+	//Dispatch action to update profile
 	const submitHandler = async (values, _actions) => {
 		setLoading(true);
 		const result = await dispatch(
@@ -60,13 +60,13 @@ const ProfileForm = () => {
 		}
 		setLoading(false);
 	};
-
+	//Initialize formik hook
 	const formik = useFormik({
 		initialValues: initialValues,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
 	});
-
+	//Validate form upon mounting
 	const { validateForm } = formik;
 	useEffect(() => {
 		validateForm();

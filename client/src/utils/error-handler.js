@@ -19,7 +19,7 @@ import {
 	NETWORK_ERROR
 } from './constants';
 import ErrorMessage from '../models/error-message';
-
+//Provide an error display view mechanism
 const ErrorHandler = (props) => {
 	const dispatch = useDispatch();
 	const error = useSelector((state) => state.errorState.error);

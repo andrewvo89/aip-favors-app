@@ -23,14 +23,14 @@ export default (props) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 	const [validatedOnMount, setValidatedOnMount] = useState(false);
-
+	//Initialize form values
 	const initialValues = {
 		email: '',
 		password: '',
 		passwordConfirm: '',
 		firstName: '',
 		lastName: ''
-	};
+	}; //Create schema for form
 	const validationSchema = yup.object().shape({
 		firstName: yup.string().label('First name').required().max(50),
 		lastName: yup.string().label('Last name').required().max(50),
@@ -45,11 +45,11 @@ export default (props) => {
 				'Confirmation password must match password.'
 			)
 	});
-
+	//Return to login
 	const backClickHandler = () => {
 		props.setSignup(false);
 	};
-
+	//Dispatch signup action
 	const submitHandler = async (values) => {
 		setLoading(true);
 		const result = await dispatch(authController.signup(values));
@@ -57,14 +57,12 @@ export default (props) => {
 			//If login failed, set loading to false
 			setLoading(false); //If login passed, cannot perform this action on unmounted component
 		}
-	};
-
+	}; //Initialize formik hook
 	const formik = useFormik({
 		initialValues: initialValues,
 		onSubmit: submitHandler,
 		validationSchema: validationSchema
-	});
-
+	}); //Validate form upon mountings
 	const { validateForm } = formik;
 	useEffect(() => {
 		validateForm();

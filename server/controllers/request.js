@@ -18,7 +18,7 @@ const catchValidationErrors = (req) => {
 		throw getError(422, validationErrors.errors[0].msg, DIALOG);
 	}
 };
-
+//Tranform request object for client
 const getRequestForClient = (request) => {
 	let completedBy = null;
 	//Only get populated data for requests that have been completed
@@ -58,7 +58,7 @@ const getRequestForClient = (request) => {
 		proof: request.proof
 	};
 };
-
+//Creation of a new request
 module.exports.create = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
@@ -108,7 +108,7 @@ module.exports.create = async (req, res, next) => {
 		next(error);
 	}
 };
-
+//Add a reward to an existing request
 module.exports.addReward = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
@@ -177,7 +177,7 @@ module.exports.addReward = async (req, res, next) => {
 		next(error);
 	}
 };
-
+//Remove a reward from an existing request
 module.exports.deleteReward = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
@@ -253,7 +253,7 @@ module.exports.deleteReward = async (req, res, next) => {
 		next(error);
 	}
 };
-
+//Increase or decrease the reward quantity on an existing request
 module.exports.udpateRewardQuantity = async (req, res, next) => {
 	try {
 		catchValidationErrors(req);
@@ -319,7 +319,7 @@ module.exports.udpateRewardQuantity = async (req, res, next) => {
 		next(error);
 	}
 };
-
+//Get al requests
 module.exports.getRequests = async (req, res, next) => {
 	try {
 		const { filter } = req.body;
@@ -337,7 +337,7 @@ module.exports.getRequests = async (req, res, next) => {
 		next(error);
 	}
 };
-
+//Complete a request
 module.exports.complete = async (req, res, next) => {
 	try {
 		const { userId } = res.locals;

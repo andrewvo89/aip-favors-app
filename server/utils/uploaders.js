@@ -1,7 +1,7 @@
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
-
+//Create filter to only accept images
 const imageFileFilter = (req, file, callback) => {
 	if (
 		file.mimetype === 'image/png' ||
@@ -13,7 +13,7 @@ const imageFileFilter = (req, file, callback) => {
 		callback(null, false);
 	}
 };
-
+//Upload profile picture to filesystem
 module.exports.profilePictureUploader = multer({
 	storage: multer.diskStorage({
 		destination: (req, _file, callback) => {
@@ -33,7 +33,7 @@ module.exports.profilePictureUploader = multer({
 		fileFilter: imageFileFilter
 	})
 }).single('file');
-
+//Upload request proof to filesystem
 module.exports.requestProofUploader = multer({
 	storage: multer.diskStorage({
 		destination: (req, _file, callback) => {
@@ -52,7 +52,7 @@ module.exports.requestProofUploader = multer({
 		fileFilter: imageFileFilter
 	})
 }).single('file');
-
+//Upload favour proof to filesystem
 module.exports.favourImageUploader = multer({
 	storage: multer.diskStorage({
 		destination: (req, file, callback) => {
@@ -62,7 +62,6 @@ module.exports.favourImageUploader = multer({
 				req.body.userId,
 				'proof'
 			);
-			// fs.rmdirSync(destination, { recursive: true });
 			fs.mkdirSync(destination, { recursive: true });
 			callback(null, destination);
 		},

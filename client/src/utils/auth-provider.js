@@ -6,7 +6,7 @@ import Auth from '../pages/Auth';
 const Transition = forwardRef(function SlideTransition(props, ref) {
 	return <Slide direction="up" ref={ref} {...props} />;
 });
-
+//Provides a popup modal for signin and login
 const AuthProvider = (props) => {
 	const dispatch = useDispatch();
 	const { login } = useSelector((state) => state.authState);

@@ -9,7 +9,7 @@ const Token = require('../models/token');
 const { getError } = require('../utils/error');
 const { getTokens, setCookies } = require('../utils/token');
 const mongoose = require('mongoose');
-
+//Export this method as default export to verify if user is logged in or not
 module.exports = async (req, res, next) => {
 	try {
 		let accessTokenError;
@@ -69,7 +69,6 @@ module.exports = async (req, res, next) => {
 		next(); //Will pass to next middleware once authentication has been verified
 	} catch (error) {
 		res.status(error.status || 500).json({
-			//error.response.status / statusText
 			message: error.message, //error.response.data.message
 			feedback: error.feedback || DIALOG //error.response.data.feedback
 		});

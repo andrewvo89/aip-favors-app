@@ -7,7 +7,7 @@ import colors from './colors';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { useSelector } from 'react-redux';
 import { LIGHT, DARK } from './constants';
-
+//Material theme provider
 const ThemeProvider = (props) => {
 	const { authUser } = useSelector((state) => state.authState);
 	let type = LIGHT;

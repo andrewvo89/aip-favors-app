@@ -9,7 +9,7 @@ import ThemeProvider from './utils/theme-provider';
 import ErrorHandler from './utils/error-handler';
 import MessageProvider from './utils/message-provider';
 import AuthProvider from './utils/auth-provider';
-
+//Render app with higher order components
 ReactDOM.render(
 	<BrowserRouter>
 		<StoreProvider>

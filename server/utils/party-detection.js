@@ -3,7 +3,6 @@ const notificationController = require('../controllers/notification');
 
 // Party detection detects whether there is a cycle/loop
 // of users who owe eachother favours.
-
 const partyNames = (users, currentUserId) => {
 	const names = [];
 	users.forEach((user, userId) => {
@@ -11,13 +10,11 @@ const partyNames = (users, currentUserId) => {
 			names.push(`${user.firstName} ${user.lastName}`);
 		}
 	});
-
 	return names.join(', ');
 };
 
 const hasLoop = (party) => {
 	const partyArr = Array.from(party.values());
-
 	const firstFavour = partyArr[0];
 	const lastFavour = partyArr[partyArr.length - 1];
 	return lastFavour.forUser.id == firstFavour.fromUser.id;
@@ -26,15 +23,12 @@ const hasLoop = (party) => {
 const detectParty = async (initiatorId) => {
 	try {
 		console.time('detectParty');
-
 		const favourDocs = await Favour.find({ repaid: false })
 			.select('_id fromUser forUser')
 			.populate('fromUser forUser', '_id firstName lastName')
 			.exec();
-
 		const visited = new Set();
 		const parties = [];
-
 		favourDocs.forEach((doc) => {
 			const party = new Map();
 			const fromUsers = new Set();
@@ -43,7 +37,6 @@ const detectParty = async (initiatorId) => {
 			while (currentFavour != null && !party.has(currentFavour.id)) {
 				party.set(currentFavour.id, currentFavour);
 				fromUsers.add(currentFavour.fromUser.id);
-
 				// Find next favour where the current forUser is the fromUser.
 				currentFavour = favourDocs.find((favour) => {
 					const fromUser = favour.fromUser.id;

@@ -28,12 +28,11 @@ const dispatchError = (error, dispatch) => {
 		error: getErrorMessage(error)
 	});
 };
-
+//Create action for favours
 export const create = (data) => {
 	return async (dispatch) => {
 		try {
 			const result = await Favour.create(data);
-
 			dispatch({
 				type: SET_MESSAGE,
 				message: new Message({
@@ -50,7 +49,7 @@ export const create = (data) => {
 		}
 	};
 };
-
+//Get all favours from the back end
 export const getAllFavours = () => {
 	return async (dispatch) => {
 		try {
@@ -63,7 +62,7 @@ export const getAllFavours = () => {
 		}
 	};
 };
-
+//Get a single Favour based on favourId
 export const getFavour = (favourId) => {
 	return async (dispatch) => {
 		try {
@@ -76,7 +75,7 @@ export const getFavour = (favourId) => {
 		}
 	};
 };
-
+//Repay action for a favour
 export const repay = (data) => {
 	return async (dispatch) => {
 		try {
@@ -97,7 +96,7 @@ export const repay = (data) => {
 		}
 	};
 };
-
+//Get the entire leaderboard to display on the view
 export const getLeaderboard = () => {
 	return async (dispatch) => {
 		try {
@@ -109,7 +108,7 @@ export const getLeaderboard = () => {
 		}
 	};
 };
-
+//Upload proof action
 export const uploadImage = (file) => {
 	return async (dispatch, getState) => {
 		try {

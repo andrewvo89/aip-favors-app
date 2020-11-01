@@ -1,5 +1,5 @@
 const { CLIENT_DOMAIN } = process.env;
-
+//Ensure all responses are sent back with certain headers
 module.exports = (req, res, next) => {
 	res.setHeader('Access-Control-Allow-Origin', CLIENT_DOMAIN);
 	res.setHeader(

@@ -1,3 +1,4 @@
+//Default theme colors
 export default {
 	primary: {
 		main: '#00405E',
